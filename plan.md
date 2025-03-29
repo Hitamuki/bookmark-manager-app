@@ -18,13 +18,13 @@
   - ブックマークの編集、移動、削除
   - フォルダの階層構造で管理
   - ドラッグ＆ドロップ
-- ブックマークごとにメモ
 - 項目(Space)ごとにドロップダウンリスト等で切り替え
 - リリースノート
 - マルチデバイス対応
 
 ### ver1.1
 
+- ブックマークごとにメモ
 - 検索
 - 広告
 - PWA
@@ -34,23 +34,33 @@
 
 ### ver1.2
 
+- モバイルアプリ対応
+
+### ver1.3
+
+- 多言語対応
+- 設定
+  - テーマ変更
+  - 言語設定
+
+### ver1.4
+
+- ヘルプ、FAQ、お問い合わせ
+  - Dify
+
+### ver1.5
+
+- インフラ移行
+  - Kubernetes
+  - AWS
+  - IaC
+    - Terraform
 - サブスクリプション
   - 端末数
   - ブックマーク数
 - 規約
   - 特定商取引法に基づく表示
   - キャンセル・返金ポリシー
-
-### ver1.3以降
-
-- モバイルアプリ対応
-- ヘルプ、FAQ、お問い合わせ
-  - Dify
-- 多言語対応
-- 設定
-  - テーマ変更
-  - 言語設定
-- カレンダー連携
 
 ## 技術スタック
 
@@ -118,7 +128,8 @@
 
 ### アプリ全般
 
-- Universal JS
+- 開発言語
+  - Universal JS
   - TypeScript
 - バージョン管理ツール
   - Volta
@@ -132,34 +143,43 @@
   - esbuild
 - テストツール
   - Vitest
+    - ユニットテスト
   - Playwright
+    - E2Eテスト
   - Storybook
+    - UIコンポーネントのカタログ
   - React Testing Library
+    - Reactコンポーネントのテスト
 - コード品質
   - Biome
+    - フォーマッタ、静的解析
   - stylelint
+    - CSSの静的解析
   - GitHub Code Scanning
+    - セキュリティ脆弱性スキャン
   - SonarQube
+    - コードの静的解析、品質管理
 - バリデーション
   - Zod
-- その他
+- その他ライブラリ
   - es-toolkit
-  - msw
-  - faker-js
+    - ESモジュール用のツール群
   - chokidar
-  - Orval
-  - openapi-typescript
+    - ファイル監視
+  - faker-js
+    - ダミーデータ生成
 
 ### Webアプリ
 
 #### フロントエンド
 
-- TypeScript
+- 開発言語
+  - TypeScript
   - React
-  - フレームワーク
-    - Next.js
-      - ランディングページはSSGかSSR
-      - アプリはSPA
+- フレームワーク
+  - Next.js
+    - ランディングページはSSGかSSR
+    - アプリはSPA
 - CSS
   - Tailwind CSS
     - v0で使用
@@ -171,36 +191,64 @@
     - Jotai
     - Recoil
     - Redux
+  - 認証
+    - NextAuth.js
 
 #### バックエンド
 
-- TypeScript
+- 開発言語
+  - TypeScript
+- 実行環境
   - Node.js
-  - フレームワーク
-    - Nest.js
+- フレームワーク
+  - NestJS
 - Web APIスキーマ
   - REST API
     - OpenAPI
 - ライブラリ
-  - Open APIスキーマから自動生成
-    - Orval
-  - ORM
-    - Prisma
-  - ログ
-    - log4js
-  - 認証
-    - Passport
+  - Prisma
+    - ORM
+  - log4js
+    - ログ
+  - Passport
+    - 認証
+  - msw
+    - APIモック
+  - Orval、openapi-typescript
+    - OpenAPIスキーマから型を自動生成
 - 認証/セキュリティ
   - JWT
   - OAuth
-  - SSL
+  - SSLサーバー証明書
   - Supabase Auth
 
 ### モバイルアプリ
 
-#### モバイルアプリのフロントエンド
-
-- React Native(Expo)
+- 開発対象
+  - iOSアプリ
+  - Androidアプリ
+- 開発言語
+  - TypeScript
+- フレームワーク
+  - React Native
+- プラットフォーム
+  - Expo
+- シミュレーター、エミュレーター
+  - Xcode
+  - Android Studio
+- ツール
+  - Expo CLI
+  - Flipper、React Native Debugger
+    - デバッグツール
+  - EAS CLI
+    - Expoのビルドとデプロイの管理
+  - React Native Tools
+  - Expo Go
+    - 開発中のアプリを実際のデバイスでテストできる
+- ライブラリ
+  - 認証
+    - SecureStore
+    - AsyncStorage
 
 ### DB
 
@@ -210,35 +258,40 @@
 
 ### インフラ
 
-| 項目                   | 小規模向け                                                                   | 大規模向け                                     |
-| ---------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------- |
-| Next.js (Web)          | Vercel, Netlify, Railway, Vercel Edge Functions                              | AWS EC2, ECS, Kubernetes, Cloudflare Workers   |
-| NestJS (API)           | Railway, Render, VPS (Linode, DigitalOcean), Supabase Edge Functions, Fly.io | AWS ECS, EKS, Kubernetes, Cloudflare Workers   |
-| DB (PostgreSQL, MySQL) | Supabase, PlanetScale, Railway, Fly.io                                       | AWS RDS, Aurora                                |
-| React Native (Expo)    | Expo Go, EAS Build, Play Store / App Store                                   | EAS Build, Firebase App Distribution           |
-| 認証 (Auth)            | Firebase Auth, Supabase Auth                                                 | Auth0, AWS Cognito                             |
-| CDN / 画像配信         | Cloudflare, ImageKit                                                         | AWS CloudFront, Fastly                         |
-| ロードバランサ         | なし (単一サーバー)                                                          | AWS ALB / NLB, nginx, Cloudflare Load Balancer |
-| コンテナ化             | Docker (オプション)                                                          | Docker + Kubernetes                            |
-| ログ監視               | Sentry, Logtail                                                              | AWS CloudWatch, Datadog, New Relic             |
+| 項目                | 小規模向け                                                                   | 大規模向け                                                         |
+| ------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Next.js (Web)       | Vercel, Netlify, Railway, Vercel Edge Functions                              | AWS EC2, ECS, Kubernetes, Cloudflare Workers                       |
+| NestJS (API)        | Railway, Render, VPS (Linode, DigitalOcean), Supabase Edge Functions, Fly.io | AWS ECS, EKS, Kubernetes, Cloudflare Workers, Cloudflare Functions |
+| DB (PostgreSQL)     | Supabase, PlanetScale, Railway, Fly.io                                       | AWS RDS, Aurora                                                    |
+| DB (MongoDB)        | MongoDB Atlas                                                                | Amazon DocumentDB, Docker + ECS                                    |
+| React Native (Expo) | Expo Go, EAS Build, Play Store / App Store                                   | EAS Build, Firebase App Distribution                               |
+| 認証プロバイダー    | Firebase Auth, Supabase Auth                                                 | Auth0, AWS Cognito                                                 |
+| CDN / 画像配信      | Cloudflare, ImageKit                                                         | AWS CloudFront, Fastly                                             |
+| ロードバランサ      | なし (単一サーバー)                                                          | AWS ALB / NLB, nginx, Cloudflare Load Balancer                     |
+| コンテナ化          | Docker (オプション)                                                          | Docker + Kubernetes                                                |
+| ログ監視            | Sentry, Logtail                                                              | AWS CloudWatch, Datadog, New Relic                                 |
 
 ### ツール
 
-- GitHub
-  - GitHub Actions
-  - GitHub Code Scanning
-- DBeaver
-- SonarQube
-- reviewdog
-- Postman
-- Locust
-- K6
-- Lighthouse
-- Datadog
-- Swagger
-- Vim
-- DBマイグレーション
-  - Flyway
+## ツール一覧
+
+| 分類                  | ツール                 | 用途・説明                                                           |
+| --------------------- | ---------------------- | -------------------------------------------------------------------- |
+| バージョン管理・CI/CD | GitHub                 | ソースコードのホスティング、バージョン管理                           |
+|                       | GitHub Actions         | CI/CDパイプラインの自動化                                            |
+|                       | GitHub Code Scanning   | リポジトリ内の脆弱性やコード品質のスキャン                           |
+|                       | GitHub Secrets         | シークレット情報の管理                                               |
+| データベース管理      | DBeaver                | GUIベースのデータベース管理ツール、複数のDBエンジンに対応            |
+| コード品質管理        | SonarQube              | コードの静的解析、品質管理、セキュリティチェック                     |
+|                       | reviewdog              | CI上でのコードレビュー自動化、Lint結果のコメント付与                 |
+| API開発・テスト       | Postman                | APIの設計、テスト、ドキュメント作成                                  |
+|                       | Swagger                | OpenAPIベースのAPIドキュメント生成、APIの可視化とテスト              |
+| パフォーマンステスト  | Locust                 | 負荷テストツール、Python製、スクリプトによる柔軟なシナリオ設定が可能 |
+|                       | K6                     | JavaScriptベースのパフォーマンステストツール、CI/CD統合向け          |
+|                       | Lighthouse             | Webページのパフォーマンス・アクセシビリティ監査ツール、Google提供    |
+| 監視・ログ管理        | Datadog                | インフラ・アプリのモニタリング、ログ分析、アラート通知               |
+| DBマイグレーション    | Flyway                 | データベースのバージョン管理、スキーマ変更の管理                     |
+| 脆弱性診断            | OWASP Dependency-Check | 依存ライブラリの脆弱性診断、OWASP提供                                |
 
 ### その他
 
@@ -255,6 +308,8 @@
   - lint-staged
 - Gitブランチ戦略
   - git-flow
+- エディタ
+  - Vim
 
 ## テスト
 
@@ -314,10 +369,25 @@
       - 日記
       - 課題管理
       - 議事録
-  - アプリ
-    - 画面
-    - API
-    - DB
+    - ソースコード
+      - バックエンド
+        - API
+        - DB
+      - Webアプリ
+        - 画面
+      - モバイルアプリ
+      - 共通
+        - ヘルパー関数
+        - ユーティリティ
+        - 認証
+        - 状態管理
+        - APIクライアント
+      - ツール
+        - CI/CD
+      - スクリプト
+        - ビルド
+        - テスト
+        - データベースのマイグレーション
 - HugoとMkDocsの構成作成
 - 設計
   - Figma、Figma AIで画面設計、ワイヤーフレーム、プロトタイプ
