@@ -66,29 +66,31 @@
 
 ### AI駆動開発
 
-#### AIコード補完・生成ツール
+#### AIコーディング支援・エージェント
 
-| ツール             | 特徴                                                                               |
-| ------------------ | ---------------------------------------------------------------------------------- |
-| Cline、Roo Code    | VS Code上で動作する対話型のAIエージェント                                          |
-| Cursor             | VSCodeを拡張したAIエディタ。GitHub Copilotとの統合やチャット機能を強化。           |
-| Windsurf           | AI補完を強化したエディタ。長いコンテキストを保持し、コードレビューも支援。         |
-| GitHub Copilot     | OpenAIのGPTを利用したコード補完。                                                  |
-| Codeium            | 無料で使えるAIコード補完ツール。Copilotの代替として人気。                          |
-| Amazon Q           | AWS環境向けのAIコードアシスタント。                                                |
-| Gemini Code Assist | GoogleのGeminiを活用した開発支援AI。                                               |
-| (✕)CodePlan        | リポジトリレベルのコーディング作業を解決するフレームワーク。2023年以降話題がない。 |
+| ツール             | 特徴                                                                             |
+| ------------------ | -------------------------------------------------------------------------------- |
+| Cline、Roo Code    | VS Code上で動作する対話型のAIエージェント                                        |
+| GitHub Copilot     | コード補完。Visual Studio Code v1.99でGithub Copilot Agent Mode登場              |
+| Gemini Code Assist | GoogleのGeminiを活用した開発支援AI                                               |
+| Cursor             | VSCodeを拡張したAIエディタ。GitHub Copilotとの統合やチャット機能を強化           |
+| Windsurf           | AI補完を強化したエディタ。長いコンテキストを保持し、コードレビューも支援         |
+| Codeium            | 無料で使えるAIコード補完ツール。Copilotの代替として人気                          |
+| Devin 2.0          | 完全自律型のソフトウェアエンジニアAIツール                                       |
+| Amazon Q           | AWS環境向けのAIコードアシスタント                                                |
+| (✕)CodePlan        | リポジトリレベルのコーディング作業を解決するフレームワーク。2023年以降話題がない |
 
 #### AIチャットアシスタント
 
-| ツール            | 特徴                                                                   |
-| ----------------- | ---------------------------------------------------------------------- |
-| ChatGPT           | OpenAIの対話型AI。開発補助やコード生成が可能。                         |
-| Claude            | AnthropicのAI。コンテキスト保持が優秀。                                |
-| Gemini            | GoogleのAI。コード理解能力も向上。                                     |
-| Microsoft Copilot | Microsoft 365やEdge/Bing統合のAI。                                     |
-| Perplexity        | 高性能なAI検索エンジン。開発のリサーチ向け。                           |
-| (✕)DeepSeek       | DeepSeekは中国企業のAIのため、安全性や情報漏洩リスクに対する懸念がある |
+| ツール                     | 特徴                                                                   |
+| -------------------------- | ---------------------------------------------------------------------- |
+| ChatGPT                    | OpenAIのAI                                                             |
+| Claude                     | AnthropicのAI                                                          |
+| Gemini                     | GoogleのAI                                                             |
+| &nbsp;Gemini Deep Research | 調査・分析に特化したAIエージェント                                     |
+| Microsoft Copilot          | Microsoft 365やEdge/Bing統合のAI                                       |
+| Perplexity                 | AIチャットボット型の検索エンジン                                       |
+| (✕)DeepSeek                | DeepSeekは中国企業のAIのため、安全性や情報漏洩リスクに対する懸念がある |
 
 #### AIデザインツール
 
@@ -109,12 +111,16 @@
 
 | 項目       | 特徴 |
 | ---------- | ---- |
-| PostgreSQL |      |
 | GitHub     |      |
-| Perplexity |      |
-| Notion     |      |
 | Figma      |      |
 | Playwright |      |
+| PostgreSQL |      |
+| Perplexity |      |
+| Notion     |      |
+
+#### その他
+
+- Agent2Agent Protocol (A2A)
 
 ### 設計
 
