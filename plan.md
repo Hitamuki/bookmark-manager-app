@@ -318,6 +318,7 @@
   - Node.js
 - リポジトリ管理
   - モノレポ
+    - Nx
     - Turborepo
     - pnpm
   - ポリレポ
