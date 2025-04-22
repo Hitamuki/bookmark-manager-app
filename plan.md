@@ -4,6 +4,19 @@
 
 ### ver1.0.0
 
+- 基本機能
+  - ブックマークの保存
+  - ブックマークの編集、移動、削除
+  - フォルダの階層構造で管理
+  - ドラッグ＆ドロップ
+- ブックマークにメモ
+- 項目(Space)ごとにドロップダウンリスト等で切り替え
+- マルチデバイス対応
+- PWA
+- リリースノート
+
+### ver1.1
+
 - ランディングページ
 - ユーザー新規登録、ログイン、ログアウト
   - パスワード認証
@@ -13,42 +26,32 @@
 - 規約
   - 個人情報保護方針（プライバシーポリシー）
   - 利用規約
-- 基本機能
-  - ブックマークの保存
-  - ブックマークの編集、移動、削除
-  - フォルダの階層構造で管理
-  - ドラッグ＆ドロップ
-- 項目(Space)ごとにドロップダウンリスト等で切り替え
-- リリースノート
-- マルチデバイス対応
 
-### ver1.1
+### ver1.2
 
-- ブックマークごとにメモ
 - 検索
 - 広告
-- PWA
 - 規約
   - クッキーポリシー
   - 広告ポリシー
 
-### ver1.2
+### ver1.3
 
 - モバイルアプリ対応
 
-### ver1.3
+### ver1.4
 
 - 多言語対応
 - 設定
   - テーマ変更
   - 言語設定
 
-### ver1.4
+### ver1.5
 
 - ヘルプ、FAQ、お問い合わせ
   - Dify
 
-### ver1.5
+### ver1.6
 
 - インフラ移行
   - Kubernetes
@@ -146,11 +149,11 @@
 
 - 開発言語
   - Universal JS
+  - Full-Stack TypeScript
   - TypeScript
 - バージョン管理ツール
+  - mise
   - Volta
-  - pnpm
-  - Corepack
 - バンドルツール
   - Vite
   - Turbopack
@@ -366,13 +369,16 @@
     - Git ProjectsのBacklogでタスク管理
       - <https://zenn.dev/ncdc/articles/55cc05c1a65292>
   - AI駆動開発の準備
-    - .clinerules作成
+    - .clinerulesファイル作成（Cline、Roo Code用）
+    - .mdcファイル作成（Cursor用）
       - <https://zenn.dev/berry_blog/articles/c72564d4d89926>
+    - .windsurfrulesファイル作成（Windsurf用）
     - Cursor
     - Windsurf
-- リポジトリ管理の設定
+- パッケージ管理の設定
   - pnpm
-  - Turborepo
+  - npm
+  - yarn
 - ディレクトリ構造の作成
   - README
   - ドキュメント
@@ -384,7 +390,6 @@
       - 内部設計
     - ログ：Hugo
       - テスト仕様書
-      - ナレッジベース
       - 日記
       - 課題管理
       - 議事録
@@ -433,6 +438,7 @@
     - Storybook
   - APIテスト
     - Postman
+    - REST Client
   - E2Eテスト
     - Playwright
   - 性能テスト
