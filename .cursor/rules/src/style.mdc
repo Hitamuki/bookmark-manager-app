@@ -1,0 +1,151 @@
+---
+description: 
+globs: 
+---
+# TypeScriptコーディング規約・開発標準ガイド
+
+## 1. ファイル規則
+
+- 拡張子は `.ts`、Reactコンポーネントは `.tsx` を使用
+```typescript
+// 通常のファイル
+userService.ts
+apiClient.ts
+
+// Reactコンポーネント
+UserProfile.tsx
+ButtonGroup.tsx
+```
+
+## 2. 命名規則
+
+### 変数・関数
+- 意味のある名前をつける
+- 略語は避ける
+
+```typescript
+// Good
+const firstName: string;
+const isActive: boolean;
+function calculateTotalPrice(): number;
+
+// Bad
+const fn: string;
+const flag: boolean;
+function calc(): number;
+```
+
+### クラス・インターフェース
+
+### 定数
+- **大文字のスネークケース**を使用
+```typescript
+const MAX_RETRY_COUNT = 3;
+```
+
+### Private変数・メソッド
+
+- プレフィックスとして_`を使用
+```typescript
+class Example {
+  private _internalValue: string;
+}
+```
+
+## 3. コーディングスタイル
+
+### インデント
+- スペース2個を使用（タブは使用しない）
+- 一貫性のあるインデントを維持
+
+### セミコロン
+- 文末には必ずセミコロンを付ける
+
+### クォート
+- 文字列にはシングルクォート（'）を使用
+- JSXではダブルクォート（"）を使用
+
+### インポート文の順序
+Biomeに従う
+
+## 4. 型定義
+
+### 型アノテーション
+- 暗黙的なany`型を避ける
+- 戻り値の型は必ず明示する
+```typescript
+// Good
+function getUser(id: string): User {
+  // ...
+}
+
+// Bad
+function getUser(id) {
+  // ...
+}
+```
+
+### ジェネリクス
+- 単一文字の型パラメータは避ける
+- 意味のある名前を使用
+```typescript
+// Good
+interface Repository<TEntity> {
+  findById(id: string): Promise<TEntity>;
+}
+
+// Bad
+interface Repository<T> {
+  findById(id: string): Promise<T>;
+}
+```
+
+## 5. コメント
+
+### ドキュメンテーションコメント
+- 公開API、クラス、インターフェースには必ずJSDocコメントを付ける
+```typescript
+/**
+ * ユーザー情報を取得する
+ * @param id ユーザーID
+ * @returns ユーザー情報
+ * @throws UserNotFoundError ユーザーが見つからない場合
+ */
+async function getUser(id: string): Promise<User> {
+  // ...
+}
+```
+
+### インラインコメント
+- 複雑なロジックの説明に使用
+- 自明なコードにはコメントを付けない
+
+## 6. エラー処理
+
+### 例外処理
+- カスタム例外クラスを使用
+- try-catchブロックは適切な範囲で使用
+```typescript
+class ValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ValidationError';
+  }
+}
+```
+
+## 7. パフォーマンス考慮事項
+
+### メモ化
+- 重い計算には`useMemo`や`useCallback`を使用
+- 過度な最適化は避ける
+
+### バンドルサイズ
+- 必要な部分のみをインポート
+```typescript
+// Good
+import { map } from 'lodash-es';
+
+// Bad
+import _ from 'lodash';
+```

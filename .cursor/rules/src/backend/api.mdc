@@ -1,0 +1,15 @@
+---
+description: 
+globs: 
+---
+# API
+
+## 開発環境
+- プログラミング言語:TypeScript
+- フレームワーク:NestJS
+
+## アーキテクチャ
+- DDDのレイヤードアーキテクチャ
+
+## ディレクトリ構成
+- root:apps/backend

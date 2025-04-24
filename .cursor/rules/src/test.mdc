@@ -1,0 +1,30 @@
+---
+description: 
+globs: 
+---
+# テストルール
+
+## ファイル命名
+- テストファイルは`.test.ts`または`.spec.ts`を使用
+```
+userService.ts
+userService.test.ts
+```
+
+## テスト記述
+- テスト名は明確に機能を説明
+- AAA（Arrange-Act-Assert）パターンに従う
+```typescript
+describe('UserService', () => {
+  it('should create new user with valid data', () => {
+    // Arrange
+    const userData = { ... };
+    
+    // Act
+    const result = createUser(userData);
+    
+    // Assert
+    expect(result).toBeDefined();
+  });
+});
+```
