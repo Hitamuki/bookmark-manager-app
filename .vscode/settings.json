@@ -1,0 +1,56 @@
+{
+    // ===== テーマ =====
+    "workbench.iconTheme": "vscode-icons", // ファイルアイコン
+    "workbench.colorTheme": "Visual Studio 2019 Dark", // カラーテーマ
+    // ===== フォーマット・コード分析 =====
+    "editor.formatOnSave": true, // ファイル保存時に自動整形
+    "editor.defaultFormatter": "biomejs.biome", // Biome
+    "editor.codeActionsOnSave": {
+        "source.fixAll.biome": "always",
+        "quickfix.biome": "always",
+        "source.organizeImports.biome": "always",
+        "source.fixAll.stylelint": "always",
+    },
+    "markuplint.enable": true, // Markuplint
+    "stylelint.enable": true, // Stylelint
+    "biome.enabled": true, // Biome
+    "css.validate": false, // CSS のバリデーションを無効化
+    "scss.validate": false, // SCSS のバリデーションを無効化
+    // ===== 言語別 =====
+    "[yaml]": {
+        "editor.defaultFormatter": "redhat.vscode-yaml"
+    },
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "[markdown]": {
+        "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+    },
+    "[html]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+            "source.fixAll.stylelint": "always",
+        },
+    },
+    "[css]": {
+        "editor.codeActionsOnSave": {
+            "source.fixAll.biome": "always",
+            "source.fixAll.stylelint": "always",
+        },
+    },
+    "[scss]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+            "source.fixAll.stylelint": "always",
+        },
+    },
+    "[typescript]": {
+        "editor.codeActionsOnSave": {
+            "source.fixAll.biome": "always",
+            "quickfix.biome": "always",
+            "source.organizeImports.biome": "always",
+            "source.fixAll.stylelint": "always",
+        },
+    },
+    // ===== 未整理 =====
+}
