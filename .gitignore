@@ -598,3 +598,10 @@ override.tf.json
 terraform.rc
 
 # End of https://www.toptal.com/developers/gitignore/api/react,nextjs,reactnative,node,terraform,hugo,python
+
+# MkDocs documentation
+site*/
+
+# Logs documentation
+!docs/logs/
+!docs/logs/**

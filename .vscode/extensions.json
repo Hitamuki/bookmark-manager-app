@@ -41,9 +41,9 @@
         "bpruitt-goddard.mermaid-markdown-syntax-highlighting",
         "jebbs.plantuml",
         "figma.figma-vscode-extension",
-        "theholycoder.swagger-tools",
-        "arjun.swagger-viewer",
-        "42crunch.vscode-openapi",
+        // "theholycoder.swagger-tools",
+        // "arjun.swagger-viewer",
+        // "42crunch.vscode-openapi",
         // Development
         "oderwat.indent-rainbow",
         "chunsen.bracket-select",
@@ -83,5 +83,6 @@
         "mrmlnc.vscode-duplicate",
         "wmaurer.change-case",
         "mosapride.zenkaku",
+        // Unsorted
     ]
 }

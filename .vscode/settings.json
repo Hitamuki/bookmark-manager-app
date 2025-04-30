@@ -1,7 +1,7 @@
 {
     // ===== テーマ =====
-    "workbench.iconTheme": "vscode-icons", // ファイルアイコン
-    "workbench.colorTheme": "Visual Studio 2019 Dark", // カラーテーマ
+    "workbench.iconTheme": "material-icon-theme", // ファイルアイコン
+    "workbench.colorTheme": "GitHub Dark", // カラーテーマ
     // ===== フォーマット・コード分析 =====
     "editor.formatOnSave": true, // ファイル保存時に自動整形
     "editor.defaultFormatter": "biomejs.biome", // Biome
