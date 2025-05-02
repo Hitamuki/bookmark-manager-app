@@ -19,10 +19,10 @@ mise install
 python -m venv .venv
 # Fishでアクティベート
 source .venv/bin/activate.fish
-# パッケージをインストール
-pip install -r requirements.txt
 # アップグレード
 pip install --upgrade pip
+# パッケージをインストール
+pip install -r requirements.txt
 ```
 
 - インストール状況を記録する場合
