@@ -60,6 +60,7 @@
         "formulahendry.auto-close-tag",
         "formulahendry.auto-rename-tag",
         "vincaslt.highlight-matching-tag",
+        "nrwl.angular-console",
         // Testing
         "vitest.explorer",
         "ms-playwright.playwright",
@@ -82,7 +83,8 @@
         "nemesv.copy-file-name",
         "mrmlnc.vscode-duplicate",
         "wmaurer.change-case",
-        "mosapride.zenkaku",
+        "mosapride.zenkaku"
         // Unsorted
+        ,
     ]
 }

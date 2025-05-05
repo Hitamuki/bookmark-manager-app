@@ -1,0 +1,5 @@
+packages:
+  - "src/apps/frontend/web"
+  - "src/apps/web-api/core"
+  # 除外
+  - "docs/**"

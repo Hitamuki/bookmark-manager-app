@@ -605,3 +605,7 @@ site*/
 # Logs documentation
 !docs/logs/
 !docs/logs/**
+
+# Nx
+.nx/cache
+.nx/workspace-data

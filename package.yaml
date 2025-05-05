@@ -1,0 +1,28 @@
+name: bookmark-manager-app
+private: true
+version: 1.0.0
+author: Hitamuki
+description: ""
+
+scripts:
+  dev: nx serve
+  build: nx run-many -t build # ワークスペース内のすべてのプロジェクトのbuild ターゲットを実行
+  test: nx run-many -t test
+  lint: nx run-many -t lint
+  graph: nx graph # ワークスペース内のすべてのプロジェクトの依存関係を可視化
+  affected:graph: nx affected:graph # 変更されたプロジェクトの依存関係を可視化
+  list: nx list # 現在使えるNxプラグインやスキーマを一覧表示
+  format: nx format:write
+  format:check: nx format:check
+
+packageManager: pnpm@10.8.1
+engines:
+  node: ">=22"
+  pnpm: ">=10.8.1"
+  npm: use pnpm please!
+  yarn: use pnpm please!
+
+devDependencies:
+  "@nx/nest": "20"
+  "@nx/next": "20"
+  nx: 20.8.1
