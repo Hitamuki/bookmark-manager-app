@@ -9,7 +9,7 @@
     "build": "nx run-many -t build",
     "test": "nx run-many -t test",
     "lint": "nx run-many -t lint",
-    "lint:check": "nx run-many -t lint:check",
+    "lint:fix": "nx run-many -t lint:fix",
     "format": "nx run-many -t format",
     "format:check": "nx run-many -t format:check",
     "graph": "nx graph",

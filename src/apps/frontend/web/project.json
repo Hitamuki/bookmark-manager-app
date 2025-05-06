@@ -7,17 +7,27 @@
   "tags": [],
   "// targets": "to see all targets run: nx show project web --web",
   "targets": {
-    "lint": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "biome check --write ."
-      }
-    },
     "lint:check": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "biome lint .",
+        "command": [
+          "biome lint . \"**/*.{ts,tsx,js,jsx}\"",
+          "markuplint .",
+          "stylelint .",
+          "textlint ."
+        ],
         "cwd": "."
+      }
+    },
+    "lint:fix": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": [
+          "biome check --write . \"**/*.{ts,tsx,js,jsx}\"",
+          "markuplint . --fix",
+          "stylelint . --fix",
+          "textlint . --fix"
+        ]
       }
     },
     "format": {

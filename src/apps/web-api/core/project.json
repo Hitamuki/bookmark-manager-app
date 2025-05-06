@@ -1,6 +1,7 @@
 {
   "name": "api-core",
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "root": "src/apps/web-api/core",
   "sourceRoot": "src/apps/web-api/core/src",
   "projectType": "application",
   "targets": {
@@ -37,6 +38,41 @@
         "production": {
           "buildTarget": "core:build:production"
         }
+      }
+    },
+    "lint:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": [
+          "biome lint . \"**/*.{ts,tsx,js,jsx}\"",
+          "markuplint .",
+          "stylelint .",
+          "textlint ."
+        ],
+        "cwd": "."
+      }
+    },
+    "lint:fix": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": [
+          "biome check --write . \"**/*.{ts,tsx,js,jsx}\"",
+          "markuplint . --fix",
+          "stylelint . --fix",
+          "textlint . --fix"
+        ]
+      }
+    },
+    "format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "biome format . --write"
+      }
+    },
+    "format:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "biome format . --check"
       }
     }
   },

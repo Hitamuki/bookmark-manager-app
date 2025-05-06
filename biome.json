@@ -10,7 +10,10 @@
     "ignoreUnknown": false,
     "ignore": [
       "**/node_modules/**",
-      "**/dist/**"
+      "**/dist/**",
+      "docs/**",
+      ".nx/**",
+      ".vscode/**"
     ]
   },
   "organizeImports": {
