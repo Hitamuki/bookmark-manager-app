@@ -9,11 +9,13 @@
     "build": "nx run-many -t build",
     "test": "nx run-many -t test",
     "lint": "nx run-many -t lint",
+    "lint:check": "nx run-many -t lint:check",
+    "format": "nx run-many -t format",
+    "format:check": "nx run-many -t format:check",
     "graph": "nx graph",
     "affected:graph": "nx affected:graph",
     "list": "nx list",
-    "format": "nx format:write",
-    "format:check": "nx format:check"
+    "list:pj": "nx show projects"
   },
   "packageManager": "pnpm@10.8.1",
   "engines": {
@@ -22,7 +24,19 @@
     "npm": "use pnpm please!",
     "yarn": "use pnpm please!"
   },
+  "dependencies": {
+    "@nestjs/common": "^10.0.2",
+    "@nestjs/core": "^10.0.2",
+    "@nestjs/platform-express": "^10.0.2",
+    "axios": "^1.6.0",
+    "next": "~15.2.4",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.0"
+  },
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "@nestjs/schematics": "^10.0.1",
     "@nestjs/testing": "^10.0.2",
     "@nx/devkit": "20.8.1",
@@ -46,19 +60,9 @@
     "postcss": "8.4.38",
     "prettier": "^2.6.2",
     "tailwindcss": "3.4.3",
+    "textlint": "14.7.1",
     "tslib": "^2.3.0",
     "typescript": "~5.7.2",
     "webpack-cli": "^5.1.4"
-  },
-  "dependencies": {
-    "@nestjs/common": "^10.0.2",
-    "@nestjs/core": "^10.0.2",
-    "@nestjs/platform-express": "^10.0.2",
-    "axios": "^1.6.0",
-    "next": "~15.2.4",
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
-    "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.8.0"
   }
 }

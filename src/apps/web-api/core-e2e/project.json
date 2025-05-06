@@ -1,17 +1,23 @@
 {
   "name": "core-e2e",
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
-  "implicitDependencies": ["core"],
+  "implicitDependencies": [
+    "api-core"
+  ],
   "projectType": "application",
   "targets": {
     "e2e": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{e2eProjectRoot}"],
+      "outputs": [
+        "{workspaceRoot}/coverage/{e2eProjectRoot}"
+      ],
       "options": {
         "jestConfig": "src/apps/web-api/core-e2e/jest.config.ts",
         "passWithNoTests": true
       },
-      "dependsOn": ["core:build"]
+      "dependsOn": [
+        "api-core:build"
+      ]
     }
   }
 }
