@@ -16,6 +16,10 @@
     "biome.enabled": true, // Biome
     "css.validate": false, // CSS のバリデーションを無効化
     "scss.validate": false, // SCSS のバリデーションを無効化
+    "axeLinter.configPath": "axe-linter.yml", // axe Accessibility Linter
+    "textlint.configPath": ".textlintrc.json", // Textlint
+    "textlint.run": "onSave",
+    "textlint.autoFixOnSave": true,
     // ===== 言語別 =====
     "[yaml]": {
         "editor.defaultFormatter": "redhat.vscode-yaml"

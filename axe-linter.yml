@@ -1,0 +1,10 @@
+rules:
+exclude:
+  - "docs/**"
+  - "**/node_modules/**"
+  - "**/dist/**"
+  - "**/out/**"
+  - "**/*.test.{js,ts,jsx,tsx}"
+  - "**/__tests__/**"
+global-components:
+global-libraries:

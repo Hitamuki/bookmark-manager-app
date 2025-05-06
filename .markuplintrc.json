@@ -1,0 +1,30 @@
+{
+  "extends": [
+    "markuplint:recommended-react"
+  ],
+  "plugins": [],
+  "specs": {
+    "\\.[jt]sx?$": "@markuplint/react-spec",
+    "\\.html?$": "@markuplint/html-spec"
+  },
+  "parser": {
+    "\\.[jt]sx?$": "@markuplint/jsx-parser",
+    "\\.html?$": "@markuplint/html-parser"
+  },
+  "parserOptions": {},
+  "excludeFiles": [
+    "docs/**",
+    "**/node_modules/**",
+    "**/dist/**"
+  ],
+  "rules": {
+    "attr-value-quotes": {
+      "severity": "warning",
+      "value": "double"
+    },
+    "no-hard-code-id": true,
+    "case-sensitive-attr-name": true
+  },
+  "nodeRules": [],
+  "childNodeRules": []
+}
