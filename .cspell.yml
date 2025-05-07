@@ -35,7 +35,7 @@ dictionaryDefinitions:
 # 辞書
 dictionaries:
   - typescript
-  - javaScript
+  - javascript
   - html
   - css
   - node
