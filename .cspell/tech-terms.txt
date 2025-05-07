@@ -1,0 +1,15 @@
+# 技術用語
+venv
+mkdocs
+pymdown
+Dify
+Canva
+Turbopack
+Qube
+Supabase
+Fastly
+Logtail
+reviewdog
+Turborepo
+clinerules
+windsurfrules
