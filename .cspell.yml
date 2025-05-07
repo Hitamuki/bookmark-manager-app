@@ -1,0 +1,44 @@
+$schema: https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json
+version: "0.2"
+language: en
+# 無視するファイル
+ignorePaths:
+  - "**{json,yml,yaml}"
+  - .cspell/**
+  - .git/**
+  - .vscode/**
+  - docs/spec/site/**
+# 正規表現で無視する単語
+ignoreRegExpList: []
+# 正しいと見なす単語
+words: []
+# 誤りと見なしたい単語
+flagWords: []
+# 無視する単語
+ignoreWords: []
+languageSettings:
+  - languageId:
+      - typescript
+      - javascript
+      - html
+      - css
+# 辞書パッケージ
+dictionaryDefinitions:
+  # 辞書ファイル名
+  - name: domain
+    # カスタム単語ファイルへのパス
+    path: ./.cspell/domain.txt
+    addWords: false
+  - name: tech-terms
+    path: ./.cspell/tech-terms.txt
+    addWords: false
+# 辞書
+dictionaries:
+  - typescript
+  - javascript
+  - html
+  - css
+  - node
+  - npm
+  - domain
+  - tech-terms
