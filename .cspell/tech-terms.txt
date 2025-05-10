@@ -13,3 +13,5 @@ reviewdog
 Turborepo
 clinerules
 windsurfrules
+Codeium
+textlint
