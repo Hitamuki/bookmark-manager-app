@@ -3,7 +3,11 @@
   "filters": {},
   "rules": {
     "preset-japanese": true,
-    "preset-ja-technical-writing": {},
+    "preset-ja-technical-writing": {
+      "max-kanji-continuous-len": {
+        "max": 10
+      }
+    },
     "no-mix-dearu-desumasu": true,
     "spellcheck-tech-word": true
   }
