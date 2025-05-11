@@ -16,7 +16,13 @@
     "graph": "nx graph",
     "affected:graph": "nx affected:graph",
     "list": "nx list",
-    "list:pj": "nx show projects"
+    "list:pj": "nx show projects",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*": [
+      "cspell --no-error-on-unmatched-pattern"
+    ]
   },
   "packageManager": "pnpm@10.8.1",
   "engines": {
@@ -62,6 +68,8 @@
     "@types/react-dom": "19.0.0",
     "autoprefixer": "10.4.13",
     "cspell": "^9.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.0.0",
     "markuplint": "^4.12.0",
     "nx": "20.8.1",
     "postcss": "8.4.38",
