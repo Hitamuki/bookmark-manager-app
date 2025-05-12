@@ -1,0 +1,12 @@
+{
+  "ignores": [
+    ".git",
+    "node_modules",
+    ".husky",
+    ".nx"
+  ],
+  "config": {
+    "MD013": false,
+    "MD034": false
+  }
+}
