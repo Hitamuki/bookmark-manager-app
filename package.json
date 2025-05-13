@@ -9,7 +9,9 @@
     "build": "nx run-many -t build",
     "test": "nx run-many -t test",
     "lint": "nx run-many -t lint",
+    "lint:markdown": "markdownlint-cli2 '**/*.md'",
     "lint:fix": "nx run-many -t lint:fix",
+    "lint:markdown:fix": "markdownlint-cli2 '**/*.md' --fix",
     "format": "nx run-many -t format",
     "format:check": "nx run-many -t format:check",
     "spell": "cspell .",
@@ -22,6 +24,9 @@
   "lint-staged": {
     "*": [
       "cspell --no-error-on-unmatched-pattern"
+    ],
+    "*.md": [
+      "markdownlint-cli2"
     ]
   },
   "packageManager": "pnpm@10.8.1",
@@ -70,6 +75,7 @@
     "cspell": "^9.0.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.0.0",
+    "markdownlint-cli2": "^0.18.0",
     "markuplint": "^4.12.0",
     "nx": "20.8.1",
     "postcss": "8.4.38",
