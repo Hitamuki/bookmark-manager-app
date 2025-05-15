@@ -14,13 +14,13 @@ html {
 body {
   font-family: inherit;
   line-height: inherit;
-  margin: 0;
+  margin: 1;
 }
 h1,
 h2,
 p,
 pre {
-  margin: 0;
+  margin: 1;
 }
 *,
 ::before,
