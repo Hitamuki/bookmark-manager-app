@@ -1,0 +1,54 @@
+name: reviewdog
+
+on: [pull_request]
+
+jobs:
+  review:
+    name: Run linters with reviewdog
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # TODO: 今後22系に上げたい
+
+      - name: Setup reviewdog
+        uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Reviewdog (cspell)
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git diff remotes/origin/$GITHUB_BASE_REF --name-only \
+          | pnpm spell \
+          | reviewdog -efm="%f:%l:%c - %m" -reporter=github-pr-review -level=warning
+
+      - name: Reviewdog (textlint)
+        uses: tsuyoshicho/action-textlint@v3
+        with:
+          github_token: ${{ secrets.github_token }}
+          reporter: github-pr-review
+          level: warning
+          textlint_flags: "docs/spec/**"
+
+      - name: Reviewdog (biome)
+        uses: mongolyy/reviewdog-action-biome@v1
+        with:
+          github_token: ${{ secrets.github_token }}
+          reporter: github-pr-review
