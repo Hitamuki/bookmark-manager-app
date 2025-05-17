@@ -15,6 +15,7 @@
     "format": "nx run-many -t format",
     "format:check": "nx run-many -t format:check",
     "spell": "cspell .",
+    "check:links": "markdown-link-check ./docs/spec",
     "graph": "nx graph",
     "affected:graph": "nx affected:graph",
     "list": "nx list",
@@ -26,7 +27,8 @@
       "cspell --no-error-on-unmatched-pattern"
     ],
     "*.md": [
-      "markdownlint-cli2"
+      "markdownlint-cli2",
+      "markdown-link-check"
     ]
   },
   "packageManager": "pnpm@10.8.1",
@@ -75,6 +77,7 @@
     "cspell": "^9.0.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.0.0",
+    "markdown-link-check": "^3.13.7",
     "markdownlint-cli2": "^0.18.0",
     "markuplint": "^4.12.0",
     "nx": "20.8.1",
