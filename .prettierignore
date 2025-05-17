@@ -1,4 +1,15 @@
-**/**.{md,ts,tsx,js,jsx,mjs,cjs,css,json,jsonc}
+**/*.md
+**/*.ts
+**/*.tsx
+**/*.js
+**/*.jsx
+**/*.mjs
+**/*.cjs
+**/*.css
+**/*.json
+**/*.jsonc
+**/pnpm-lock.yaml
 docs/**
 **/node_modules/**
 **/dist/**
+.nx/** */

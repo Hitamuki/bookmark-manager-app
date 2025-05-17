@@ -5,8 +5,8 @@ on:
     branches:
       - main
     paths:
-        - 'docs/spec/**'
-        - '.github/workflows/gh-pages.yml'
+      - "docs/spec/**"
+      - ".github/workflows/gh-pages.yml"
 
 permissions:
   contents: write
@@ -18,8 +18,8 @@ jobs:
     runs-on: ubuntu-latest
 
     defaults:
-        run:
-          working-directory: docs/spec
+      run:
+        working-directory: docs/spec
 
     steps:
       - name: Checkout repository
@@ -45,4 +45,3 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: docs/spec/site
-
