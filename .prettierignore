@@ -1,3 +1,4 @@
-"docs/**",
-"**/node_modules/**",
-"**/dist/**"
+**/**.{md,ts,tsx,js,jsx,mjs,cjs,css,json,jsonc}
+docs/**
+**/node_modules/**
+**/dist/**

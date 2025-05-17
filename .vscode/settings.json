@@ -1,60 +1,79 @@
 {
-    // ===== テーマ =====
-    "workbench.iconTheme": "material-icon-theme", // ファイルアイコン
-    "workbench.colorTheme": "GitHub Dark", // カラーテーマ
-    // ===== フォーマット・コード分析 =====
-    "editor.formatOnSave": true, // ファイル保存時に自動整形
-    "editor.defaultFormatter": "biomejs.biome", // Biome
+  // ===== テーマ =====
+  "workbench.iconTheme": "material-icon-theme", // ファイルアイコン
+  "workbench.colorTheme": "GitHub Dark", // カラーテーマ
+  // ===== フォーマット・コード分析 =====
+  "editor.formatOnSave": true, // ファイル保存時に自動整形
+  "editor.codeActionsOnSave": {
+    "source.fixAll.biome": "always",
+    "quickfix.biome": "always",
+    "source.organizeImports.biome": "always",
+    "source.fixAll.stylelint": "always",
+  },
+  "markuplint.enable": true, // Markuplint
+  "stylelint.enable": true, // Stylelint
+  "biome.enabled": true, // Biome
+  "css.validate": false, // CSS のバリデーションを無効化
+  "scss.validate": false, // SCSS のバリデーションを無効化
+  "axeLinter.configPath": "axe-linter.yml", // axe Accessibility Linter
+  "textlint.configPath": ".textlintrc.json", // Textlint
+  "textlint.run": "onSave",
+  "textlint.autoFixOnSave": true,
+  // ===== 言語別 =====
+  "[yml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[toml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.codeActionsOnSave": {
-        "source.fixAll.biome": "always",
-        "quickfix.biome": "always",
-        "source.organizeImports.biome": "always",
-        "source.fixAll.stylelint": "always",
+      "source.fixAll.stylelint": "always",
     },
-    "markuplint.enable": true, // Markuplint
-    "stylelint.enable": true, // Stylelint
-    "biome.enabled": true, // Biome
-    "css.validate": false, // CSS のバリデーションを無効化
-    "scss.validate": false, // SCSS のバリデーションを無効化
-    "axeLinter.configPath": "axe-linter.yml", // axe Accessibility Linter
-    "textlint.configPath": ".textlintrc.json", // Textlint
-    "textlint.run": "onSave",
-    "textlint.autoFixOnSave": true,
-    // ===== 言語別 =====
-    "[yaml]": {
-        "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.biome": "always",
+      "source.fixAll.stylelint": "always",
     },
-    "[json]": {
-        "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[scss]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.stylelint": "always",
     },
-    "[markdown]": {
-        "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.biome": "always",
+      "quickfix.biome": "always",
+      "source.organizeImports.biome": "always",
+      "source.fixAll.stylelint": "always",
     },
-    "[html]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.codeActionsOnSave": {
-            "source.fixAll.stylelint": "always",
-        },
+  },
+  "[tsx]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.biome": "always",
+      "quickfix.biome": "always",
+      "source.organizeImports.biome": "always",
+      "source.fixAll.stylelint": "always",
     },
-    "[css]": {
-        "editor.codeActionsOnSave": {
-            "source.fixAll.biome": "always",
-            "source.fixAll.stylelint": "always",
-        },
-    },
-    "[scss]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.codeActionsOnSave": {
-            "source.fixAll.stylelint": "always",
-        },
-    },
-    "[typescript]": {
-        "editor.codeActionsOnSave": {
-            "source.fixAll.biome": "always",
-            "quickfix.biome": "always",
-            "source.organizeImports.biome": "always",
-            "source.fixAll.stylelint": "always",
-        },
-    },
-    // ===== 未整理 =====
+  },
+  // ===== 未整理 =====
 }

@@ -13,7 +13,8 @@
       "**/dist/**",
       "docs/**",
       ".nx/**",
-      ".vscode/**"
+      ".vscode/**",
+      "**/*.{md,html,scss,yml,yaml,toml}"
     ]
   },
   "organizeImports": {
