@@ -32,9 +32,7 @@
   ],
   "targetDefaults": {
     "e2e-ci--**/**": {
-      "dependsOn": [
-        "^build"
-      ]
+      "dependsOn": ["^build"]
     }
   },
   "generators": {

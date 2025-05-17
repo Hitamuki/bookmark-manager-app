@@ -9,24 +9,18 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "webpack-cli build",
-        "args": [
-          "node-env=production"
-        ]
+        "args": ["node-env=production"]
       },
       "configurations": {
         "development": {
-          "args": [
-            "node-env=development"
-          ]
+          "args": ["node-env=development"]
         }
       }
     },
     "serve": {
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
-      "dependsOn": [
-        "build"
-      ],
+      "dependsOn": ["build"],
       "options": {
         "buildTarget": "core:build",
         "runBuildTargetDependencies": false
@@ -43,12 +37,7 @@
     "lint:check": {
       "executor": "nx:run-commands",
       "options": {
-        "command": [
-          "biome lint . \"**/*.{ts,tsx,js,jsx}\"",
-          "markuplint .",
-          "stylelint .",
-          "textlint ."
-        ],
+        "command": ["biome lint . \"**/*.{ts,tsx,js,jsx}\"", "markuplint .", "stylelint .", "textlint ."],
         "cwd": "."
       }
     },

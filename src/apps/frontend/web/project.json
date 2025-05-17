@@ -10,12 +10,7 @@
     "lint:check": {
       "executor": "nx:run-commands",
       "options": {
-        "command": [
-          "biome lint . \"**/*.{ts,tsx,js,jsx}\"",
-          "markuplint .",
-          "stylelint .",
-          "textlint ."
-        ],
+        "command": ["biome lint . \"**/*.{ts,tsx,js,jsx}\"", "markuplint .", "stylelint .", "textlint ."],
         "cwd": "."
       }
     },

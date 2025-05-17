@@ -1,7 +1,5 @@
 {
-  "extends": [
-    "markuplint:recommended-react"
-  ],
+  "extends": ["markuplint:recommended-react"],
   "plugins": [],
   "specs": {
     "\\.[jt]sx?$": "@markuplint/react-spec",
@@ -12,11 +10,7 @@
     "\\.html?$": "@markuplint/html-parser"
   },
   "parserOptions": {},
-  "excludeFiles": [
-    "docs/**",
-    "**/node_modules/**",
-    "**/dist/**"
-  ],
+  "excludeFiles": ["docs/**", "**/node_modules/**", "**/dist/**"],
   "rules": {
     "attr-value-quotes": {
       "severity": "warning",
