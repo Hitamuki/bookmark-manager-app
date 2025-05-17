@@ -18,7 +18,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # TODO: 今後22系に上げたい
+          node-version: "20" # TODO: 今後22系に上げたい
 
       - name: Setup reviewdog
         uses: reviewdog/action-setup@v1
@@ -36,7 +36,7 @@ jobs:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git diff remotes/origin/$GITHUB_BASE_REF --name-only \
-          | pnpm spell \
+          | pnpm check:spell \
           | reviewdog -efm="%f:%l:%c - %m" -reporter=github-pr-review -level=warning
 
       - name: Reviewdog (textlint)

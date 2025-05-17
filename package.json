@@ -8,13 +8,14 @@
     "dev": "nx serve",
     "build": "nx run-many -t build",
     "test": "nx run-many -t test",
-    "lint": "nx run-many -t lint",
-    "lint:markdown": "markdownlint-cli2 '**/*.md'",
-    "lint:fix": "nx run-many -t lint:fix",
-    "lint:markdown:fix": "markdownlint-cli2 '**/*.md' --fix",
-    "format": "nx run-many -t format",
     "format:check": "nx run-many -t format:check",
-    "spell": "cspell .",
+    "format": "nx run-many -t format",
+    "lint": "nx run-many -t lint",
+    "lint:md": "markdownlint-cli2 '**/*.md'",
+    "lint:txt": "textlint .",
+    "lint:fix": "nx run-many -t lint:fix",
+    "lint:md:fix": "markdownlint-cli2 '**/*.md' --fix",
+    "check:spell": "cspell .",
     "check:links": "markdown-link-check ./docs/spec",
     "check:axe": "axe http://localhost:3000",
     "graph": "nx graph",
@@ -24,13 +25,13 @@
     "prepare": "husky && npx browser-driver-manager install chrome"
   },
   "lint-staged": {
-    "*": [
-      "cspell --no-error-on-unmatched-pattern"
-    ],
-    "*.md": [
-      "markdownlint-cli2",
-      "markdown-link-check"
-    ]
+    "*.md": ["markdownlint-cli2", "markdown-link-check", "textlint"],
+    "*.{ts,tsx,js,jsx,mjs,cjs}": ["biome format --write", "biome lint", "markuplint"],
+    "*.html": ["prettier --write", "markuplint"],
+    "*.css": ["biome format --write", "stylelint", "biome lint"],
+    "*.scss": ["prettier --write", "stylelint"],
+    "*.{json,jsonc}": ["biome format --write"],
+    "*.{yml,yaml,toml}": ["prettier --write"]
   },
   "packageManager": "pnpm@10.8.1",
   "engines": {
