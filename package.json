@@ -16,11 +16,12 @@
     "format:check": "nx run-many -t format:check",
     "spell": "cspell .",
     "check:links": "markdown-link-check ./docs/spec",
+    "check:axe": "axe http://localhost:3000",
     "graph": "nx graph",
     "affected:graph": "nx affected:graph",
     "list": "nx list",
     "list:pj": "nx show projects",
-    "prepare": "husky"
+    "prepare": "husky && npx browser-driver-manager install chrome"
   },
   "lint-staged": {
     "*": [
@@ -50,6 +51,7 @@
     "rxjs": "^7.8.0"
   },
   "devDependencies": {
+    "@axe-core/cli": "^4.10.1",
     "@biomejs/biome": "1.9.4",
     "@markuplint/html-parser": "^4.6.19",
     "@markuplint/html-spec": "^4.14.2",
@@ -74,6 +76,7 @@
     "@types/react": "19.0.0",
     "@types/react-dom": "19.0.0",
     "autoprefixer": "10.4.13",
+    "browser-driver-manager": "^2.0.1",
     "cspell": "^9.0.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.0.0",
