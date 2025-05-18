@@ -8,6 +8,7 @@
     "dev": "nx serve",
     "build": "nx run-many -t build",
     "test": "nx run-many -t test",
+    "commit": "cz",
     "format:check": "nx run-many -t format:check",
     "format": "nx run-many -t format",
     "lint": "nx run-many -t lint",
@@ -24,6 +25,14 @@
     "list:pj": "nx show projects",
     "prepare": "husky && npx browser-driver-manager install chrome"
   },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "commitlint": {
+    "extends": ["@commitlint/config-conventional"]
+  },
   "lint-staged": {
     "*.md": ["markdownlint-cli2", "markdown-link-check", "textlint"],
     "*.{ts,tsx,js,jsx,mjs,cjs}": ["biome format --write", "biome lint", "markuplint"],
@@ -32,9 +41,6 @@
     "*.scss": ["prettier --write", "stylelint"],
     "*.{json,jsonc}": ["biome format --write"],
     "*.{yml,yaml,toml}": ["prettier --write"]
-  },
-  "commitlint": {
-    "extends": ["@commitlint/config-conventional"]
   },
   "packageManager": "pnpm@10.8.1",
   "engines": {
@@ -83,7 +89,9 @@
     "@types/react-dom": "19.0.0",
     "autoprefixer": "10.4.13",
     "browser-driver-manager": "^2.0.1",
+    "commitizen": "^4.3.1",
     "cspell": "^9.0.0",
+    "cz-conventional-changelog": "^3.3.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.0.0",
     "markdown-link-check": "^3.13.7",
