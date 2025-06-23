@@ -33,15 +33,6 @@
   "commitlint": {
     "extends": ["@commitlint/config-conventional"]
   },
-  "lint-staged": {
-    "*.md": ["markdownlint-cli2", "markdown-link-check", "textlint"],
-    "*.{ts,tsx,js,jsx,mjs,cjs}": ["biome format --write", "biome lint", "markuplint"],
-    "*.html": ["prettier --write", "markuplint"],
-    "*.css": ["biome format --write", "stylelint", "biome lint"],
-    "*.scss": ["prettier --write", "stylelint"],
-    "*.{json,jsonc}": ["biome format --write"],
-    "*.{yml,yaml,toml}": ["prettier --write"]
-  },
   "packageManager": "pnpm@10.8.1",
   "engines": {
     "node": ">=22",
