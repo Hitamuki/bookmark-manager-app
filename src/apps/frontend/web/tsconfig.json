@@ -2,7 +2,6 @@
   "extends": "../../../../tsconfig.base.json",
   "compilerOptions": {
     "jsx": "preserve",
-
     "strict": true,
     "noEmit": true,
     "emitDeclarationOnly": false,
@@ -16,18 +15,21 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
-    "plugins": [{ "name": "next" }]
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
     "**/*.js",
     "**/*.jsx",
-
-    "../../../../src/apps/frontend/web/.next/types/**/*.ts",
+    "**/*.ts",
+    "**/*.tsx",
     "../../../../dist/src/apps/frontend/web/.next/types/**/*.ts",
-
-    "next-env.d.ts"
+    "../../../../src/apps/frontend/web/.next/types/**/*.ts",
+    "next-env.d.ts",
+    ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules", "jest.config.ts", "**/*.spec.ts", "**/*.test.ts"]
 }
