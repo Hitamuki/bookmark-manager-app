@@ -1,4 +1,9 @@
 {
+  // 設定
+  "search.exclude": {
+    "poc/**": true,
+    "sandbox/**": true,
+  },
   // ===== テーマ =====
   "workbench.iconTheme": "material-icon-theme", // ファイルアイコン
   "workbench.colorTheme": "GitHub Dark", // カラーテーマ
