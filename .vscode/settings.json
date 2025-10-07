@@ -18,6 +18,7 @@
   "markuplint.enable": true, // Markuplint
   "stylelint.enable": true, // Stylelint
   "biome.enabled": true, // Biome
+  "biome.requireConfiguration": true,
   "css.validate": false, // CSS のバリデーションを無効化
   "scss.validate": false, // SCSS のバリデーションを無効化
   "axeLinter.configPath": "axe-linter.yml", // axe Accessibility Linter
@@ -63,7 +64,7 @@
     },
   },
   "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "biomejs.biome",
     "editor.codeActionsOnSave": {
       "source.fixAll.biome": "always",
       "quickfix.biome": "always",

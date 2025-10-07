@@ -22,15 +22,15 @@
       "defaultConfiguration": "development",
       "dependsOn": ["build"],
       "options": {
-        "buildTarget": "core:build",
+        "buildTarget": "api-core:build",
         "runBuildTargetDependencies": false
       },
       "configurations": {
         "development": {
-          "buildTarget": "core:build:development"
+          "buildTarget": "api-core:build:development"
         },
         "production": {
-          "buildTarget": "core:build:production"
+          "buildTarget": "api-core:build:production"
         }
       }
     },

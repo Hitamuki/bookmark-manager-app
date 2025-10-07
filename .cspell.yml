@@ -11,7 +11,8 @@ ignorePaths:
 # 正規表現で無視する単語
 ignoreRegExpList: []
 # 正しいと見なす単語
-words: []
+words:
+  - autoincrement
 # 誤りと見なしたい単語
 flagWords: []
 # 無視する単語

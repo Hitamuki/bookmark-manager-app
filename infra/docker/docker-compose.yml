@@ -1,0 +1,19 @@
+services:
+  db-main:
+    image: postgres:17.6
+    container_name: db-main
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: main
+    restart: always
+    volumes:
+      - db-main-data:/var/lib/postgresql/data
+    networks:
+      - lesson
+networks:
+  lesson:
+volumes:
+  db-main-data:
