@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
+import { CqrsModule } from '@nestjs/cqrs';
 import { PrismaModule } from './bootstrap/prisma.module';
 import { SampleModule } from './presentation/sample/sample.module';
 
 @Module({
-  imports: [PrismaModule, SampleModule],
+  imports: [CqrsModule.forRoot(), PrismaModule, SampleModule],
   controllers: [],
   providers: [],
 })
