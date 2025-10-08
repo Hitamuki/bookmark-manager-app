@@ -7,6 +7,8 @@
 ``` bash
 # Prismaクライアントコードを生成（スキーマの変更の都度実行する）
 npx prisma generate
+# Prismaマイグレーションを実行（スキーマの変更の都度実行する）
+npx prisma migrate dev
 # Prisma Studio
 npx prisma studio
 ```
@@ -18,6 +20,8 @@ npx prisma studio
 npx prisma init
 # Prismaクライアントコードを生成
 npx prisma generate
+# Prismaマイグレーションを実行
+npx prisma migrate dev
 # Prisma Studio
 npx prisma studio
 ```

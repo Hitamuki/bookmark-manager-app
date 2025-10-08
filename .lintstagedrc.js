@@ -17,7 +17,9 @@ module.exports = {
     files
       .filter(shouldInclude)
       .flatMap((file) => [`markdownlint-cli2 ${file}`, `markdown-link-check ${file}`, `textlint ${file}`]),
-  '*.{ts,tsx,js,jsx,mjs,cjs}': (files) =>
+  '*.{ts,js,mjs,cjs}': (files) =>
+    files.filter(shouldInclude).flatMap((file) => [`biome format --write ${file}`, `biome lint ${file}`]),
+  '*.{tsx,jsx}': (files) =>
     files
       .filter(shouldInclude)
       .flatMap((file) => [`biome format --write ${file}`, `biome lint ${file}`, `markuplint ${file}`]),
@@ -29,5 +31,5 @@ module.exports = {
       .flatMap((file) => [`biome format --write ${file}`, `stylelint ${file}`, `biome lint ${file}`]),
   '*.scss': (files) => files.filter(shouldInclude).flatMap((file) => [`prettier --write ${file}`, `stylelint ${file}`]),
   '*.{json,jsonc}': (files) => files.filter(shouldInclude).map((file) => `biome format --write ${file}`),
-  '*.{yml,yaml,toml}': (files) => files.filter(shouldInclude).map((file) => `prettier --write ${file}`),
+  '*.{yml,yaml}': (files) => files.filter(shouldInclude).map((file) => `prettier --write ${file}`), // TODO: toml対応（prettier-plugin-toml）
 };

@@ -1,0 +1,14 @@
+### Fix
+@baseUrl = http://localhost:3000/api
+@contentType = application/json
+
+### Variables
+
+### Sample
+# @name CreateSample
+POST {{baseUrl}}/samples
+Content-Type: {{contentType}}
+
+{
+  "title": "タイトル"
+}

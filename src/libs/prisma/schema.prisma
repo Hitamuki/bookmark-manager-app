@@ -14,11 +14,11 @@ datasource db {
 }
 
 model Sample {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   title     String?
-  isDeleted Boolean  @default(false)
+  isDeleted Boolean   @default(false)
   createdBy String
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
   updatedBy String?
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime? @updatedAt
 }

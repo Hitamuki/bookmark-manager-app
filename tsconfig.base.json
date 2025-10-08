@@ -15,8 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@libs/*": ["src/libs/*"],
-      "@prisma/client": ["src/libs/prisma/generated/prisma"]
+      "@libs/*": ["src/libs/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]

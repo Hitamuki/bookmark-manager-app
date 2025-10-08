@@ -1,6 +1,7 @@
 import { SampleEntity } from '@libs/domain/sample/entities/sample.entity';
 import type { SampleRepository } from '@libs/domain/sample/repositories/sample.repository';
-import type { PrismaService } from '@libs/infrastructure/prisma/prisma.service';
+// biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
+import { PrismaService } from '@libs/infrastructure/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -25,8 +26,13 @@ export class SamplePrismaRepository implements SampleRepository {
 
   async create(sampleEntity: SampleEntity): Promise<void> {
     const data = {
+      id: sampleEntity.id.toString(),
       title: sampleEntity.title,
+      isDeleted: sampleEntity.isDeleted,
       createdBy: sampleEntity.createdBy,
+      createdAt: sampleEntity.createdAt,
+      updatedBy: sampleEntity.updatedBy,
+      updatedAt: sampleEntity.updatedAt,
     };
     await this.prisma.sample.create({ data });
   }

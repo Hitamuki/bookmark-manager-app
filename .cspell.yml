@@ -4,15 +4,20 @@ language: en
 # 無視するファイル
 ignorePaths:
   - "**{json,yml,yaml}"
+  - node_modules/**
+  - dist/**
   - .cspell/**
   - .git/**
   - .vscode/**
   - docs/spec/site/**
+  - poc/**
+  - sandbox/**
 # 正規表現で無視する単語
 ignoreRegExpList: []
 # 正しいと見なす単語
 words:
   - autoincrement
+  - usecase
 # 誤りと見なしたい単語
 flagWords: []
 # 無視する単語

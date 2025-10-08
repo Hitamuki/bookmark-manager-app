@@ -67,7 +67,7 @@
     "vitest.explorer",
     "ms-playwright.playwright",
     // "postman.postman-for-vscode",
-    // "humao.rest-client",
+    "humao.rest-client",
     // "rangav.vscode-thunder-client",
     "wallabyjs.console-ninja",
     // "formulahendry.code-runner",
