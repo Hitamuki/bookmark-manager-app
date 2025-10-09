@@ -1,11 +1,25 @@
-import { Module } from '@nestjs/common';
+import { Logger, type MiddlewareConsumer, Module, type NestModule } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { PrismaModule } from './bootstrap/prisma.module';
+import { LoggerMiddleware } from './presentation/middleware/logger.middleware';
 import { SampleModule } from './presentation/sample/sample.module';
 
 @Module({
-  imports: [CqrsModule.forRoot(), PrismaModule, SampleModule],
+  providers: [Logger],
   controllers: [],
-  providers: [],
+  imports: [CqrsModule.forRoot(), PrismaModule, SampleModule],
+  exports: [],
 })
-export class AppModule {}
+
+// ルートモジュール
+export class AppModule implements NestModule {
+  // ミドルウェアの適用
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggerMiddleware)
+      .exclude(
+        // 除外ルート
+      )
+      .forRoutes('*');
+  }
+}

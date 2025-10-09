@@ -4,10 +4,11 @@
 
 ### Variables
 
-### Sample
+###
 # @name GetSamples
 GET {{baseUrl}}/samples
 
+###
 # @name CreateSample
 POST {{baseUrl}}/samples
 Content-Type: {{contentType}}
