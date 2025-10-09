@@ -43,6 +43,7 @@
     "yarn": "use pnpm please!"
   },
   "dependencies": {
+    "@anatine/zod-nestjs": "^2.0.12",
     "@nestjs/common": "11.0.7",
     "@nestjs/core": "11.0.7",
     "@nestjs/cqrs": "^11.0.3",
