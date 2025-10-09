@@ -1,7 +1,7 @@
 services:
-  db-main:
+  postgres:
     image: postgres:17.6
-    container_name: db-main
+    container_name: db_main
     ports:
       - 5432:5432
     environment:
@@ -13,7 +13,22 @@ services:
       - db-main-data:/var/lib/postgresql/data
     networks:
       - lesson
+  # mongo:
+  #   image: mongo:8.0
+  #   container_name: db_logs
+  #   ports:
+  #     - 27017:27017
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: user
+  #     MONGO_INITDB_ROOT_PASSWORD: password
+  #     MONGO_INITDB_DATABASE: logs
+  #   restart: always
+  #   volumes:
+  #     - db-mongo-data:/data/db
+  #   networks:
+  #     - lesson
 networks:
   lesson:
 volumes:
   db-main-data:
+  # db-mongo-data:

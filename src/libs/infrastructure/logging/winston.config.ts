@@ -1,4 +1,5 @@
 import { utilities as nestWinstonModuleUtilities } from 'nest-winston';
+import * as winston from 'winston';
 import { format, transports } from 'winston';
 import 'winston-mongodb';
 
@@ -14,13 +15,15 @@ export const WinstonConfig = () => ({
     }),
 
     // MongoDB出力
-    // new transports.MongoDB({
-    //   level: 'info',
-    //   db: process.env.MONGO_LOG_URI,
-    //   options: { useUnifiedTopology: true },
-    //   collection: 'application_logs',
-    //   tryReconnect: true,
-    //   format: format.combine(format.timestamp(), format.json()),
-    // }),
+    //   new transports.MongoDB({
+    //     level: 'info',
+    //     db: process.env.MONGO_LOG_URI,
+    //     collection: 'app_logs',
+    //     options: {
+    //       useUnifiedTopology: true,
+    //     },
+    //     tryReconnect: true,
+    //     format: winston.format.simple(),
+    //   }),
   ],
 });
