@@ -8,7 +8,7 @@ async function bootstrap() {
   // Nestロガーの交換
   const logger = WinstonModule.createLogger(WinstonConfig());
 
-  const app = await NestFactory.create(AppModule, { logger: logger });
+  const app = await NestFactory.create(AppModule, { logger });
 
   // 例外フィルター
   app.useGlobalFilters(new AllExceptionsFilter(logger));

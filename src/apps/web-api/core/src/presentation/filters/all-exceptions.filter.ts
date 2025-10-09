@@ -15,7 +15,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const message = exception instanceof HttpException ? exception.message : 'Internal server error';
 
     // ログ出力
-    this.logger.error({
+    this.logger.error('', {
       timestamp: new Date().toISOString(),
       statusCode: status,
       httpMethod: request.method,
