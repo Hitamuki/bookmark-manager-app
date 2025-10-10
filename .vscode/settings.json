@@ -4,6 +4,7 @@
     "poc/**": true,
     "sandbox/**": true,
   },
+  "files.autoSave": "onFocusChange",
   // ===== テーマ =====
   "workbench.iconTheme": "material-icon-theme", // ファイルアイコン
   "workbench.colorTheme": "GitHub Dark", // カラーテーマ

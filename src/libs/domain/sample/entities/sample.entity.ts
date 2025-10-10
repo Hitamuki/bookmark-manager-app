@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from 'uuid';
 import { z } from 'zod';
-import { SampleId } from '../value-objects/sample.vo';
+import { SampleId } from '../value-objects/sample-id.vo';
 
 const SampleSchema = z.object({
   id: z.string().uuid(),
@@ -15,39 +15,24 @@ const SampleSchema = z.object({
 export type SampleProps = z.infer<typeof SampleSchema>;
 
 export class SampleEntity {
-  private readonly props: SampleProps;
+  readonly id: string;
+  readonly title: string | null;
+  readonly isDeleted: boolean;
+  readonly createdBy: string;
+  readonly createdAt: Date;
+  readonly updatedBy: string | null;
+  readonly updatedAt: Date | null;
 
   constructor(props: SampleProps) {
     // バリデーション
-    this.props = SampleSchema.parse(props);
-  }
-
-  get id(): SampleId {
-    return new SampleId(this.props.id);
-  }
-
-  get title(): string | null {
-    return this.props.title;
-  }
-
-  get isDeleted(): boolean {
-    return this.props.isDeleted;
-  }
-
-  get createdBy(): string {
-    return this.props.createdBy;
-  }
-
-  get createdAt(): Date {
-    return this.props.createdAt;
-  }
-
-  get updatedBy(): string | null {
-    return this.props.updatedBy;
-  }
-
-  get updatedAt(): Date | null {
-    return this.props.updatedAt;
+    const validProps = SampleSchema.parse(props);
+    this.id = new SampleId(validProps.id).value;
+    this.title = validProps.title;
+    this.isDeleted = validProps.isDeleted;
+    this.createdBy = validProps.createdBy;
+    this.createdAt = validProps.createdAt;
+    this.updatedBy = validProps.updatedBy;
+    this.updatedAt = validProps.updatedAt;
   }
 
   static create(inputTitle: string | null, createdBy: string): SampleEntity {

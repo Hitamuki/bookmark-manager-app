@@ -26,7 +26,7 @@ export class SamplePrismaRepository implements SampleRepository {
 
   async create(sampleEntity: SampleEntity): Promise<void> {
     const data = {
-      id: sampleEntity.id.toString(),
+      id: sampleEntity.id,
       title: sampleEntity.title,
       isDeleted: sampleEntity.isDeleted,
       createdBy: sampleEntity.createdBy,

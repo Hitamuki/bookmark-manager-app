@@ -3,13 +3,13 @@ import { z } from 'zod';
 const SampleIdSchema = z.string().uuid();
 
 export class SampleId {
-  private readonly value: string;
+  private readonly _value: string;
 
   constructor(value: string) {
-    this.value = SampleIdSchema.parse(value);
+    this._value = SampleIdSchema.parse(value);
   }
 
-  toString() {
-    return this.value;
+  get value(): string {
+    return this._value;
   }
 }
