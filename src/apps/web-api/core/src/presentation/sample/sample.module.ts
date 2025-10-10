@@ -1,4 +1,7 @@
 import { CreateSampleHandler } from '@libs/application/sample/commands/handlers/create-sample.handler';
+import { DeleteSampleHandler } from '@libs/application/sample/commands/handlers/delete-sample.handler';
+import { UpdateSampleHandler } from '@libs/application/sample/commands/handlers/update-sample.handler';
+import { GetSampleHandler } from '@libs/application/sample/queries/handlers/get-sample.handler';
 import { GetSamplesHandler } from '@libs/application/sample/queries/handlers/get-samples.handler';
 import { SAMPLE_REPOSITORY } from '@libs/domain/sample/repositories/sample.repository';
 import { SamplePrismaRepository } from '@libs/infrastructure/prisma/repositories/sample.prisma.repository';
@@ -10,6 +13,13 @@ import { SampleController } from './sample.controller';
 @Module({
   imports: [PrismaModule, CqrsModule],
   controllers: [SampleController],
-  providers: [{ provide: SAMPLE_REPOSITORY, useClass: SamplePrismaRepository }, CreateSampleHandler, GetSamplesHandler],
+  providers: [
+    { provide: SAMPLE_REPOSITORY, useClass: SamplePrismaRepository },
+    GetSamplesHandler,
+    GetSampleHandler,
+    CreateSampleHandler,
+    UpdateSampleHandler,
+    DeleteSampleHandler,
+  ],
 })
 export class SampleModule {}

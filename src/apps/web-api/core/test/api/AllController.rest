@@ -3,10 +3,15 @@
 @contentType = application/json
 
 ### Variables
+@sampleId = {{GetSamples.response.body.0.id}}
 
 ###
 # @name GetSamples
 GET {{baseUrl}}/samples
+
+###
+# @name GetSample
+GET {{baseUrl}}/samples/{{sampleId}}
 
 ###
 # @name CreateSample
@@ -16,3 +21,16 @@ Content-Type: {{contentType}}
 {
   "title": "タイトル"
 }
+
+###
+# @name UpdateSample
+Put {{baseUrl}}/samples/{{sampleId}}
+Content-Type: {{contentType}}
+
+{
+  "title": "タイトル更新"
+}
+
+###
+# @name DeleteSample
+DELETE {{baseUrl}}/samples/{{sampleId}}

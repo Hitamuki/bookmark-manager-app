@@ -1,12 +1,16 @@
 import { CreateSampleCommand } from '@libs/application/sample/commands/create-sample.command';
+import { UpdateSampleCommand } from '@libs/application/sample/commands/update-sample.command';
 // biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
 import { CreateSampleDto } from '@libs/application/sample/dto/create-sample.dto';
+// biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
+import { UpdateSampleDto } from '@libs/application/sample/dto/update-sample.dto';
 import { GetSamplesQuery } from '@libs/application/sample/queries/get-samples.query';
 import type { SampleEntity } from '@libs/domain/sample/entities/sample.entity';
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put, Query } from '@nestjs/common';
 // biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiQuery } from '@nestjs/swagger';
+import { DeleteSampleCommand } from './../../../../../../libs/application/sample/commands/delete-sample.command';
 
 @Controller('samples')
 export class SampleController {
@@ -22,8 +26,18 @@ export class SampleController {
    */
   @Get()
   @ApiQuery({ name: 'title', required: false })
-  async search(@Query('title') title: string | null): Promise<SampleEntity[]> {
+  async searchSamples(@Query('title') title: string | null): Promise<SampleEntity[]> {
     return await this.queryBus.execute(new GetSamplesQuery(title));
+  }
+
+  /**
+   * サンプル1件取得
+   * @param sampleId UUID
+   * @returns サンプル
+   */
+  @Get(':id')
+  async getSampleById(@Param('id', ParseUUIDPipe) sampleId: string): Promise<SampleEntity> {
+    return await this.queryBus.execute(new GetSamplesQuery(sampleId));
   }
 
   /**
@@ -32,7 +46,30 @@ export class SampleController {
    * @returns なし
    */
   @Post()
-  async create(@Body() reqBody: CreateSampleDto): Promise<void> {
+  async createSample(@Body() reqBody: CreateSampleDto): Promise<void> {
     return this.commandBus.execute(new CreateSampleCommand(reqBody));
+  }
+
+  /**
+   * サンプル更新
+   * @param reqBody リクエストボディ
+   * @returns なし
+   */
+  @Put(':id')
+  async updateSampleById(
+    @Param('id', ParseUUIDPipe) sampleId: string,
+    @Body() reqBody: UpdateSampleDto,
+  ): Promise<void> {
+    return this.commandBus.execute(new UpdateSampleCommand(sampleId, reqBody));
+  }
+
+  /**
+   *
+   * @param sampleId UUID
+   * @returns なし
+   */
+  @Delete(':id')
+  async deleteSampleById(@Param('id', ParseUUIDPipe) sampleId: string): Promise<void> {
+    return this.commandBus.execute(new DeleteSampleCommand(sampleId));
   }
 }

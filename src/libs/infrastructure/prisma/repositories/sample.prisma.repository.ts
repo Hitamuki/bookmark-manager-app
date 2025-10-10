@@ -37,27 +37,33 @@ export class SamplePrismaRepository implements SampleRepository {
     await this.prisma.sample.create({ data });
   }
 
-  async update(sampleEntity: SampleEntity): Promise<void> {
-    const { id, ...data } = sampleEntity;
+  async update(id: string, sampleEntity: SampleEntity): Promise<void> {
+    const { ...data } = sampleEntity;
     const dbData = await this.prisma.sample.findUnique({
-      where: { id: sampleEntity.id.toString() },
+      where: { id: id },
     });
     if (!dbData) {
       // TODO: 例外をスロー
     }
     await this.prisma.sample.update({
-      where: { id: sampleEntity.id.toString() },
-      data,
+      where: { id: id },
+      data: {
+        title: data.title,
+        updatedAt: new Date(),
+        updatedBy: data.updatedBy,
+        ...dbData,
+      },
     });
   }
 
   async delete(id: string): Promise<void> {
     const data = await this.prisma.sample.findUnique({
-      where: { id: id.toString() },
+      where: { id: id },
     });
     if (!data) {
       // TODO: 例外をスロー
     }
+    // 物理削除
     await this.prisma.sample.delete({ where: { id } });
   }
 }
