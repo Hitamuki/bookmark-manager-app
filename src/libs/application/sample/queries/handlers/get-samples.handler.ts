@@ -1,4 +1,4 @@
-import type { SampleEntity } from '@libs/domain/sample/entities/sample.entity';
+import type { SampleEntity, SampleProps } from '@libs/domain/sample/entities/sample.entity';
 import { SAMPLE_REPOSITORY, type SampleRepository } from '@libs/domain/sample/repositories/sample.repository';
 import { Inject } from '@nestjs/common';
 import { type IQueryHandler, QueryHandler } from '@nestjs/cqrs';
@@ -11,7 +11,7 @@ export class GetSamplesHandler implements IQueryHandler<GetSamplesQuery> {
     private readonly sampleRepository: SampleRepository,
   ) {}
 
-  async execute(query: GetSamplesQuery): Promise<SampleEntity[]> {
+  async execute(query: GetSamplesQuery): Promise<SampleProps[]> {
     return await this.sampleRepository.search(query.title);
   }
 }

@@ -15,7 +15,7 @@ export class CreateSampleHandler implements ICommandHandler<CreateSampleCommand>
   async execute(command: CreateSampleCommand) {
     // DTOのZodバリデーション
     CreateSampleDtoSchema.parse(command.reqBody);
-    const entity = SampleEntity.create(command.reqBody.title, '仮ユーザー'); // TODO: Userテーブル対応
+    const entity = SampleEntity.create(command.reqBody, '仮ユーザー'); // TODO: Userテーブル対応
     await this.sampleRepository.create(entity);
   }
 }

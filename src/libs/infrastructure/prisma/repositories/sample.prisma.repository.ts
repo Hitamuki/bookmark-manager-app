@@ -1,4 +1,4 @@
-import { SampleEntity } from '@libs/domain/sample/entities/sample.entity';
+import { SampleEntity, type SampleProps } from '@libs/domain/sample/entities/sample.entity';
 import type { SampleRepository } from '@libs/domain/sample/repositories/sample.repository';
 // biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
 import { PrismaService } from '@libs/infrastructure/prisma/prisma.service';
@@ -8,7 +8,7 @@ import { Injectable } from '@nestjs/common';
 export class SamplePrismaRepository implements SampleRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async search(title: string | null): Promise<SampleEntity[]> {
+  async search(title: string | null): Promise<SampleProps[]> {
     const records = await this.prisma.sample.findMany({
       where: {
         isDeleted: false,
@@ -16,12 +16,12 @@ export class SamplePrismaRepository implements SampleRepository {
       },
       orderBy: { createdAt: 'desc' },
     });
-    return records.map((record) => new SampleEntity(record));
+    return records.map((record) => new SampleEntity(record).restore());
   }
 
-  async findById(id: string): Promise<SampleEntity | null> {
+  async findById(id: string): Promise<SampleProps | null> {
     const record = await this.prisma.sample.findUnique({ where: { id } });
-    return record ? new SampleEntity(record) : null;
+    return record ? new SampleEntity(record).restore() : null;
   }
 
   async create(sampleEntity: SampleEntity): Promise<void> {
@@ -38,7 +38,6 @@ export class SamplePrismaRepository implements SampleRepository {
   }
 
   async update(id: string, sampleEntity: SampleEntity): Promise<void> {
-    const { ...data } = sampleEntity;
     const dbData = await this.prisma.sample.findUnique({
       where: { id: id },
     });
@@ -48,10 +47,9 @@ export class SamplePrismaRepository implements SampleRepository {
     await this.prisma.sample.update({
       where: { id: id },
       data: {
-        title: data.title,
+        title: sampleEntity.title,
         updatedAt: new Date(),
-        updatedBy: data.updatedBy,
-        ...dbData,
+        updatedBy: sampleEntity.updatedBy,
       },
     });
   }

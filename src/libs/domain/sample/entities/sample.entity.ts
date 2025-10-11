@@ -1,3 +1,5 @@
+import type { CreateSampleDto } from '@libs/application/sample/dto/create-sample.dto';
+import type { UpdateSampleDto } from '@libs/application/sample/dto/update-sample.dto';
 import { v7 as uuidv7 } from 'uuid';
 import { z } from 'zod';
 import { SampleId } from '../value-objects/sample-id.vo';
@@ -15,36 +17,62 @@ const SampleSchema = z.object({
 export type SampleProps = z.infer<typeof SampleSchema>;
 
 export class SampleEntity {
-  readonly id: string;
-  readonly title: string | null;
-  readonly isDeleted: boolean;
-  readonly createdBy: string;
-  readonly createdAt: Date;
-  readonly updatedBy: string | null;
-  readonly updatedAt: Date | null;
-
-  constructor(props: SampleProps) {
-    // バリデーション
-    const validProps = SampleSchema.parse(props);
-    this.id = new SampleId(validProps.id).value;
-    this.title = validProps.title;
-    this.isDeleted = validProps.isDeleted;
-    this.createdBy = validProps.createdBy;
-    this.createdAt = validProps.createdAt;
-    this.updatedBy = validProps.updatedBy;
-    this.updatedAt = validProps.updatedAt;
+  get id(): string {
+    return new SampleId(this.props.id).value;
   }
 
-  static create(inputTitle: string | null, createdBy: string): SampleEntity {
+  get title(): string | null {
+    return this.props.title;
+  }
+
+  get isDeleted(): boolean {
+    return this.props.isDeleted;
+  }
+
+  get createdBy(): string {
+    return this.props.createdBy;
+  }
+
+  get createdAt(): Date {
+    return this.props.createdAt;
+  }
+
+  get updatedBy(): string | null {
+    return this.props.updatedBy;
+  }
+
+  get updatedAt(): Date | null {
+    return this.props.updatedAt;
+  }
+
+  constructor(private readonly props: SampleProps) {}
+
+  // DB復元用
+  restore(): SampleProps {
+    const parsed = SampleSchema.parse(this.props);
+    return parsed;
+  }
+
+  // 新規登録用
+  static create(createSampleDto: CreateSampleDto, userId: string): SampleEntity {
     const props: SampleProps = {
       id: uuidv7(),
-      title: inputTitle,
+      title: createSampleDto.title,
       isDeleted: false,
-      createdBy: createdBy,
+      createdBy: userId,
       createdAt: new Date(),
       updatedBy: null,
       updatedAt: null,
     };
+    SampleSchema.parse(props);
     return new SampleEntity(props);
+  }
+
+  // 更新用
+  fromUpdateDto(updateSampleDto: UpdateSampleDto, userId: string) {
+    this.props.updatedAt = new Date();
+    this.props.updatedBy = userId;
+    this.props.title = updateSampleDto.title;
+    SampleSchema.parse(this.props);
   }
 }

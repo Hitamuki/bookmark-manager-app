@@ -4,8 +4,9 @@ import { UpdateSampleCommand } from '@libs/application/sample/commands/update-sa
 import { CreateSampleDto } from '@libs/application/sample/dto/create-sample.dto';
 // biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
 import { UpdateSampleDto } from '@libs/application/sample/dto/update-sample.dto';
+import { GetSampleQuery } from '@libs/application/sample/queries/get-sample.query';
 import { GetSamplesQuery } from '@libs/application/sample/queries/get-samples.query';
-import type { SampleEntity } from '@libs/domain/sample/entities/sample.entity';
+import type { SampleEntity, SampleProps } from '@libs/domain/sample/entities/sample.entity';
 import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put, Query } from '@nestjs/common';
 // biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -26,7 +27,7 @@ export class SampleController {
    */
   @Get()
   @ApiQuery({ name: 'title', required: false })
-  async searchSamples(@Query('title') title: string | null): Promise<SampleEntity[]> {
+  async searchSamples(@Query('title') title: string | null): Promise<SampleProps[]> {
     return await this.queryBus.execute(new GetSamplesQuery(title));
   }
 
@@ -36,8 +37,8 @@ export class SampleController {
    * @returns サンプル
    */
   @Get(':id')
-  async getSampleById(@Param('id', ParseUUIDPipe) sampleId: string): Promise<SampleEntity> {
-    return await this.queryBus.execute(new GetSamplesQuery(sampleId));
+  async getSampleById(@Param('id', ParseUUIDPipe) sampleId: string): Promise<SampleProps | null> {
+    return await this.queryBus.execute(new GetSampleQuery(sampleId));
   }
 
   /**
