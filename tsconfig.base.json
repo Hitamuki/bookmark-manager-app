@@ -16,7 +16,8 @@
     "baseUrl": ".",
     "paths": {
       "@libs/*": ["src/libs/*"]
-    }
+    },
+    "types": ["vitest/globals"]
   },
   "exclude": ["node_modules", "tmp"]
 }

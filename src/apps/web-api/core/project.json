@@ -63,6 +63,18 @@
       "options": {
         "command": "biome format . --check"
       }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest run --config src/vitest.config.nestjs.ts"
+      }
+    },
+    "test:coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest run --coverage --config src/vitest.config.nestjs.ts"
+      }
     }
   },
   "tags": []
