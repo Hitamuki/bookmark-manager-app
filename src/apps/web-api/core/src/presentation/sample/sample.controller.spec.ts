@@ -38,10 +38,10 @@ describe('SampleController', () => {
       vi.spyOn(queryBus, 'execute').mockResolvedValue(expectedResult);
 
       // Act
-      const result = await controller.searchSamples(title);
+      const result = await controller.searchSamples(null, null, title);
 
       // Assert
-      expect(queryBus.execute).toHaveBeenCalledWith(new GetSamplesQuery(title));
+      expect(queryBus.execute).toHaveBeenCalledWith(new GetSamplesQuery(null, null, title));
       expect(result).toBe(expectedResult);
     });
 
@@ -52,10 +52,10 @@ describe('SampleController', () => {
       vi.spyOn(queryBus, 'execute').mockResolvedValue(expectedResult);
 
       // Act
-      const result = await controller.searchSamples(title);
+      const result = await controller.searchSamples(null, null, title);
 
       // Assert
-      expect(queryBus.execute).toHaveBeenCalledWith(new GetSamplesQuery(title));
+      expect(queryBus.execute).toHaveBeenCalledWith(new GetSamplesQuery(null, null, title));
       expect(result).toBe(expectedResult);
     });
   });

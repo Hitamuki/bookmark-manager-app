@@ -3,11 +3,15 @@
 @contentType = application/json
 
 ### Variables
-@sampleId = {{GetSamples.response.body.0.id}}
+@sampleId = {{GetSamples.response.body.data.0.id}}
 
 ###
 # @name GetSamples
 GET {{baseUrl}}/samples
+
+###
+# @name GetSamples_Pagination
+GET {{baseUrl}}/samples?limit=50&offset=0
 
 ###
 # @name GetSample

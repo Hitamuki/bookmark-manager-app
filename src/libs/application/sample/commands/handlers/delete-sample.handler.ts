@@ -1,5 +1,5 @@
 import { SAMPLE_REPOSITORY, type SampleRepository } from '@libs/domain/sample/repositories/sample.repository';
-import { Inject } from '@nestjs/common';
+import { Inject, NotFoundException } from '@nestjs/common';
 import { CommandHandler, type ICommandHandler } from '@nestjs/cqrs';
 import { DeleteSampleCommand } from '../delete-sample.command';
 
@@ -11,6 +11,11 @@ export class DeleteSampleHandler implements ICommandHandler<DeleteSampleCommand>
   ) {}
 
   async execute(command: DeleteSampleCommand) {
+    const sampleProps = await this.sampleRepository.findById(command.sampleId);
+    if (sampleProps === null) {
+      throw new NotFoundException();
+    }
+
     await this.sampleRepository.delete(command.sampleId);
   }
 }

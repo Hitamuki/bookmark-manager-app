@@ -8,20 +8,38 @@ import { Injectable } from '@nestjs/common';
 export class SamplePrismaRepository implements SampleRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async search(title: string | null): Promise<SampleProps[]> {
+  async search(limit: number | null, offset: number | null, title: string | null): Promise<SampleProps[]> {
     const records = await this.prisma.sample.findMany({
+      take: limit ?? limit,
+      skip: offset ?? offset,
       where: {
         isDeleted: false,
-        title: title ? { contains: title } : undefined,
+        title: title ?? { contains: title },
       },
       orderBy: { createdAt: 'desc' },
     });
     return records.map((record) => new SampleEntity(record).restore());
   }
 
+  async count(title: string | null): Promise<number> {
+    return this.prisma.sample.count({
+      where: {
+        isDeleted: false,
+        title: title ? { contains: title } : undefined,
+      },
+    });
+  }
+
   async findById(id: string): Promise<SampleProps | null> {
     const record = await this.prisma.sample.findUnique({ where: { id } });
     return record ? new SampleEntity(record).restore() : null;
+  }
+
+  async exists(id: string): Promise<boolean> {
+    const count = await this.prisma.sample.count({
+      where: { id: id, isDeleted: false },
+    });
+    return count > 0;
   }
 
   async create(sampleEntity: SampleEntity): Promise<void> {
@@ -38,12 +56,6 @@ export class SamplePrismaRepository implements SampleRepository {
   }
 
   async update(id: string, sampleEntity: SampleEntity): Promise<void> {
-    const dbData = await this.prisma.sample.findUnique({
-      where: { id: id },
-    });
-    if (!dbData) {
-      // TODO: 例外をスロー
-    }
     await this.prisma.sample.update({
       where: { id: id },
       data: {
@@ -55,12 +67,6 @@ export class SamplePrismaRepository implements SampleRepository {
   }
 
   async delete(id: string): Promise<void> {
-    const data = await this.prisma.sample.findUnique({
-      where: { id: id },
-    });
-    if (!data) {
-      // TODO: 例外をスロー
-    }
     // 物理削除
     await this.prisma.sample.delete({ where: { id } });
   }

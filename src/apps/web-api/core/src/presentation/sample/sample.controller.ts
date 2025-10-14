@@ -2,12 +2,13 @@ import { CreateSampleCommand } from '@libs/application/sample/commands/create-sa
 import { UpdateSampleCommand } from '@libs/application/sample/commands/update-sample.command';
 // biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
 import { CreateSampleDto } from '@libs/application/sample/dto/create-sample.dto';
+import type { PaginationDto } from '@libs/application/sample/dto/pagination.dto';
 // biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
 import { UpdateSampleDto } from '@libs/application/sample/dto/update-sample.dto';
 import { GetSampleQuery } from '@libs/application/sample/queries/get-sample.query';
 import { GetSamplesQuery } from '@libs/application/sample/queries/get-samples.query';
 import type { SampleEntity, SampleProps } from '@libs/domain/sample/entities/sample.entity';
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, ParseUUIDPipe, Post, Put, Query } from '@nestjs/common';
 // biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiQuery } from '@nestjs/swagger';
@@ -26,9 +27,15 @@ export class SampleController {
    * @returns サンプル一覧
    */
   @Get()
+  @ApiQuery({ name: 'limit', required: false })
+  @ApiQuery({ name: 'offset', required: false })
   @ApiQuery({ name: 'title', required: false })
-  async searchSamples(@Query('title') title: string | null): Promise<SampleProps[]> {
-    return await this.queryBus.execute(new GetSamplesQuery(title));
+  async searchSamples(
+    @Query('limit', new ParseIntPipe({ optional: true })) limit: number | null,
+    @Query('offset', new ParseIntPipe({ optional: true })) offset: number | null,
+    @Query('title') title: string | null,
+  ): Promise<PaginationDto<SampleProps>> {
+    return await this.queryBus.execute(new GetSamplesQuery(limit, offset, title));
   }
 
   /**

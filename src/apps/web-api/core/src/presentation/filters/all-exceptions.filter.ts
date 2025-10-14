@@ -15,26 +15,29 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const message = exception instanceof HttpException ? exception.message : 'Internal server error';
 
     // ログ出力
-    this.logger.error('', {
+    let parsedMessage: string;
+    try {
+      // messageがJSON文字列の場合、パースしてオブジェクトとして扱う
+      parsedMessage = JSON.parse(message);
+    } catch (e) {
+      // パースに失敗した場合は、元のmessage文字列をそのまま使う
+      parsedMessage = message;
+    }
+
+    this.logger.error('', (exception as Error).stack, {
       timestamp: new Date().toISOString(),
       statusCode: status,
       httpMethod: request.method,
       url: request.url,
-      message,
-      stack: (exception as Error).stack,
+      message: parsedMessage,
     });
-
-    // Sentryへ通知（重大エラーのみ）
-    if (status === 500) {
-      // Sentry.captureException(exception);
-    }
 
     response.status(status).json({
       timestamp: new Date().toISOString(),
       statusCode: status,
       httpMethod: request.method,
       url: request.url,
-      message,
+      message: parsedMessage,
     });
   }
 }

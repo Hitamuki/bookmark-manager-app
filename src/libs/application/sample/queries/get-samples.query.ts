@@ -1,3 +1,7 @@
 export class GetSamplesQuery {
-  constructor(public readonly title: string | null) {}
+  constructor(
+    public readonly limit: number | null,
+    public readonly offset: number | null,
+    public readonly title: string | null,
+  ) {}
 }

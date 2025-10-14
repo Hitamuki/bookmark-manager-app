@@ -1,3 +1,4 @@
+import { v7 as uuidv7 } from 'uuid';
 import { z } from 'zod';
 
 const SampleIdSchema = z.string().uuid();
@@ -11,5 +12,9 @@ export class SampleId {
 
   get value(): string {
     return this._value;
+  }
+
+  static generate() {
+    return new SampleId(uuidv7());
   }
 }

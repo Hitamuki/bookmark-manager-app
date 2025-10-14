@@ -4,6 +4,7 @@ import { UpdateSampleHandler } from '@libs/application/sample/commands/handlers/
 import { GetSampleHandler } from '@libs/application/sample/queries/handlers/get-sample.handler';
 import { GetSamplesHandler } from '@libs/application/sample/queries/handlers/get-samples.handler';
 import { SAMPLE_REPOSITORY } from '@libs/domain/sample/repositories/sample.repository';
+import { SampleDomainService } from '@libs/domain/sample/services/sample.domain-service';
 import { SamplePrismaRepository } from '@libs/infrastructure/prisma/repositories/sample.prisma.repository';
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -14,6 +15,7 @@ import { SampleController } from './sample.controller';
   imports: [PrismaModule, CqrsModule],
   controllers: [SampleController],
   providers: [
+    SampleDomainService,
     { provide: SAMPLE_REPOSITORY, useClass: SamplePrismaRepository },
     GetSamplesHandler,
     GetSampleHandler,

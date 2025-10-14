@@ -1,6 +1,5 @@
 import type { CreateSampleDto } from '@libs/application/sample/dto/create-sample.dto';
 import type { UpdateSampleDto } from '@libs/application/sample/dto/update-sample.dto';
-import { v7 as uuidv7 } from 'uuid';
 import { z } from 'zod';
 import { SampleId } from '../value-objects/sample-id.vo';
 
@@ -54,9 +53,9 @@ export class SampleEntity {
   }
 
   // 新規登録用
-  static create(createSampleDto: CreateSampleDto, userId: string): SampleEntity {
+  static createFromCreateSampleDto(createSampleDto: CreateSampleDto, userId: string): SampleEntity {
     const props: SampleProps = {
-      id: uuidv7(),
+      id: SampleId.generate().value,
       title: createSampleDto.title,
       isDeleted: false,
       createdBy: userId,
