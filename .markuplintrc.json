@@ -20,5 +20,12 @@
     "case-sensitive-attr-name": true
   },
   "nodeRules": [],
-  "childNodeRules": []
+  "childNodeRules": [],
+  "overrides": {
+    "**/*.tsx": {
+      "rules": {
+        "case-sensitive-attr-name": false
+      }
+    }
+  }
 }

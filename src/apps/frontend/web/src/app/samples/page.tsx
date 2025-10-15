@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { SampleList } from '../features/samples/components/SampleList';
+import { SampleList } from '../../features/samples/components/SampleList';
 
 export default function SamplesPage() {
   return (

@@ -36,6 +36,9 @@
       "options": {
         "command": "biome format . --check"
       }
+    },
+    "add-component": {
+      "executor": "@nx-extend/shadcn-ui:add"
     }
   }
 }
