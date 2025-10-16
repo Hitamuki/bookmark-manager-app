@@ -27,14 +27,14 @@ export class CreateSampleHandler implements ICommandHandler<CreateSampleCommand>
       throw error;
     }
 
-    const entity = SampleEntity.createFromCreateSampleDto(command.reqBody, '仮ユーザー'); // TODO: Userテーブル対応
+    const sampleEntity = SampleEntity.createFromCreateSampleDto(command.reqBody, '仮ユーザー'); // TODO: Userテーブル対応
 
     // ID重複チェック
-    const duplicationResult = await this.sampleDomainService.existsSampleId(entity.id);
+    const duplicationResult = await this.sampleDomainService.existsSampleId(sampleEntity.id);
     if (duplicationResult === true) {
       throw new ConflictException();
     }
 
-    await this.sampleRepository.create(entity);
+    await this.sampleRepository.create(sampleEntity);
   }
 }

@@ -8,6 +8,7 @@
     "dev": "nx serve",
     "build": "nx run-many -t build",
     "test": "nx run-many -t test",
+    "generate:api-client": "orval --config ./src/tools/orval.config.ts",
     "commit": "cz",
     "format:check": "nx run-many -t format:check",
     "format": "nx run-many -t format",
@@ -45,6 +46,7 @@
   "dependencies": {
     "@anatine/zod-nestjs": "^2.0.12",
     "@nestjs/common": "11.0.7",
+    "@nestjs/config": "^4.0.2",
     "@nestjs/core": "11.0.7",
     "@nestjs/cqrs": "^11.0.3",
     "@nestjs/passport": "11.0.5",
@@ -61,6 +63,7 @@
     "class-validator": "^0.14.0",
     "nest-winston": "^1.10.2",
     "next": "~15.2.4",
+    "orval": "^7.13.2",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",

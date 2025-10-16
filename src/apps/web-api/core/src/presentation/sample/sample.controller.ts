@@ -2,18 +2,19 @@ import { CreateSampleCommand } from '@libs/application/sample/commands/create-sa
 import { UpdateSampleCommand } from '@libs/application/sample/commands/update-sample.command';
 // biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
 import { CreateSampleDto } from '@libs/application/sample/dto/create-sample.dto';
-import type { PaginationDto } from '@libs/application/sample/dto/pagination.dto';
+import { ApiOkResponsePagination, type PaginationDto } from '@libs/application/sample/dto/pagination.dto';
+import { SampleDto } from '@libs/application/sample/dto/sample.dto';
 // biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
 import { UpdateSampleDto } from '@libs/application/sample/dto/update-sample.dto';
 import { GetSampleQuery } from '@libs/application/sample/queries/get-sample.query';
 import { GetSamplesQuery } from '@libs/application/sample/queries/get-samples.query';
-import type { SampleEntity, SampleProps } from '@libs/domain/sample/entities/sample.entity';
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, ParseUUIDPipe, Post, Put, Query } from '@nestjs/common';
 // biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { ApiQuery } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { DeleteSampleCommand } from './../../../../../../libs/application/sample/commands/delete-sample.command';
 
+@ApiTags('samples')
 @Controller('samples')
 export class SampleController {
   constructor(
@@ -30,11 +31,12 @@ export class SampleController {
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'offset', required: false })
   @ApiQuery({ name: 'title', required: false })
+  @ApiOkResponsePagination(SampleDto)
   async searchSamples(
     @Query('limit', new ParseIntPipe({ optional: true })) limit: number | null,
     @Query('offset', new ParseIntPipe({ optional: true })) offset: number | null,
     @Query('title') title: string | null,
-  ): Promise<PaginationDto<SampleProps>> {
+  ): Promise<PaginationDto<SampleDto>> {
     return await this.queryBus.execute(new GetSamplesQuery(limit, offset, title));
   }
 
@@ -44,7 +46,8 @@ export class SampleController {
    * @returns サンプル
    */
   @Get(':id')
-  async getSampleById(@Param('id', ParseUUIDPipe) sampleId: string): Promise<SampleProps | null> {
+  @ApiOkResponse({ type: SampleDto })
+  async getSampleById(@Param('id', ParseUUIDPipe) sampleId: string): Promise<SampleDto> {
     return await this.queryBus.execute(new GetSampleQuery(sampleId));
   }
 
@@ -54,6 +57,7 @@ export class SampleController {
    * @returns なし
    */
   @Post()
+  @ApiCreatedResponse()
   async createSample(@Body() reqBody: CreateSampleDto): Promise<void> {
     return this.commandBus.execute(new CreateSampleCommand(reqBody));
   }
@@ -64,6 +68,7 @@ export class SampleController {
    * @returns なし
    */
   @Put(':id')
+  @ApiOkResponse()
   async updateSampleById(
     @Param('id', ParseUUIDPipe) sampleId: string,
     @Body() reqBody: UpdateSampleDto,

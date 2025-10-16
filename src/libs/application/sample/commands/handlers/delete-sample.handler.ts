@@ -11,8 +11,8 @@ export class DeleteSampleHandler implements ICommandHandler<DeleteSampleCommand>
   ) {}
 
   async execute(command: DeleteSampleCommand) {
-    const sampleProps = await this.sampleRepository.findById(command.sampleId);
-    if (sampleProps === null) {
+    const sampleEntity = await this.sampleRepository.findById(command.sampleId);
+    if (sampleEntity === null) {
       throw new NotFoundException();
     }
 

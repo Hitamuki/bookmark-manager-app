@@ -23,7 +23,7 @@ export function setup() {}
 // サンプル作成のテスト
 export default function () {
   // Arrange
-  const url = 'http://localhost:3000/api/samples';
+  const url = 'http://localhost:4000/api/samples';
   const payload = JSON.stringify({
     title: 'タイトル_性能テスト',
   });

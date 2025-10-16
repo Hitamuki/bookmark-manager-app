@@ -46,12 +46,6 @@ export class SampleEntity {
 
   constructor(private readonly props: SampleProps) {}
 
-  // DB復元用
-  restore(): SampleProps {
-    const parsed = SampleSchema.parse(this.props);
-    return parsed;
-  }
-
   // 新規登録用
   static createFromCreateSampleDto(createSampleDto: CreateSampleDto, userId: string): SampleEntity {
     const props: SampleProps = {

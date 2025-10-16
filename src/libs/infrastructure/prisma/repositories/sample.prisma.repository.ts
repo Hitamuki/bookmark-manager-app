@@ -1,4 +1,4 @@
-import { SampleEntity, type SampleProps } from '@libs/domain/sample/entities/sample.entity';
+import { SampleEntity } from '@libs/domain/sample/entities/sample.entity';
 import type { SampleRepository } from '@libs/domain/sample/repositories/sample.repository';
 // biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
 import { PrismaService } from '@libs/infrastructure/prisma/prisma.service';
@@ -8,7 +8,7 @@ import { Injectable } from '@nestjs/common';
 export class SamplePrismaRepository implements SampleRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async search(limit: number | null, offset: number | null, title: string | null): Promise<SampleProps[]> {
+  async search(limit: number | null, offset: number | null, title: string | null): Promise<SampleEntity[]> {
     const records = await this.prisma.sample.findMany({
       take: limit ?? limit,
       skip: offset ?? offset,
@@ -18,7 +18,7 @@ export class SamplePrismaRepository implements SampleRepository {
       },
       orderBy: { createdAt: 'desc' },
     });
-    return records.map((record) => new SampleEntity(record).restore());
+    return records.map((record) => new SampleEntity(record));
   }
 
   async count(title: string | null): Promise<number> {
@@ -30,9 +30,9 @@ export class SamplePrismaRepository implements SampleRepository {
     });
   }
 
-  async findById(id: string): Promise<SampleProps | null> {
+  async findById(id: string): Promise<SampleEntity | null> {
     const record = await this.prisma.sample.findUnique({ where: { id } });
-    return record ? new SampleEntity(record).restore() : null;
+    return record ? new SampleEntity(record) : null;
   }
 
   async exists(id: string): Promise<boolean> {

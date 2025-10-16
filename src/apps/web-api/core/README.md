@@ -25,8 +25,16 @@
 pnpm nx run api-core:build
 # ローカル環境実行
 pnpm nx run api-core:serve
+# APIクライアント生成
+pnpm generate:api-client
 ```
 
 ## ToDo
 
+- ビルド前に「pnpm nx reset」を実行しないと挙動が不正確になる
+- openapi.json更新時の作業を自動化したい
+  - pnpm generate:api-client実行
+  - Apidogに取り込み
+  - 対象のコントローラーのユニットテスト実施
+  - 結合テスト実施
 - 脱Webpack

@@ -1,5 +1,5 @@
 // 除外対象のディレクトリ
-const EXCLUDED_DIRS = ['poc', 'sandbox', '.vscode'];
+const EXCLUDED_DIRS = ['poc', 'sandbox', '.vscode', 'src/libs/api-client'];
 
 const shouldInclude = (filePath) => {
   // 絶対パスから相対パスに変換
@@ -30,6 +30,6 @@ module.exports = {
       .filter(shouldInclude)
       .flatMap((file) => [`biome format --write ${file}`, `stylelint ${file}`, `biome lint ${file}`]),
   '*.scss': (files) => files.filter(shouldInclude).flatMap((file) => [`prettier --write ${file}`, `stylelint ${file}`]),
-  '*.{json,jsonc}': (files) => files.filter(shouldInclude).map((file) => `biome format --write ${file}`),
-  '*.{yml,yaml}': (files) => files.filter(shouldInclude).map((file) => `prettier --write ${file}`), // TODO: toml対応（prettier-plugin-toml）
+  // '*.{json,jsonc}': (files) => files.filter(shouldInclude).map((file) => `biome format --write ${file}`),
+  // '*.{yml,yaml}': (files) => files.filter(shouldInclude).map((file) => `prettier --write ${file}`), // TODO: toml対応（prettier-plugin-toml）
 };

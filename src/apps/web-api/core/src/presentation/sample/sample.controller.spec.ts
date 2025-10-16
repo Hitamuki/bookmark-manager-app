@@ -2,10 +2,10 @@ import { CreateSampleCommand } from '@libs/application/sample/commands/create-sa
 import { DeleteSampleCommand } from '@libs/application/sample/commands/delete-sample.command';
 import { UpdateSampleCommand } from '@libs/application/sample/commands/update-sample.command';
 import type { CreateSampleDto } from '@libs/application/sample/dto/create-sample.dto';
+import type { SampleDto } from '@libs/application/sample/dto/sample.dto';
 import type { UpdateSampleDto } from '@libs/application/sample/dto/update-sample.dto';
 import { GetSampleQuery } from '@libs/application/sample/queries/get-sample.query';
 import { GetSamplesQuery } from '@libs/application/sample/queries/get-samples.query';
-import type { SampleProps } from '@libs/domain/sample/entities/sample.entity';
 import type { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SampleController } from './sample.controller';
@@ -34,7 +34,7 @@ describe('SampleController', () => {
     it('should call GetSamplesQuery with title', async () => {
       // Arrange
       const title = 'test';
-      const expectedResult: SampleProps[] = [];
+      const expectedResult: SampleDto[] = [];
       vi.spyOn(queryBus, 'execute').mockResolvedValue(expectedResult);
 
       // Act
@@ -48,7 +48,7 @@ describe('SampleController', () => {
     it('should call GetSamplesQuery with null', async () => {
       // Arrange
       const title = null;
-      const expectedResult: SampleProps[] = [];
+      const expectedResult: SampleDto[] = [];
       vi.spyOn(queryBus, 'execute').mockResolvedValue(expectedResult);
 
       // Act
@@ -64,7 +64,7 @@ describe('SampleController', () => {
     it('should call GetSampleQuery with sampleId', async () => {
       // Arrange
       const sampleId = 'a-valid-uuid';
-      const expectedResult: SampleProps | null = null;
+      const expectedResult: SampleDto | null = null;
       vi.spyOn(queryBus, 'execute').mockResolvedValue(expectedResult);
 
       // Act

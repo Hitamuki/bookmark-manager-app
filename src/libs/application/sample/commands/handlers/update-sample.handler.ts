@@ -24,14 +24,13 @@ export class UpdateSampleHandler implements ICommandHandler<UpdateSampleCommand>
       throw error;
     }
 
-    const sampleProps = await this.sampleRepository.findById(command.sampleId);
-    if (sampleProps === null) {
+    const sampleEntity = await this.sampleRepository.findById(command.sampleId);
+    if (sampleEntity === null) {
       throw new NotFoundException();
     }
 
-    const entity = new SampleEntity(sampleProps);
-    entity.fromUpdateDto(command.reqBody, '仮ユーザー'); // TODO: Userテーブル対応
+    sampleEntity.fromUpdateDto(command.reqBody, '仮ユーザー'); // TODO: Userテーブル対応
 
-    await this.sampleRepository.update(command.sampleId, entity);
+    await this.sampleRepository.update(command.sampleId, sampleEntity);
   }
 }
