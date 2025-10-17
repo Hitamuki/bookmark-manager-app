@@ -1,4 +1,4 @@
-import { SampleForm } from '../../../features/samples/components/SampleForm';
+import { SampleForm } from '@/features/samples/components/SampleForm';
 
 export default async function EditSamplePage({ params }: { params: Promise<{ uuid: string }> }) {
   const { uuid } = await params;

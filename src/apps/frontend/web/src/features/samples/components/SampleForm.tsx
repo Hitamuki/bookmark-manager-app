@@ -1,5 +1,9 @@
 'use client';
 
+import {
+  useSampleControllerCreateSample,
+  useSampleControllerUpdateSampleById,
+} from '@/libs/api-client/endpoints/samples/samples';
 import { useRouter } from 'next/navigation';
 import { useSampleForm } from '../hooks/useSampleForm';
 
@@ -7,18 +11,17 @@ export const SampleForm = ({ isEdit = false, id }: { isEdit?: boolean; id?: stri
   const { editedSample, handleChange } = useSampleForm();
   const router = useRouter();
 
+  const createMutation = useSampleControllerCreateSample();
+  const updateMutation = useSampleControllerUpdateSampleById();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isEdit && id) {
-      // TODO: Implement update mutation
-      // await updateMutation.mutateAsync({ id, data: editedSample! });
-      console.log('Mock update:', { id, data: editedSample });
+      await updateMutation.mutateAsync({ id, data: { title: editedSample?.title ?? '' } });
     } else {
-      // TODO: Implement create mutation
-      // await createMutation.mutateAsync({
-      //   title: editedSample?.title ?? '',
-      // });
-      console.log('Mock create:', { title: editedSample?.title ?? '' });
+      await createMutation.mutateAsync({
+        data: { title: editedSample?.title ?? '' },
+      });
     }
     router.push('/samples');
   };

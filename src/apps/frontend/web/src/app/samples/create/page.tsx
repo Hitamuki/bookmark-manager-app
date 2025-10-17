@@ -1,4 +1,4 @@
-import { SampleForm } from '../../../features/samples/components/SampleForm';
+import { SampleForm } from '@/features/samples/components/SampleForm';
 
 export default function CreateSamplePage() {
   return (

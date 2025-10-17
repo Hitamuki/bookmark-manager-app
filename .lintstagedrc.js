@@ -1,5 +1,5 @@
 // 除外対象のディレクトリ
-const EXCLUDED_DIRS = ['poc', 'sandbox', '.vscode', 'src/libs/api-client'];
+const EXCLUDED_DIRS = ['poc', 'sandbox', '.vscode', 'src/libs/api-client', 'src/apps/frontend/web/public'];
 
 const shouldInclude = (filePath) => {
   // 絶対パスから相対パスに変換

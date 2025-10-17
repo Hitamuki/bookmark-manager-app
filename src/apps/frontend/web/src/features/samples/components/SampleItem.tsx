@@ -1,9 +1,20 @@
 'use client';
 
+import { useSampleControllerDeleteSampleById } from '@/libs/api-client/endpoints/samples/samples';
+import type { SampleDto } from '@/libs/api-client/model';
+import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
-import type { Sample } from '../types/sample';
 
-export const SampleItem = ({ sample }: { sample: Sample }) => {
+export const SampleItem = ({ sample }: { sample: SampleDto }) => {
+  const queryClient = useQueryClient();
+  const deleteMutation = useSampleControllerDeleteSampleById({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['/api/samples'] });
+      },
+    },
+  });
+
   return (
     <li className="flex justify-between items-center border rounded-lg p-3 hover:bg-gray-50">
       <Link href={`/samples/${sample.id}`} className="text-blue-600 font-medium">
@@ -12,8 +23,7 @@ export const SampleItem = ({ sample }: { sample: Sample }) => {
       <button
         type="button"
         onClick={() => {
-          // TODO: Implement delete mutation
-          console.log('Deleting sample:', sample.id);
+          deleteMutation.mutateAsync({ id: sample.id });
         }}
         className="text-red-500 text-sm"
       >

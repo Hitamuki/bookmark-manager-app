@@ -11,11 +11,12 @@
     "ignore": [
       "**/node_modules/**",
       "**/dist/**",
-      "**/api-client/**",
       "docs/**",
       ".nx/**",
       ".vscode/**",
-      "**/*.{md,html,scss,yml,yaml,toml}"
+      "**/*.{md,html,scss,yml,yaml,toml}",
+      "**/api-client/**",
+      "src/apps/frontend/web/public/mockServiceWorker.js"
     ]
   },
   "organizeImports": {

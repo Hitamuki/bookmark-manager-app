@@ -1,9 +1,9 @@
+import type { SampleDto } from '@/libs/api-client/model';
 import { create } from 'zustand';
-import type { Sample } from '../types/sample';
 
 type State = {
-  editedSample: Partial<Sample> | null;
-  setEditedSample: (sample: Partial<Sample> | null) => void;
+  editedSample: Partial<SampleDto> | null;
+  setEditedSample: (sample: Partial<SampleDto> | null) => void;
 };
 
 export const useSampleStore = create<State>((set) => ({

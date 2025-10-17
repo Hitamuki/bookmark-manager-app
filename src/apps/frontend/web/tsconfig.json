@@ -1,6 +1,7 @@
 {
   "extends": "../../../../tsconfig.base.json",
   "compilerOptions": {
+    "baseUrl": ".",
     "jsx": "preserve",
     "strict": true,
     "noEmit": true,
@@ -19,7 +20,16 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "paths": {
+      "@/libs/api-client/*": ["../../../../src/libs/api-client/*"],
+      "@/features/*": ["./src/features/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/hooks/*": ["./src/hooks/*"],
+      "@/providers/*": ["./src/providers/*"],
+      "@/stores/*": ["./src/stores/*"],
+      "@/utils/*": ["./src/utils/*"]
+    }
   },
   "include": [
     "**/*.js",
