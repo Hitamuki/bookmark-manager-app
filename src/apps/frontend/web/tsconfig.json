@@ -28,7 +28,8 @@
       "@/hooks/*": ["./src/hooks/*"],
       "@/providers/*": ["./src/providers/*"],
       "@/stores/*": ["./src/stores/*"],
-      "@/utils/*": ["./src/utils/*"]
+      "@/utils/*": ["./src/utils/*"],
+      "@/styles/*": ["./src/styles/*"]
     }
   },
   "include": [

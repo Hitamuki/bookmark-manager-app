@@ -5,6 +5,7 @@ import {
   useSampleControllerUpdateSampleById,
 } from '@/libs/api-client/endpoints/samples/samples';
 import { useRouter } from 'next/navigation';
+import { Button } from '../../../../../../../libs/ui/shadcn/components/ui/button';
 import { useSampleForm } from '../hooks/useSampleForm';
 
 export const SampleForm = ({ isEdit = false, id }: { isEdit?: boolean; id?: string }) => {
@@ -39,6 +40,9 @@ export const SampleForm = ({ isEdit = false, id }: { isEdit?: boolean; id?: stri
       <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
         {isEdit ? 'Update' : 'Create'}
       </button>
+      <Button variant="outline" size="sm">
+        test-button
+      </Button>
     </form>
   );
 };
