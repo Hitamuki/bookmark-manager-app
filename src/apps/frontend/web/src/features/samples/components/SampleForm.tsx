@@ -4,6 +4,8 @@ import {
   useSampleControllerCreateSample,
   useSampleControllerUpdateSampleById,
 } from '@/libs/api-client/endpoints/samples/samples';
+import { Button } from '@/libs/ui/shadcn/components/ui/button';
+import { Input } from '@/libs/ui/shadcn/components/ui/input';
 import { useRouter } from 'next/navigation';
 import { useSampleForm } from '../hooks/useSampleForm';
 
@@ -27,18 +29,11 @@ export const SampleForm = ({ isEdit = false, id }: { isEdit?: boolean; id?: stri
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto">
-      <input
-        type="text"
-        name="title"
-        value={editedSample?.title ?? ''}
-        onChange={handleChange}
-        placeholder="Title"
-        className="w-full border rounded p-2"
-      />
-      <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+    <form onSubmit={handleSubmit} className="grid gap-4">
+      <Input type="text" name="title" value={editedSample?.title ?? ''} onChange={handleChange} placeholder="Title" />
+      <Button type="submit" variant="default" size="lg">
         {isEdit ? 'Update' : 'Create'}
-      </button>
+      </Button>
     </form>
   );
 };

@@ -38,6 +38,11 @@
       "@commitlint/config-conventional"
     ]
   },
+  "msw": {
+    "workerDirectory": [
+      "src/apps/frontend/web/public"
+    ]
+  },
   "packageManager": "pnpm@10.8.1",
   "engines": {
     "node": ">=22",
@@ -56,6 +61,7 @@
     "@nestjs/platform-express": "11.0.7",
     "@nestjs/swagger": "11.0.7",
     "@prisma/client": "^6.16.3",
+    "@radix-ui/react-slot": "^1.2.3",
     "@tailwindcss/postcss": "^4.1.14",
     "@tanstack/react-query": "^5.90.3",
     "@types/k6": "^1.3.1",
@@ -64,21 +70,29 @@
     "bcrypt": "^5.1.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.546.0",
     "msw": "^2.11.5",
     "nest-winston": "^1.10.2",
     "next": "~15.2.4",
+    "next-themes": "^0.4.6",
     "orval": "^7.13.2",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
+    "postcss": "8.4.38",
     "prisma": "^6.16.3",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0",
     "shadcn": "^3.4.0",
+    "stylelint-config-tailwindcss": "^1.0.0",
     "swagger-ui-express": "^5.0.0",
+    "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.14",
+    "tw-animate-css": "^1.4.0",
     "unplugin-swc": "^1.5.7",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4",
@@ -99,7 +113,6 @@
     "@nestjs/cli": "11.0.7",
     "@nestjs/schematics": "11.0.7",
     "@nestjs/testing": "11.0.7",
-    "@nx-extend/shadcn-ui": "^5.0.0",
     "@nx/devkit": "21.6.3",
     "@nx/js": "21.6.3",
     "@nx/nest": "21.6.3",
@@ -131,13 +144,12 @@
     "markdownlint-cli2": "^0.18.0",
     "markuplint": "^4.12.0",
     "nx": "21.6.3",
-    "postcss": "8.4.38",
     "postcss-html": "^1.8.0",
     "postcss-scss": "^4.0.9",
     "prettier": "^2.6.2",
-    "stylelint": "^16.19.1",
-    "stylelint-config-recess-order": "^6.0.0",
-    "stylelint-config-recommended-scss": "^14.1.0",
+    "stylelint": "^16.25.0",
+    "stylelint-config-recess-order": "^7.4.0",
+    "stylelint-config-recommended-scss": "^16.0.2",
     "supertest": "^7.1.4",
     "textlint": "14.7.1",
     "textlint-rule-no-mix-dearu-desumasu": "^6.0.4",
@@ -147,10 +159,5 @@
     "tslib": "^2.3.0",
     "typescript": "5.9.3",
     "webpack-cli": "^5.1.4"
-  },
-  "msw": {
-    "workerDirectory": [
-      "src/apps/frontend/web/public"
-    ]
   }
 }

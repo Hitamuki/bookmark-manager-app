@@ -16,7 +16,8 @@
       ".vscode/**",
       "**/*.{md,html,scss,yml,yaml,toml}",
       "**/api-client/**",
-      "src/apps/frontend/web/public/mockServiceWorker.js"
+      "src/apps/frontend/web/public/mockServiceWorker.js",
+      "src/libs/ui/shadcn/**"
     ]
   },
   "organizeImports": {

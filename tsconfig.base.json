@@ -15,7 +15,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@libs/*": ["src/libs/*"]
+      "@/apps/*": ["./src/apps/*"],
+      "@/libs/*": ["./src/libs/*"],
+      "@/web/*": ["./src/apps/frontend/web/*"]
     },
     "types": ["vitest/globals"]
   },

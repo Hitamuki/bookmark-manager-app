@@ -63,6 +63,7 @@
     "formulahendry.auto-rename-tag",
     "vincaslt.highlight-matching-tag",
     "nrwl.angular-console",
+    "bradlc.vscode-tailwindcss",
     // ◆ Testing
     "vitest.explorer",
     "ms-playwright.playwright",

@@ -28,7 +28,9 @@
       "@/hooks/*": ["./src/hooks/*"],
       "@/providers/*": ["./src/providers/*"],
       "@/stores/*": ["./src/stores/*"],
-      "@/utils/*": ["./src/utils/*"]
+      "@/utils/*": ["./src/utils/*"],
+      "@/styles/*": ["./src/styles/*"],
+      "@/libs/ui/shadcn/*": ["../../../../src/libs/ui/shadcn/*"]
     }
   },
   "include": [
@@ -36,6 +38,7 @@
     "**/*.jsx",
     "**/*.ts",
     "**/*.tsx",
+    "**/*.css",
     "../../../../dist/src/apps/frontend/web/.next/types/**/*.ts",
     "../../../../src/apps/frontend/web/.next/types/**/*.ts",
     "next-env.d.ts",
