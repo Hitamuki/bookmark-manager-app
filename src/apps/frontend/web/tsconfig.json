@@ -29,8 +29,7 @@
       "@/providers/*": ["./src/providers/*"],
       "@/stores/*": ["./src/stores/*"],
       "@/utils/*": ["./src/utils/*"],
-      "@/styles/*": ["./src/styles/*"],
-      "@/libs/ui/shadcn/*": ["../../../../src/libs/ui/shadcn/*"]
+      "@/styles/*": ["./src/styles/*"]
     }
   },
   "include": [

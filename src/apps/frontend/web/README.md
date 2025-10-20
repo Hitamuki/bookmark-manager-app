@@ -25,8 +25,6 @@ SPA
 pnpm nx run web:build
 # ローカル環境実行
 pnpm nx run web:dev
-# shadcnでUIコンポーネントを作成
-pnpm dlx shadcn@latest add <コンポーネント名>
 ```
 
 ## ToDo

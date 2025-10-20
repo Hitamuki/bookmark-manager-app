@@ -5,7 +5,6 @@ export const metadata = {
 
 import '@/styles/globals.css';
 import MswProvider from '@/providers/MswProvider';
-import { ThemeProvider } from '@/providers/ThemeProvider';
 import ReactQueryProvider from '../providers/ReactQueryProvider';
 
 // ルートレイアウト（全ページ共通）
@@ -15,15 +14,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ja" suppressHydrationWarning>
-      <body className="flex min-h-screen flex-col">
+    <html lang="ja">
+      <body>
         <MswProvider>
           <ReactQueryProvider>
-            <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-              <header className="bg-gray-800 p-4 text-white">Header</header>
-              <main className="container mx-auto flex-grow p-4">{children}</main>
-              <footer className="bg-gray-800 p-4 text-white">Footer</footer>
-            </ThemeProvider>
+            <header>Header</header>
+            <main>{children}</main>
+            <footer>Footer</footer>
           </ReactQueryProvider>
         </MswProvider>
       </body>

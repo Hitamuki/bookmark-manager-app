@@ -2,7 +2,6 @@
 
 import { useSampleControllerDeleteSampleById } from '@/libs/api-client/endpoints/samples/samples';
 import type { SampleDto } from '@/libs/api-client/model';
-import { Button } from '@/libs/ui/shadcn/components/ui/button';
 import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 
@@ -17,17 +16,16 @@ export const SampleItem = ({ sample }: { sample: SampleDto }) => {
   });
 
   return (
-    <li className="flex items-center justify-between p-4">
+    <li>
       <Link href={`/samples/${sample.id}`}>{sample.title}</Link>
-      <Button
-        variant="default"
-        size="sm"
+      <button
+        type="button"
         onClick={() => {
           deleteMutation.mutateAsync({ id: sample.id });
         }}
       >
         Delete
-      </Button>
+      </button>
     </li>
   );
 };
