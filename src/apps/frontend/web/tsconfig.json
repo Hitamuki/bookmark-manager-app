@@ -29,7 +29,8 @@
       "@/providers/*": ["./src/providers/*"],
       "@/stores/*": ["./src/stores/*"],
       "@/utils/*": ["./src/utils/*"],
-      "@/styles/*": ["./src/styles/*"]
+      "@/styles/*": ["./src/styles/*"],
+      "@/libs/ui/generate/*": ["../../../../src/libs/ui/generate/*"]
     }
   },
   "include": [

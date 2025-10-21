@@ -1,0 +1,18 @@
+{
+  "style": "new-york-v4",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "src/apps/frontend/web/src/styles/globals.css",
+    "baseColor": "",
+    "cssVariables": false
+  },
+  "aliases": {
+    "components": "@libs/ui/generate/components",
+    "utils": "@libs/ui/generate/utils"
+  },
+  "registries": {
+    "@intentui": "https://intentui.com/r/{name}"
+  }
+}

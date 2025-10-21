@@ -1,1 +1,9 @@
+# 現在のブランチ名を取得
+branch=$(git rev-parse --abbrev-ref HEAD)
+
+# mainブランチ以外ならスキップ
+if [ "$branch" != "main" ]; then
+  exit 0
+fi
+
 pnpm lint-staged

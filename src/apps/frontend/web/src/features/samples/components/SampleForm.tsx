@@ -4,6 +4,7 @@ import {
   useSampleControllerCreateSample,
   useSampleControllerUpdateSampleById,
 } from '@/libs/api-client/endpoints/samples/samples';
+import { Button } from '@/libs/ui/generate/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useSampleForm } from '../hooks/useSampleForm';
 
@@ -30,6 +31,7 @@ export const SampleForm = ({ isEdit = false, id }: { isEdit?: boolean; id?: stri
     <form onSubmit={handleSubmit}>
       <input type="text" name="title" value={editedSample?.title ?? ''} onChange={handleChange} placeholder="Title" />
       <button type="submit">{isEdit ? 'Update' : 'Create'}</button>
+      <Button onPress={() => alert('Pressed')}>Label</Button>
     </form>
   );
 };
