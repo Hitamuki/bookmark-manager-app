@@ -4,6 +4,7 @@ export const metadata = {
 };
 
 import '@/styles/globals.css';
+import { HeroUiProvider } from '@/providers/HeroUiProvider';
 import MswProvider from '@/providers/MswProvider';
 import ReactQueryProvider from '../providers/ReactQueryProvider';
 
@@ -14,13 +15,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ja">
+    <html lang="en" className="light">
       <body>
         <MswProvider>
           <ReactQueryProvider>
-            <header>Header</header>
-            <main>{children}</main>
-            <footer>Footer</footer>
+            <HeroUiProvider>
+              <header>Header</header>
+              <main>{children}</main>
+              <footer>Footer</footer>
+            </HeroUiProvider>
           </ReactQueryProvider>
         </MswProvider>
       </body>

@@ -4,6 +4,8 @@ import {
   useSampleControllerCreateSample,
   useSampleControllerUpdateSampleById,
 } from '@/libs/api-client/endpoints/samples/samples';
+import { Button } from '@heroui/button';
+import { Input } from '@heroui/input';
 import { useRouter } from 'next/navigation';
 import { useSampleForm } from '../hooks/useSampleForm';
 
@@ -27,9 +29,18 @@ export const SampleForm = ({ isEdit = false, id }: { isEdit?: boolean; id?: stri
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input type="text" name="title" value={editedSample?.title ?? ''} onChange={handleChange} placeholder="Title" />
-      <button type="submit">{isEdit ? 'Update' : 'Create'}</button>
+    <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
+      <Input
+        type="text"
+        name="title"
+        value={editedSample?.title ?? ''}
+        onChange={handleChange}
+        placeholder="Title"
+        label="タイトル"
+      />
+      <Button type="submit" color="primary">
+        {isEdit ? 'Update' : 'Create'}
+      </Button>
     </form>
   );
 };
