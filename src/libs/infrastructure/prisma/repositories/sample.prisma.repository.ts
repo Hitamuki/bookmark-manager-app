@@ -1,7 +1,7 @@
-import { SampleEntity } from '@libs/domain/sample/entities/sample.entity';
-import type { SampleRepository } from '@libs/domain/sample/repositories/sample.repository';
+import { SampleEntity } from '@/libs/domain/sample/entities/sample.entity';
+import type { SampleRepository } from '@/libs/domain/sample/repositories/sample.repository';
 // biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
-import { PrismaService } from '@libs/infrastructure/prisma/prisma.service';
+import { PrismaService } from '@/libs/infrastructure/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

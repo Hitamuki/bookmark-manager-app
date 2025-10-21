@@ -1,13 +1,13 @@
-import { CreateSampleCommand } from '@libs/application/sample/commands/create-sample.command';
-import { UpdateSampleCommand } from '@libs/application/sample/commands/update-sample.command';
+import { CreateSampleCommand } from '@/libs/application/sample/commands/create-sample.command';
+import { UpdateSampleCommand } from '@/libs/application/sample/commands/update-sample.command';
 // biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
-import { CreateSampleDto } from '@libs/application/sample/dto/create-sample.dto';
-import { ApiOkResponsePagination, type PaginationDto } from '@libs/application/sample/dto/pagination.dto';
-import { SampleDto } from '@libs/application/sample/dto/sample.dto';
+import { CreateSampleDto } from '@/libs/application/sample/dto/create-sample.dto';
+import { ApiOkResponsePagination, type PaginationDto } from '@/libs/application/sample/dto/pagination.dto';
+import { SampleDto } from '@/libs/application/sample/dto/sample.dto';
 // biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
-import { UpdateSampleDto } from '@libs/application/sample/dto/update-sample.dto';
-import { GetSampleQuery } from '@libs/application/sample/queries/get-sample.query';
-import { GetSamplesQuery } from '@libs/application/sample/queries/get-samples.query';
+import { UpdateSampleDto } from '@/libs/application/sample/dto/update-sample.dto';
+import { GetSampleQuery } from '@/libs/application/sample/queries/get-sample.query';
+import { GetSamplesQuery } from '@/libs/application/sample/queries/get-samples.query';
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, ParseUUIDPipe, Post, Put, Query } from '@nestjs/common';
 // biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
 import { CommandBus, QueryBus } from '@nestjs/cqrs';

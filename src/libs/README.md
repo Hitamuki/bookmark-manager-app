@@ -5,7 +5,7 @@
 ### コマンド
 
 ``` bash
-# Prismaクライアントコードを生成（スキーマの変更の都度実行する）
+# Prismaクライアントコードを生成（スキーマの変更やnode_modulesの削除時実行）
 npx prisma generate
 # Prismaマイグレーションを実行（スキーマの変更の都度実行する）
 npx prisma migrate dev

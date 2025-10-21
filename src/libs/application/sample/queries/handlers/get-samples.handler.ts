@@ -1,4 +1,4 @@
-import { SAMPLE_REPOSITORY, type SampleRepository } from '@libs/domain/sample/repositories/sample.repository';
+import { SAMPLE_REPOSITORY, type SampleRepository } from '@/libs/domain/sample/repositories/sample.repository';
 import { Inject } from '@nestjs/common';
 import { type IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { PaginationDto } from '../../dto/pagination.dto';

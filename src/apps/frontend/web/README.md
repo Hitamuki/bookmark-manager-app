@@ -23,7 +23,7 @@ SPA
 ``` bash
 # ビルド
 pnpm nx run web:build
-# ローカル環境実行
+# ローカル環境実行（モックを使用する場合は.envのNEXT_PUBLIC_API_MOCKINGをtrueに設定）
 pnpm nx run web:dev
 ```
 

@@ -27,6 +27,8 @@ pnpm nx run api-core:build
 pnpm nx run api-core:serve
 # APIクライアント生成
 pnpm generate:api-client
+# テスト実行
+pnpm exec nx run api-core:test
 ```
 
 ## ToDo

@@ -1,7 +1,7 @@
 import * as fs from 'node:fs';
 import path from 'node:path';
+import { WinstonConfig } from '@/libs/infrastructure/logging/winston.config';
 import { patchNestjsSwagger } from '@anatine/zod-nestjs';
-import { WinstonConfig } from '@libs/infrastructure/logging/winston.config';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
