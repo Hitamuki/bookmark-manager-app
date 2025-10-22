@@ -1,17 +1,18 @@
-import { Button } from '@heroui/button';
+import { Button } from '@heroui/react';
+import { PlusIcon } from 'lucide-react';
 import Link from 'next/link';
-import { SampleList } from '../../features/samples/components/SampleList';
+import { SamplesLayout } from '../../features/samples/components/layout/SamplesLayout';
+import { SampleList } from '../../features/samples/components/ui/SampleList';
 
 export default function SamplesPage() {
   return (
-    <div>
-      <div>
-        <h1 className="text-emerald-700">Samples</h1>
-        <Button as={Link} href="/samples/create" color="primary">
-          Create New
+    <SamplesLayout>
+      <div className="flex justify-end">
+        <Button as={Link} href="/samples/create" isIconOnly color="primary">
+          <PlusIcon className="h-4 w-4" />
         </Button>
       </div>
       <SampleList />
-    </div>
+    </SamplesLayout>
   );
 }

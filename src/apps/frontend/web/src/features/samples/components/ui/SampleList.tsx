@@ -1,15 +1,16 @@
 'use client';
 
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { PAGINATION } from '@/constants/pagination';
 import {
   useSampleControllerDeleteSampleById,
   useSampleControllerSearchSamples,
 } from '@/libs/api-client/endpoints/samples/samples';
 import type { SampleDto } from '@/libs/api-client/model';
-import { Button } from '@heroui/button';
-import { Pagination } from '@heroui/pagination';
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/table';
+import { Button, Pagination, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import { useQueryClient } from '@tanstack/react-query';
+import { Edit, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -31,12 +32,13 @@ export const SampleList = () => {
     },
   });
 
+  // TODO: ローディングスケルトン検討
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <LoadingSpinner />;
   }
 
   if (isError) {
-    return <div>Error fetching data</div>;
+    return <ErrorDisplay />;
   }
 
   const samples = data?.data.data || [];
@@ -52,21 +54,33 @@ export const SampleList = () => {
         <TableBody>
           {samples.map((sample: SampleDto) => (
             <TableRow key={sample.id}>
+              <TableCell>{sample.title}</TableCell>
               <TableCell>
-                <Link href={`/samples/${sample.id}`} className="text-blue-600 hover:underline">
-                  {sample.title}
-                </Link>
-              </TableCell>
-              <TableCell>
-                <Button color="danger" size="sm" onPress={() => deleteMutation.mutateAsync({ id: sample.id })}>
-                  Delete
-                </Button>
+                <div className="flex items-center space-x-2">
+                  <Link href={`/samples/${sample.id}`}>
+                    <Button isIconOnly size="sm" variant="light" aria-label="Edit sample">
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                  <Button
+                    isIconOnly
+                    color="danger"
+                    size="sm"
+                    variant="light"
+                    onPress={() => deleteMutation.mutateAsync({ id: sample.id })}
+                    aria-label="Delete sample"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-      <Pagination isCompact showControls page={currentPage} total={totalPages} onChange={setCurrentPage} />
+      <div className="flex justify-center">
+        <Pagination isCompact showControls page={currentPage} total={totalPages} onChange={setCurrentPage} />
+      </div>
     </div>
   );
 };

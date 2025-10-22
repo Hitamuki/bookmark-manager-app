@@ -34,14 +34,10 @@
     }
   },
   "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
+    "extends": ["@commitlint/config-conventional"]
   },
   "msw": {
-    "workerDirectory": [
-      "src/apps/frontend/web/public"
-    ]
+    "workerDirectory": ["src/apps/frontend/web/public"]
   },
   "packageManager": "pnpm@10.8.1",
   "engines": {
@@ -53,12 +49,8 @@
   "dependencies": {
     "@anatine/zod-nestjs": "^2.0.12",
     "@faker-js/faker": "^10.1.0",
-    "@heroui/button": "^2.2.27",
-    "@heroui/input": "^2.4.28",
-    "@heroui/pagination": "^2.2.24",
     "@heroui/react": "^2.8.5",
     "@heroui/system": "^2.4.23",
-    "@heroui/table": "^2.2.27",
     "@heroui/theme": "^2.4.23",
     "@nestjs/common": "11.0.7",
     "@nestjs/config": "^4.0.2",
@@ -78,6 +70,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "framer-motion": "^12.23.24",
+    "lucide-react": "^0.546.0",
     "msw": "^2.11.5",
     "nest-winston": "^1.10.2",
     "next": "~15.2.4",

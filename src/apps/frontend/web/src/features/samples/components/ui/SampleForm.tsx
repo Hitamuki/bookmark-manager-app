@@ -4,13 +4,12 @@ import {
   useSampleControllerCreateSample,
   useSampleControllerUpdateSampleById,
 } from '@/libs/api-client/endpoints/samples/samples';
-import { Button } from '@heroui/button';
-import { Input } from '@heroui/input';
+import { Button, Form, Input } from '@heroui/react';
 import { useRouter } from 'next/navigation';
-import { useSampleForm } from '../hooks/useSampleForm';
+import { useSampleForm } from '../../hooks/useSampleForm';
 
 export const SampleForm = ({ isEdit = false, id }: { isEdit?: boolean; id?: string }) => {
-  const { editedSample, handleChange } = useSampleForm();
+  const { editedSample, setEditedSample, handleChange } = useSampleForm(isEdit, id);
   const router = useRouter();
 
   const createMutation = useSampleControllerCreateSample();
@@ -29,8 +28,10 @@ export const SampleForm = ({ isEdit = false, id }: { isEdit?: boolean; id?: stri
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
+    <Form onSubmit={handleSubmit} onReset={() => setEditedSample({ title: '' })} className="flex flex-col space-y-4">
       <Input
+        isRequired
+        errorMessage="必須入力です"
         type="text"
         name="title"
         value={editedSample?.title ?? ''}
@@ -38,9 +39,14 @@ export const SampleForm = ({ isEdit = false, id }: { isEdit?: boolean; id?: stri
         placeholder="Title"
         label="タイトル"
       />
-      <Button type="submit" color="primary">
-        {isEdit ? 'Update' : 'Create'}
-      </Button>
-    </form>
+      <div className="flex flex-row justify-center gap-2">
+        <Button type="submit" color="primary">
+          {isEdit ? 'Update' : 'Create'}
+        </Button>
+        <Button type="reset" variant="flat">
+          Reset
+        </Button>
+      </div>
+    </Form>
   );
 };

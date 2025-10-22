@@ -16,13 +16,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="light">
-      <body>
+      <body className="min-h-screen">
         <MswProvider>
           <ReactQueryProvider>
             <HeroUiProvider>
-              <header>Header</header>
-              <main>{children}</main>
-              <footer>Footer</footer>
+              <header className="p-4 bg-gray-100">Header</header>
+              <main className="container mx-auto px-4 py-8 flex-grow">{children}</main>
+              <footer className="p-4 bg-gray-100">Footer</footer>
             </HeroUiProvider>
           </ReactQueryProvider>
         </MswProvider>

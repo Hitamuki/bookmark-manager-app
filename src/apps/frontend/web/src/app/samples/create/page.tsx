@@ -1,10 +1,10 @@
-import { SampleForm } from '@/features/samples/components/SampleForm';
+import { SampleCreateLayout } from '@/features/samples/components/layout/SampleCreateLayout';
+import { SampleForm } from '@/features/samples/components/ui/SampleForm';
 
 export default function CreateSamplePage() {
   return (
-    <div>
-      <h1>Create Sample</h1>
+    <SampleCreateLayout>
       <SampleForm />
-    </div>
+    </SampleCreateLayout>
   );
 }

@@ -1,11 +1,11 @@
-import { SampleForm } from '@/features/samples/components/SampleForm';
+import { SampleEditLayout } from '@/features/samples/components/layout/SampleEditLayout';
+import { SampleForm } from '@/features/samples/components/ui/SampleForm';
 
 export default async function EditSamplePage({ params }: { params: Promise<{ uuid: string }> }) {
   const { uuid } = await params;
   return (
-    <div>
-      <h1>Edit Sample</h1>
+    <SampleEditLayout>
       <SampleForm isEdit id={uuid} />
-    </div>
+    </SampleEditLayout>
   );
 }
