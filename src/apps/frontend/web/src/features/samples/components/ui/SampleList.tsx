@@ -18,7 +18,7 @@ export const SampleList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const offset = (currentPage - 1) * PAGINATION.ITEMS_PER_PAGE;
 
-  const { data, isLoading, isError } = useSampleControllerSearchSamples({
+  const { data, isLoading, isError, error } = useSampleControllerSearchSamples({
     limit: PAGINATION.ITEMS_PER_PAGE,
     offset,
   });
@@ -38,7 +38,7 @@ export const SampleList = () => {
   }
 
   if (isError) {
-    return <ErrorDisplay />;
+    return <ErrorDisplay message={error?.message} statusCode={error?.response?.status} />;
   }
 
   const samples = data?.data.data || [];

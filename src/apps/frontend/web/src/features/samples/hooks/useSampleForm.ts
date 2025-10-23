@@ -8,8 +8,12 @@ import { useSampleStore } from '../stores/sampleStore';
 
 export const useSampleForm = (isEdit: boolean, id?: string) => {
   const { editedSample, setEditedSample } = useSampleStore();
-  // TODO: 404NotFound対応
-  const { data: sampleData } = useSampleControllerGetSampleById(id ?? '', { query: { enabled: isEdit && !!id } });
+  const {
+    data: sampleData,
+    isLoading,
+    isError,
+    error,
+  } = useSampleControllerGetSampleById(id ?? '', { query: { enabled: isEdit && !!id } });
 
   useEffect(() => {
     if (isEdit && sampleData) {
@@ -24,5 +28,5 @@ export const useSampleForm = (isEdit: boolean, id?: string) => {
     setEditedSample({ ...editedSample, [name]: value });
   };
 
-  return { editedSample, setEditedSample, handleChange };
+  return { editedSample, setEditedSample, handleChange, isLoading, isError, error };
 };

@@ -8,7 +8,7 @@ export default {
       target: './../libs/api-client/endpoints',
       schemas: './../libs/api-client/model',
       client: 'react-query', // TanStack Query
-      httpClient: 'fetch',
+      httpClient: 'axios',
       mock: true,
       biome: true,
       clean: true,

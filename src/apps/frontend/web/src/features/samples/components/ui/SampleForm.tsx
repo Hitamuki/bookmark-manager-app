@@ -1,5 +1,7 @@
 'use client';
 
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import {
   useSampleControllerCreateSample,
   useSampleControllerUpdateSampleById,
@@ -9,9 +11,8 @@ import { useRouter } from 'next/navigation';
 import { useSampleForm } from '../../hooks/useSampleForm';
 
 export const SampleForm = ({ isEdit = false, id }: { isEdit?: boolean; id?: string }) => {
-  const { editedSample, setEditedSample, handleChange } = useSampleForm(isEdit, id);
+  const { editedSample, setEditedSample, handleChange, isLoading, isError, error } = useSampleForm(isEdit, id);
   const router = useRouter();
-
   const createMutation = useSampleControllerCreateSample();
   const updateMutation = useSampleControllerUpdateSampleById();
 
@@ -26,6 +27,14 @@ export const SampleForm = ({ isEdit = false, id }: { isEdit?: boolean; id?: stri
     }
     router.push('/samples');
   };
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (isError) {
+    return <ErrorDisplay message={error?.message} statusCode={error?.response?.status} />;
+  }
 
   return (
     <Form onSubmit={handleSubmit} onReset={() => setEditedSample({ title: '' })} className="flex flex-col space-y-4">

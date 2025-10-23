@@ -24,6 +24,13 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
+import axios from 'axios';
+import type {
+  AxiosError,
+  AxiosRequestConfig,
+  AxiosResponse
+} from 'axios';
+
 import type {
   CreateSampleDto,
   SampleControllerSearchSamples200,
@@ -36,50 +43,17 @@ import type {
 
 
 
-export type sampleControllerSearchSamplesResponse200 = {
-  data: SampleControllerSearchSamples200
-  status: 200
-}
+export const sampleControllerSearchSamples = (
+    params?: SampleControllerSearchSamplesParams, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<SampleControllerSearchSamples200>> => {
     
-export type sampleControllerSearchSamplesResponseSuccess = (sampleControllerSearchSamplesResponse200) & {
-  headers: Headers;
-};
-;
-
-export type sampleControllerSearchSamplesResponse = (sampleControllerSearchSamplesResponseSuccess)
-
-export const getSampleControllerSearchSamplesUrl = (params?: SampleControllerSearchSamplesParams,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
     
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/samples?${stringifiedParams}` : `/api/samples`
-}
-
-export const sampleControllerSearchSamples = async (params?: SampleControllerSearchSamplesParams, options?: RequestInit): Promise<sampleControllerSearchSamplesResponse> => {
-  
-  const res = await fetch(getSampleControllerSearchSamplesUrl(params),
-  {      
+    return axios.get(
+      `/api/samples`,{
     ...options,
-    method: 'GET'
-    
-    
+        params: {...params, ...options?.params},}
+    );
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: sampleControllerSearchSamplesResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as sampleControllerSearchSamplesResponse
-}
-
 
 
 
@@ -91,16 +65,16 @@ export const getSampleControllerSearchSamplesQueryKey = (params?: SampleControll
     }
 
     
-export const getSampleControllerSearchSamplesQueryOptions = <TData = Awaited<ReturnType<typeof sampleControllerSearchSamples>>, TError = unknown>(params?: SampleControllerSearchSamplesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sampleControllerSearchSamples>>, TError, TData>>, fetch?: RequestInit}
+export const getSampleControllerSearchSamplesQueryOptions = <TData = Awaited<ReturnType<typeof sampleControllerSearchSamples>>, TError = AxiosError<unknown>>(params?: SampleControllerSearchSamplesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sampleControllerSearchSamples>>, TError, TData>>, axios?: AxiosRequestConfig}
 ) => {
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getSampleControllerSearchSamplesQueryKey(params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof sampleControllerSearchSamples>>> = ({ signal }) => sampleControllerSearchSamples(params, { signal, ...fetchOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof sampleControllerSearchSamples>>> = ({ signal }) => sampleControllerSearchSamples(params, { signal, ...axiosOptions });
 
       
 
@@ -110,36 +84,36 @@ const {query: queryOptions, fetch: fetchOptions} = options ?? {};
 }
 
 export type SampleControllerSearchSamplesQueryResult = NonNullable<Awaited<ReturnType<typeof sampleControllerSearchSamples>>>
-export type SampleControllerSearchSamplesQueryError = unknown
+export type SampleControllerSearchSamplesQueryError = AxiosError<unknown>
 
 
-export function useSampleControllerSearchSamples<TData = Awaited<ReturnType<typeof sampleControllerSearchSamples>>, TError = unknown>(
+export function useSampleControllerSearchSamples<TData = Awaited<ReturnType<typeof sampleControllerSearchSamples>>, TError = AxiosError<unknown>>(
  params: undefined |  SampleControllerSearchSamplesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof sampleControllerSearchSamples>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof sampleControllerSearchSamples>>,
           TError,
           Awaited<ReturnType<typeof sampleControllerSearchSamples>>
         > , 'initialData'
-      >, fetch?: RequestInit}
+      >, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSampleControllerSearchSamples<TData = Awaited<ReturnType<typeof sampleControllerSearchSamples>>, TError = unknown>(
+export function useSampleControllerSearchSamples<TData = Awaited<ReturnType<typeof sampleControllerSearchSamples>>, TError = AxiosError<unknown>>(
  params?: SampleControllerSearchSamplesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sampleControllerSearchSamples>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof sampleControllerSearchSamples>>,
           TError,
           Awaited<ReturnType<typeof sampleControllerSearchSamples>>
         > , 'initialData'
-      >, fetch?: RequestInit}
+      >, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSampleControllerSearchSamples<TData = Awaited<ReturnType<typeof sampleControllerSearchSamples>>, TError = unknown>(
- params?: SampleControllerSearchSamplesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sampleControllerSearchSamples>>, TError, TData>>, fetch?: RequestInit}
+export function useSampleControllerSearchSamples<TData = Awaited<ReturnType<typeof sampleControllerSearchSamples>>, TError = AxiosError<unknown>>(
+ params?: SampleControllerSearchSamplesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sampleControllerSearchSamples>>, TError, TData>>, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useSampleControllerSearchSamples<TData = Awaited<ReturnType<typeof sampleControllerSearchSamples>>, TError = unknown>(
- params?: SampleControllerSearchSamplesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sampleControllerSearchSamples>>, TError, TData>>, fetch?: RequestInit}
+export function useSampleControllerSearchSamples<TData = Awaited<ReturnType<typeof sampleControllerSearchSamples>>, TError = AxiosError<unknown>>(
+ params?: SampleControllerSearchSamplesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sampleControllerSearchSamples>>, TError, TData>>, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -154,57 +128,29 @@ export function useSampleControllerSearchSamples<TData = Awaited<ReturnType<type
 
 
 
-export type sampleControllerCreateSampleResponse201 = {
-  data: void
-  status: 201
-}
+export const sampleControllerCreateSample = (
+    createSampleDto: CreateSampleDto, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<void>> => {
     
-export type sampleControllerCreateSampleResponseSuccess = (sampleControllerCreateSampleResponse201) & {
-  headers: Headers;
-};
-;
-
-export type sampleControllerCreateSampleResponse = (sampleControllerCreateSampleResponseSuccess)
-
-export const getSampleControllerCreateSampleUrl = () => {
-
-
-  
-
-  return `/api/samples`
-}
-
-export const sampleControllerCreateSample = async (createSampleDto: CreateSampleDto, options?: RequestInit): Promise<sampleControllerCreateSampleResponse> => {
-  
-  const res = await fetch(getSampleControllerCreateSampleUrl(),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      createSampleDto,)
+    
+    return axios.post(
+      `/api/samples`,
+      createSampleDto,options
+    );
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: sampleControllerCreateSampleResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as sampleControllerCreateSampleResponse
-}
 
 
 
-
-export const getSampleControllerCreateSampleMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sampleControllerCreateSample>>, TError,{data: CreateSampleDto}, TContext>, fetch?: RequestInit}
+export const getSampleControllerCreateSampleMutationOptions = <TError = AxiosError<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sampleControllerCreateSample>>, TError,{data: CreateSampleDto}, TContext>, axios?: AxiosRequestConfig}
 ): UseMutationOptions<Awaited<ReturnType<typeof sampleControllerCreateSample>>, TError,{data: CreateSampleDto}, TContext> => {
 
 const mutationKey = ['sampleControllerCreateSample'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+const {mutation: mutationOptions, axios: axiosOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+      : {mutation: { mutationKey, }, axios: undefined};
 
       
 
@@ -212,7 +158,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof sampleControllerCreateSample>>, {data: CreateSampleDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  sampleControllerCreateSample(data,fetchOptions)
+          return  sampleControllerCreateSample(data,axiosOptions)
         }
 
         
@@ -222,10 +168,10 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
 
     export type SampleControllerCreateSampleMutationResult = NonNullable<Awaited<ReturnType<typeof sampleControllerCreateSample>>>
     export type SampleControllerCreateSampleMutationBody = CreateSampleDto
-    export type SampleControllerCreateSampleMutationError = unknown
+    export type SampleControllerCreateSampleMutationError = AxiosError<unknown>
 
-    export const useSampleControllerCreateSample = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sampleControllerCreateSample>>, TError,{data: CreateSampleDto}, TContext>, fetch?: RequestInit}
+    export const useSampleControllerCreateSample = <TError = AxiosError<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sampleControllerCreateSample>>, TError,{data: CreateSampleDto}, TContext>, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof sampleControllerCreateSample>>,
         TError,
@@ -237,43 +183,15 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
 
       return useMutation(mutationOptions, queryClient);
     }
-    export type sampleControllerGetSampleByIdResponse200 = {
-  data: SampleDto
-  status: 200
-}
-    
-export type sampleControllerGetSampleByIdResponseSuccess = (sampleControllerGetSampleByIdResponse200) & {
-  headers: Headers;
-};
-;
-
-export type sampleControllerGetSampleByIdResponse = (sampleControllerGetSampleByIdResponseSuccess)
-
-export const getSampleControllerGetSampleByIdUrl = (id: string,) => {
-
-
-  
-
-  return `/api/samples/${id}`
-}
-
-export const sampleControllerGetSampleById = async (id: string, options?: RequestInit): Promise<sampleControllerGetSampleByIdResponse> => {
-  
-  const res = await fetch(getSampleControllerGetSampleByIdUrl(id),
-  {      
-    ...options,
-    method: 'GET'
+    export const sampleControllerGetSampleById = (
+    id: string, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<SampleDto>> => {
     
     
+    return axios.get(
+      `/api/samples/${id}`,options
+    );
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: sampleControllerGetSampleByIdResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as sampleControllerGetSampleByIdResponse
-}
-
 
 
 
@@ -285,16 +203,16 @@ export const getSampleControllerGetSampleByIdQueryKey = (id?: string,) => {
     }
 
     
-export const getSampleControllerGetSampleByIdQueryOptions = <TData = Awaited<ReturnType<typeof sampleControllerGetSampleById>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sampleControllerGetSampleById>>, TError, TData>>, fetch?: RequestInit}
+export const getSampleControllerGetSampleByIdQueryOptions = <TData = Awaited<ReturnType<typeof sampleControllerGetSampleById>>, TError = AxiosError<unknown>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sampleControllerGetSampleById>>, TError, TData>>, axios?: AxiosRequestConfig}
 ) => {
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getSampleControllerGetSampleByIdQueryKey(id);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof sampleControllerGetSampleById>>> = ({ signal }) => sampleControllerGetSampleById(id, { signal, ...fetchOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof sampleControllerGetSampleById>>> = ({ signal }) => sampleControllerGetSampleById(id, { signal, ...axiosOptions });
 
       
 
@@ -304,36 +222,36 @@ const {query: queryOptions, fetch: fetchOptions} = options ?? {};
 }
 
 export type SampleControllerGetSampleByIdQueryResult = NonNullable<Awaited<ReturnType<typeof sampleControllerGetSampleById>>>
-export type SampleControllerGetSampleByIdQueryError = unknown
+export type SampleControllerGetSampleByIdQueryError = AxiosError<unknown>
 
 
-export function useSampleControllerGetSampleById<TData = Awaited<ReturnType<typeof sampleControllerGetSampleById>>, TError = unknown>(
+export function useSampleControllerGetSampleById<TData = Awaited<ReturnType<typeof sampleControllerGetSampleById>>, TError = AxiosError<unknown>>(
  id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof sampleControllerGetSampleById>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof sampleControllerGetSampleById>>,
           TError,
           Awaited<ReturnType<typeof sampleControllerGetSampleById>>
         > , 'initialData'
-      >, fetch?: RequestInit}
+      >, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSampleControllerGetSampleById<TData = Awaited<ReturnType<typeof sampleControllerGetSampleById>>, TError = unknown>(
+export function useSampleControllerGetSampleById<TData = Awaited<ReturnType<typeof sampleControllerGetSampleById>>, TError = AxiosError<unknown>>(
  id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sampleControllerGetSampleById>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof sampleControllerGetSampleById>>,
           TError,
           Awaited<ReturnType<typeof sampleControllerGetSampleById>>
         > , 'initialData'
-      >, fetch?: RequestInit}
+      >, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSampleControllerGetSampleById<TData = Awaited<ReturnType<typeof sampleControllerGetSampleById>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sampleControllerGetSampleById>>, TError, TData>>, fetch?: RequestInit}
+export function useSampleControllerGetSampleById<TData = Awaited<ReturnType<typeof sampleControllerGetSampleById>>, TError = AxiosError<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sampleControllerGetSampleById>>, TError, TData>>, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useSampleControllerGetSampleById<TData = Awaited<ReturnType<typeof sampleControllerGetSampleById>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sampleControllerGetSampleById>>, TError, TData>>, fetch?: RequestInit}
+export function useSampleControllerGetSampleById<TData = Awaited<ReturnType<typeof sampleControllerGetSampleById>>, TError = AxiosError<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sampleControllerGetSampleById>>, TError, TData>>, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -348,58 +266,30 @@ export function useSampleControllerGetSampleById<TData = Awaited<ReturnType<type
 
 
 
-export type sampleControllerUpdateSampleByIdResponse200 = {
-  data: void
-  status: 200
-}
+export const sampleControllerUpdateSampleById = (
+    id: string,
+    updateSampleDto: UpdateSampleDto, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<void>> => {
     
-export type sampleControllerUpdateSampleByIdResponseSuccess = (sampleControllerUpdateSampleByIdResponse200) & {
-  headers: Headers;
-};
-;
-
-export type sampleControllerUpdateSampleByIdResponse = (sampleControllerUpdateSampleByIdResponseSuccess)
-
-export const getSampleControllerUpdateSampleByIdUrl = (id: string,) => {
-
-
-  
-
-  return `/api/samples/${id}`
-}
-
-export const sampleControllerUpdateSampleById = async (id: string,
-    updateSampleDto: UpdateSampleDto, options?: RequestInit): Promise<sampleControllerUpdateSampleByIdResponse> => {
-  
-  const res = await fetch(getSampleControllerUpdateSampleByIdUrl(id),
-  {      
-    ...options,
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      updateSampleDto,)
+    
+    return axios.put(
+      `/api/samples/${id}`,
+      updateSampleDto,options
+    );
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: sampleControllerUpdateSampleByIdResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as sampleControllerUpdateSampleByIdResponse
-}
 
 
 
-
-export const getSampleControllerUpdateSampleByIdMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sampleControllerUpdateSampleById>>, TError,{id: string;data: UpdateSampleDto}, TContext>, fetch?: RequestInit}
+export const getSampleControllerUpdateSampleByIdMutationOptions = <TError = AxiosError<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sampleControllerUpdateSampleById>>, TError,{id: string;data: UpdateSampleDto}, TContext>, axios?: AxiosRequestConfig}
 ): UseMutationOptions<Awaited<ReturnType<typeof sampleControllerUpdateSampleById>>, TError,{id: string;data: UpdateSampleDto}, TContext> => {
 
 const mutationKey = ['sampleControllerUpdateSampleById'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+const {mutation: mutationOptions, axios: axiosOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+      : {mutation: { mutationKey, }, axios: undefined};
 
       
 
@@ -407,7 +297,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof sampleControllerUpdateSampleById>>, {id: string;data: UpdateSampleDto}> = (props) => {
           const {id,data} = props ?? {};
 
-          return  sampleControllerUpdateSampleById(id,data,fetchOptions)
+          return  sampleControllerUpdateSampleById(id,data,axiosOptions)
         }
 
         
@@ -417,10 +307,10 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
 
     export type SampleControllerUpdateSampleByIdMutationResult = NonNullable<Awaited<ReturnType<typeof sampleControllerUpdateSampleById>>>
     export type SampleControllerUpdateSampleByIdMutationBody = UpdateSampleDto
-    export type SampleControllerUpdateSampleByIdMutationError = unknown
+    export type SampleControllerUpdateSampleByIdMutationError = AxiosError<unknown>
 
-    export const useSampleControllerUpdateSampleById = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sampleControllerUpdateSampleById>>, TError,{id: string;data: UpdateSampleDto}, TContext>, fetch?: RequestInit}
+    export const useSampleControllerUpdateSampleById = <TError = AxiosError<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sampleControllerUpdateSampleById>>, TError,{id: string;data: UpdateSampleDto}, TContext>, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof sampleControllerUpdateSampleById>>,
         TError,
@@ -432,56 +322,28 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
 
       return useMutation(mutationOptions, queryClient);
     }
-    export type sampleControllerDeleteSampleByIdResponse200 = {
-  data: void
-  status: 200
-}
-    
-export type sampleControllerDeleteSampleByIdResponseSuccess = (sampleControllerDeleteSampleByIdResponse200) & {
-  headers: Headers;
-};
-;
-
-export type sampleControllerDeleteSampleByIdResponse = (sampleControllerDeleteSampleByIdResponseSuccess)
-
-export const getSampleControllerDeleteSampleByIdUrl = (id: string,) => {
-
-
-  
-
-  return `/api/samples/${id}`
-}
-
-export const sampleControllerDeleteSampleById = async (id: string, options?: RequestInit): Promise<sampleControllerDeleteSampleByIdResponse> => {
-  
-  const res = await fetch(getSampleControllerDeleteSampleByIdUrl(id),
-  {      
-    ...options,
-    method: 'DELETE'
+    export const sampleControllerDeleteSampleById = (
+    id: string, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<void>> => {
     
     
+    return axios.delete(
+      `/api/samples/${id}`,options
+    );
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: sampleControllerDeleteSampleByIdResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as sampleControllerDeleteSampleByIdResponse
-}
 
 
 
-
-export const getSampleControllerDeleteSampleByIdMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sampleControllerDeleteSampleById>>, TError,{id: string}, TContext>, fetch?: RequestInit}
+export const getSampleControllerDeleteSampleByIdMutationOptions = <TError = AxiosError<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sampleControllerDeleteSampleById>>, TError,{id: string}, TContext>, axios?: AxiosRequestConfig}
 ): UseMutationOptions<Awaited<ReturnType<typeof sampleControllerDeleteSampleById>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['sampleControllerDeleteSampleById'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+const {mutation: mutationOptions, axios: axiosOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+      : {mutation: { mutationKey, }, axios: undefined};
 
       
 
@@ -489,7 +351,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof sampleControllerDeleteSampleById>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  sampleControllerDeleteSampleById(id,fetchOptions)
+          return  sampleControllerDeleteSampleById(id,axiosOptions)
         }
 
         
@@ -499,10 +361,10 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
 
     export type SampleControllerDeleteSampleByIdMutationResult = NonNullable<Awaited<ReturnType<typeof sampleControllerDeleteSampleById>>>
     
-    export type SampleControllerDeleteSampleByIdMutationError = unknown
+    export type SampleControllerDeleteSampleByIdMutationError = AxiosError<unknown>
 
-    export const useSampleControllerDeleteSampleById = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sampleControllerDeleteSampleById>>, TError,{id: string}, TContext>, fetch?: RequestInit}
+    export const useSampleControllerDeleteSampleById = <TError = AxiosError<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sampleControllerDeleteSampleById>>, TError,{id: string}, TContext>, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof sampleControllerDeleteSampleById>>,
         TError,
