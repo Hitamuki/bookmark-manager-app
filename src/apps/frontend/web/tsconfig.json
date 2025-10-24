@@ -12,6 +12,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "lib": ["dom", "dom.iterable", "esnext"],
+    "types": ["@testing-library/jest-dom"],
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
@@ -30,7 +31,9 @@
       "@/stores/*": ["./src/stores/*"],
       "@/utils/*": ["./src/utils/*"],
       "@/styles/*": ["./src/styles/*"],
-      "@/constants/*": ["./src/constants/*"]
+      "@/constants/*": ["./src/constants/*"],
+      "@/test/*": ["./test/*"],
+      "@/msw/*": ["./src/msw/*"]
     }
   },
   "include": [
@@ -44,5 +47,5 @@
     "next-env.d.ts",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "jest.config.ts", "**/*.spec.ts", "**/*.test.ts"]
+  "exclude": ["node_modules", "jest.config.ts"]
 }

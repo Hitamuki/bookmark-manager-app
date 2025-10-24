@@ -37,8 +37,17 @@
         "command": "biome format . --check"
       }
     },
-    "add-component": {
-      "executor": "@nx-extend/shadcn-ui:add"
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest run --config src/vitest.config.nextjs.ts"
+      }
+    },
+    "test:coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest run --coverage --config src/vitest.config.nextjs.ts"
+      }
     }
   }
 }

@@ -1,5 +1,4 @@
 import { resolve } from 'node:path';
-import swc from 'unplugin-swc';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { defineConfig } from 'vitest/config';
 

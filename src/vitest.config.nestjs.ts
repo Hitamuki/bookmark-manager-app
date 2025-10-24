@@ -7,6 +7,7 @@ export default mergeConfig(
   defineConfig({
     test: {
       environment: 'node',
+      exclude: ['src/apps/frontend/web/**'],
     },
     plugins: [
       swc.vite({
