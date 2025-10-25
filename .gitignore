@@ -614,3 +614,6 @@ site*/
 
 # Prisma
 **/generated/prisma
+
+# Playwright
+/test-results/

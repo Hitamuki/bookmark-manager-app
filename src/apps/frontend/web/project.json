@@ -48,6 +48,12 @@
       "options": {
         "command": "vitest run --coverage --config src/vitest.config.nextjs.ts"
       }
+    },
+    "test:e2e": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "playwright test --config src/apps/frontend/web/playwright.config.ts"
+      }
     }
   }
 }

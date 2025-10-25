@@ -1,6 +1,7 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "nxCloudId": "68184095b497582e2a9b650f",
+  "targetDefaults": {},
   "plugins": [
     {
       "plugin": "@nx/next/plugin",
@@ -30,11 +31,6 @@
       }
     }
   ],
-  "targetDefaults": {
-    "e2e-ci--**/**": {
-      "dependsOn": ["^build"]
-    }
-  },
   "generators": {
     "@nx/next": {
       "application": {

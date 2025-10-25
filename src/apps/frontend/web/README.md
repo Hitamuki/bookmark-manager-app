@@ -25,8 +25,10 @@ SPA
 pnpm nx run web:build
 # ローカル環境実行（モックを使用する場合は.envのNEXT_PUBLIC_API_MOCKINGをenabledに設定）
 pnpm nx run web:dev
-# テスト実行
+# 単体&統合テスト実行
 pnpm nx run web:test
+# E2Eテスト実行
+pnpm nx run web:test:e2e
 ```
 
 ## ToDo

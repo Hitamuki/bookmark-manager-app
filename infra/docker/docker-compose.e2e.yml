@@ -1,0 +1,27 @@
+services:
+  postgres_e2e:
+    image: postgres:17.6
+    container_name: db_e2e
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: main_e2e
+    restart: always
+    networks:
+      - lesson_e2e
+  mongo:
+    image: mongo:8.0
+    container_name: db_logs_e2e
+    ports:
+      - 27018:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: logs_e2e
+    restart: always
+    networks:
+      - lesson_e2e
+networks:
+  lesson_e2e:

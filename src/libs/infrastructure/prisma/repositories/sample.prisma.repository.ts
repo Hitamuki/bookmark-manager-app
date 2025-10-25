@@ -14,7 +14,7 @@ export class SamplePrismaRepository implements SampleRepository {
       skip: offset ?? offset,
       where: {
         isDeleted: false,
-        title: title ?? { contains: title },
+        title: title ? { contains: title } : undefined,
       },
       orderBy: { createdAt: 'desc' },
     });

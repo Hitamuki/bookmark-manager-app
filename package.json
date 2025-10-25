@@ -5,6 +5,7 @@
   "author": "Hitamuki",
   "description": "",
   "scripts": {
+    "postinstall": "prisma generate --schema=src/libs/prisma/schema.prisma",
     "dev": "nx serve",
     "build": "nx run-many -t build",
     "test": "nx run-many -t test",
@@ -34,14 +35,13 @@
     }
   },
   "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
+    "extends": ["@commitlint/config-conventional"]
   },
   "msw": {
-    "workerDirectory": [
-      "src/apps/frontend/web/public"
-    ]
+    "workerDirectory": ["src/apps/frontend/web/public"]
+  },
+  "prisma": {
+    "seed": "pnpm tsx src/libs/prisma/seed.ts"
   },
   "packageManager": "pnpm@10.8.1",
   "engines": {
@@ -164,6 +164,7 @@
     "textlint-rule-preset-japanese": "^10.0.4",
     "textlint-rule-spellcheck-tech-word": "^5.0.0",
     "tslib": "^2.3.0",
+    "tsx": "^4.20.6",
     "typescript": "5.9.3",
     "webpack-cli": "^5.1.4"
   }
