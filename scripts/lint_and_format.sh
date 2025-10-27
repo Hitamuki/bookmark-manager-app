@@ -9,7 +9,7 @@ pnpm lint:md:fix || exit 1
 pnpm textlint . --fix || exit 1
 pnpm markuplint . --fix || exit 1
 pnpm stylelint . --fix || exit 1
-pnpm biome check . --write "**/*.{ts,tsx,js,jsx}" || exit 1
+pnpm biome check . --write || exit 1
 
 # フォーマット
-pnpm biome format . --write "**/*.{ts,tsx,js,jsx}" || exit 1
+pnpm biome format . --write || exit 1

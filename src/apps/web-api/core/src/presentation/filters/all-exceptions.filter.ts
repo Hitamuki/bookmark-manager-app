@@ -1,5 +1,5 @@
-import { type ArgumentsHost, Catch, type ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import type { LoggerService } from '@nestjs/common';
+import { type ArgumentsHost, Catch, type ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 // import * as Sentry from '@sentry/node';
 import type { Request, Response } from 'express';
 
@@ -19,7 +19,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     try {
       // messageがJSON文字列の場合、パースしてオブジェクトとして扱う
       parsedMessage = JSON.parse(message);
-    } catch (e) {
+    } catch (_e) {
       // パースに失敗した場合は、元のmessage文字列をそのまま使う
       parsedMessage = message;
     }

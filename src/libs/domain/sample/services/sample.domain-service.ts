@@ -1,5 +1,5 @@
-import { SAMPLE_REPOSITORY, type SampleRepository } from '@/libs/domain/sample/repositories/sample.repository';
 import { Inject, Injectable } from '@nestjs/common';
+import { SAMPLE_REPOSITORY, type SampleRepository } from '@/libs/domain/sample/repositories/sample.repository';
 
 @Injectable()
 export class SampleDomainService {

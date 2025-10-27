@@ -5,14 +5,7 @@ import { House, RefreshCcw } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect } from 'react';
 
-// biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
-export default function Error({
-  error,
-  reset,
-}: {
-  error: Error;
-  reset: () => void;
-}) {
+export default function CustomError({ error, reset }: { error: Error; reset: () => void }) {
   useEffect(() => {
     console.error(error);
   }, [error]);

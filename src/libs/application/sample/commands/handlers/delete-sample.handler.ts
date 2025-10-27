@@ -1,6 +1,6 @@
-import { SAMPLE_REPOSITORY, type SampleRepository } from '@/libs/domain/sample/repositories/sample.repository';
 import { Inject, NotFoundException } from '@nestjs/common';
 import { CommandHandler, type ICommandHandler } from '@nestjs/cqrs';
+import { SAMPLE_REPOSITORY, type SampleRepository } from '@/libs/domain/sample/repositories/sample.repository';
 import { DeleteSampleCommand } from '../delete-sample.command';
 
 @CommandHandler(DeleteSampleCommand)

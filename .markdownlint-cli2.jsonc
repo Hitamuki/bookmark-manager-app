@@ -1,5 +1,5 @@
 {
-  "ignores": [".git", "node_modules", ".husky", ".nx"],
+  "ignores": [".git", "node_modules", ".husky", ".nx", "sandbox", "poc"],
   "config": {
     "MD013": false,
     "MD034": false

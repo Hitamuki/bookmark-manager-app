@@ -1,0 +1,75 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.3.0/schema.json",
+  "extends": [],
+  "html": {
+    "formatter": {
+      "enabled": true
+    }
+  },
+  "css": {
+    "formatter": {
+      "enabled": true
+    },
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": false
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "includes": [
+      "**",
+      "!**/dist",
+      "!**/.next",
+      "!**/coverage",
+      "!**/docs",
+      "!**/.nx",
+      "!**/.vscode",
+      "!**/poc",
+      "!**/sandbox",
+      "!**/*.{md,html,scss,yml,yaml,toml}",
+      "!**/api-client",
+      "!**/src/apps/frontend/web/public/mockServiceWorker.js"
+    ]
+  },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": false,
+    "includes": ["**"],
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 120
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single"
+    },
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
+    }
+  },
+  "json": {},
+  "linter": {
+    // TODO: JSDocの記述を必須化したい
+    "enabled": true,
+    "includes": ["**"],
+    "rules": {
+      "recommended": true,
+      "a11y": {},
+      "complexity": {},
+      "correctness": {
+        "useSingleJsDocAsterisk": "warn"
+      },
+      "nursery": {},
+      "performance": {},
+      "security": {},
+      "style": {},
+      "suspicious": {}
+    }
+  }
+}

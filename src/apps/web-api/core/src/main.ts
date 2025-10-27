@@ -1,11 +1,10 @@
 import * as fs from 'node:fs';
 import path from 'node:path';
-import { WinstonConfig } from '@/libs/infrastructure/logging/winston.config';
 import { patchNestjsSwagger } from '@anatine/zod-nestjs';
-import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
-import { NestFactory, Reflector } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { WinstonModule } from 'nest-winston';
+import { WinstonConfig } from '@/libs/infrastructure/logging/winston.config';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './presentation/filters/all-exceptions.filter';
 
@@ -43,6 +42,7 @@ async function bootstrap() {
   fs.writeFileSync(openApiPath, JSON.stringify(documentFactory, null, 2));
 
   // 例外フィルター
+  // biome-ignore lint/correctness/useHookAtTopLevel: NestJSのコードなのでReact Hooksのルールは適用しない
   app.useGlobalFilters(new AllExceptionsFilter(logger));
 
   const port = process.env.PORT || 4000;

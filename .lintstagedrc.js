@@ -31,7 +31,7 @@ module.exports = {
       .filter(shouldInclude)
       .flatMap((file) => [`biome format --write ${file}`, `biome lint ${file}`, `markuplint ${file}`]),
   '*.html': (files) =>
-    files.filter(shouldInclude).flatMap((file) => [`prettier --write ${file}`, `markuplint ${file}`]),
+    files.filter(shouldInclude).flatMap((file) => [`biome format --write ${file}`, `markuplint ${file}`]),
   '*.css': (files) =>
     files
       .filter(shouldInclude)

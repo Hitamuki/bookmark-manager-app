@@ -46,13 +46,13 @@
     "editor.defaultFormatter": "yzhang.markdown-all-in-one"
   },
   "[html]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "biomejs.biome",
     "editor.codeActionsOnSave": {
       "source.fixAll.stylelint": "always",
     },
   },
   "[css]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "biomejs.biome",
     "editor.codeActionsOnSave": {
       "source.fixAll.biome": "always",
       "source.fixAll.stylelint": "always",

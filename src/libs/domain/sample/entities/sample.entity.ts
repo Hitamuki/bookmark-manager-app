@@ -1,6 +1,6 @@
+import { z } from 'zod';
 import type { CreateSampleDto } from '@/libs/application/sample/dto/create-sample.dto';
 import type { UpdateSampleDto } from '@/libs/application/sample/dto/update-sample.dto';
-import { z } from 'zod';
 import { SampleId } from '../value-objects/sample-id.vo';
 
 const SampleSchema = z.object({

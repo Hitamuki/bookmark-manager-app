@@ -1,4 +1,4 @@
-# 技術用語
+# 技術用語、ライブラリ、予約語
 venv
 mkdocs
 pymdown
@@ -15,3 +15,11 @@ clinerules
 windsurfrules
 Codeium
 textlint
+markuplint
+heroui
+Apidog
+anatine
+uuidv
+unplugin
+isready
+transferrables

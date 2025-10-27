@@ -1,7 +1,5 @@
 // biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
-import { Injectable, NestMiddleware } from '@nestjs/common';
-// biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
-import { Logger } from '@nestjs/common';
+import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
 
 @Injectable()

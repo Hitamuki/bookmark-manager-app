@@ -1,3 +1,7 @@
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, ParseUUIDPipe, Post, Put, Query } from '@nestjs/common';
+// biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { ApiCreatedResponse, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CreateSampleCommand } from '@/libs/application/sample/commands/create-sample.command';
 import { UpdateSampleCommand } from '@/libs/application/sample/commands/update-sample.command';
 // biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
@@ -8,10 +12,6 @@ import { SampleDto } from '@/libs/application/sample/dto/sample.dto';
 import { UpdateSampleDto } from '@/libs/application/sample/dto/update-sample.dto';
 import { GetSampleQuery } from '@/libs/application/sample/queries/get-sample.query';
 import { GetSamplesQuery } from '@/libs/application/sample/queries/get-samples.query';
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, ParseUUIDPipe, Post, Put, Query } from '@nestjs/common';
-// biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { ApiCreatedResponse, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { DeleteSampleCommand } from './../../../../../../libs/application/sample/commands/delete-sample.command';
 
 @ApiTags('samples')

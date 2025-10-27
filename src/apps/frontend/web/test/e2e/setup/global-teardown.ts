@@ -4,7 +4,7 @@ import type { FullConfig } from '@playwright/test';
 
 const rootDir = path.join(__dirname, '../../../../../../../');
 
-async function globalTeardown(config: FullConfig) {
+async function globalTeardown(_config: FullConfig) {
   console.log('Global teardown started...');
 
   // Stop Docker for E2E tests

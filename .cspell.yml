@@ -10,6 +10,8 @@ ignorePaths:
   - .git/**
   - .vscode/**
   - docs/spec/site/**
+  - coverage/**
+  - src/libs/prisma/migrations/**
   - poc/**
   - sandbox/**
 # 正規表現で無視する単語

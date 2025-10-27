@@ -9,11 +9,7 @@ import MswProvider from '@/providers/MswProvider';
 import ReactQueryProvider from '../providers/ReactQueryProvider';
 
 // ルートレイアウト（全ページ共通）
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="light">
       <body className="min-h-screen">

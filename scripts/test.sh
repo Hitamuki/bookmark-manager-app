@@ -40,4 +40,3 @@ echo "Stopping API server with PID: $API_PID"
 kill $API_PID
 wait $API_PID 2>/dev/null
 echo "API server stopped."
-

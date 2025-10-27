@@ -1,7 +1,7 @@
 import * as winston from 'winston';
 import { format, transports } from 'winston';
 import 'winston-mongodb';
-const { combine, timestamp, colorize, prettyPrint } = format;
+const { combine, timestamp, colorize } = format;
 
 export const WinstonConfig = () => ({
   transports: [

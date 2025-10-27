@@ -1,8 +1,7 @@
-import { SampleEntity } from '@/libs/domain/sample/entities/sample.entity';
-import { SAMPLE_REPOSITORY, type SampleRepository } from '@/libs/domain/sample/repositories/sample.repository';
 import { BadRequestException, Inject, NotFoundException } from '@nestjs/common';
-import { CommandHandler, type ICommandHandler, type IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { CommandHandler, type ICommandHandler } from '@nestjs/cqrs';
 import { ZodError } from 'zod';
+import { SAMPLE_REPOSITORY, type SampleRepository } from '@/libs/domain/sample/repositories/sample.repository';
 import { UpdateSampleDtoSchema } from '../../dto/update-sample.dto';
 import { UpdateSampleCommand } from '../update-sample.command';
 

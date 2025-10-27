@@ -1,3 +1,5 @@
+import type { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CreateSampleCommand } from '@/libs/application/sample/commands/create-sample.command';
 import { DeleteSampleCommand } from '@/libs/application/sample/commands/delete-sample.command';
 import { UpdateSampleCommand } from '@/libs/application/sample/commands/update-sample.command';
@@ -6,8 +8,6 @@ import type { SampleDto } from '@/libs/application/sample/dto/sample.dto';
 import type { UpdateSampleDto } from '@/libs/application/sample/dto/update-sample.dto';
 import { GetSampleQuery } from '@/libs/application/sample/queries/get-sample.query';
 import { GetSamplesQuery } from '@/libs/application/sample/queries/get-samples.query';
-import type { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SampleController } from './sample.controller';
 
 describe('SampleController', () => {

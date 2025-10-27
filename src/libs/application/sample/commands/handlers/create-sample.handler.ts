@@ -1,10 +1,10 @@
+import { BadRequestException, ConflictException, Inject } from '@nestjs/common';
+import { CommandHandler, type ICommandHandler } from '@nestjs/cqrs';
+import { ZodError } from 'zod';
 import { SampleEntity } from '@/libs/domain/sample/entities/sample.entity';
 import { SAMPLE_REPOSITORY, type SampleRepository } from '@/libs/domain/sample/repositories/sample.repository';
 // biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
 import { SampleDomainService } from '@/libs/domain/sample/services/sample.domain-service';
-import { BadRequestException, ConflictException, Inject } from '@nestjs/common';
-import { CommandHandler, type ICommandHandler } from '@nestjs/cqrs';
-import { ZodError } from 'zod';
 import { CreateSampleCommand } from '../../commands/create-sample.command';
 import { CreateSampleDtoSchema } from '../../dto/create-sample.dto';
 

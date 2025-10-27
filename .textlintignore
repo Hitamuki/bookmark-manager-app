@@ -1,2 +1,4 @@
 .cspell/**
 **/requirements.txt/**
+sandbox/**
+poc/**

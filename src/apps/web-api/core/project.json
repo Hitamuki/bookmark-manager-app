@@ -41,31 +41,20 @@
     "lint:check": {
       "executor": "nx:run-commands",
       "options": {
-        "command": ["biome lint . \"**/*.{ts,tsx,js,jsx}\"", "markuplint .", "stylelint .", "textlint ."],
+        "command": ["biome lint .", "textlint ."],
         "cwd": "."
       }
     },
     "lint:fix": {
       "executor": "nx:run-commands",
       "options": {
-        "command": [
-          "biome check --write . \"**/*.{ts,tsx,js,jsx}\"",
-          "markuplint . --fix",
-          "stylelint . --fix",
-          "textlint . --fix"
-        ]
+        "command": ["biome check . --write", "textlint . --fix"]
       }
     },
     "format": {
       "executor": "nx:run-commands",
       "options": {
         "command": "biome format . --write"
-      }
-    },
-    "format:check": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "biome format . --check"
       }
     },
     "test": {

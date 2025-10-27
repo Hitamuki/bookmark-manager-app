@@ -1,5 +1,5 @@
-import type { SampleDto } from '@/libs/api-client/model';
 import { create } from 'zustand';
+import type { SampleDto } from '@/libs/api-client/model';
 
 type State = {
   editedSample: Partial<SampleDto> | null;

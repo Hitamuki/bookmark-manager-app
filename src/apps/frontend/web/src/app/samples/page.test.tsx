@@ -1,8 +1,8 @@
+import { screen, waitFor } from '@testing-library/react';
+import { HttpResponse, http } from 'msw';
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { server } from '@/msw/setup/server';
 import { renderWithProviders } from '@/test/integration/utils';
-import { screen, waitFor } from '@testing-library/react';
-import { http, HttpResponse } from 'msw';
-import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import SamplesPage from './page';
 import '@testing-library/jest-dom';
 

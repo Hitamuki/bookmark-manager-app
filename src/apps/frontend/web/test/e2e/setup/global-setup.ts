@@ -27,7 +27,7 @@ async function waitForPostgresReady(timeoutMs = 30000, intervalMs = 2000) {
   }
 }
 
-async function globalSetup(config: FullConfig) {
+async function globalSetup(_config: FullConfig) {
   console.log('Global setup started...');
 
   // Start Docker for E2E tests

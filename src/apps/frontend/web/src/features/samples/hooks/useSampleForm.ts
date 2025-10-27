@@ -1,9 +1,8 @@
 'use client';
 
-import { useSampleControllerGetSampleById } from '@/libs/api-client/endpoints/samples/samples';
-import type { SampleDto } from '@/libs/api-client/model';
 import type { ChangeEvent } from 'react';
 import { useEffect } from 'react';
+import { useSampleControllerGetSampleById } from '@/libs/api-client/endpoints/samples/samples';
 import { useSampleStore } from '../stores/sampleStore';
 
 export const useSampleForm = (isEdit: boolean, id?: string) => {
