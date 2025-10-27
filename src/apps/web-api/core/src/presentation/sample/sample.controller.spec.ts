@@ -1,3 +1,7 @@
+/**
+ * sample.controller.specコントローラー
+ * HTTPリクエストを処理
+ */
 import type { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CreateSampleCommand } from '@/libs/application/sample/commands/create-sample.command';

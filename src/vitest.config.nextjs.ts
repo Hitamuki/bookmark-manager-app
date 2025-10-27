@@ -1,3 +1,7 @@
+/**
+ * Next.js用のVitest設定ファイル
+ * フロントエンドのテスト実行環境を設定
+ */
 import react from '@vitejs/plugin-react';
 import { defineConfig, mergeConfig } from 'vitest/config';
 import { sharedVitestConfig } from '../vitest.config';

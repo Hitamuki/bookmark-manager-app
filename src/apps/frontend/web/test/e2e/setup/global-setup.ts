@@ -1,3 +1,7 @@
+/**
+ * global-setup
+ * モジュール定義
+ */
 import { exec, execSync } from 'node:child_process';
 import * as path from 'node:path';
 import type { FullConfig } from '@playwright/test';

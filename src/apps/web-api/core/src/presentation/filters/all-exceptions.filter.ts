@@ -1,9 +1,15 @@
+/**
+ * all-exceptions.filterの機能実装
+ */
 import type { LoggerService } from '@nestjs/common';
 import { type ArgumentsHost, Catch, type ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 // import * as Sentry from '@sentry/node';
 import type { Request, Response } from 'express';
 
 @Catch()
+/**
+ * AllExceptionsFilterの実装
+ */
 export class AllExceptionsFilter implements ExceptionFilter {
   constructor(private readonly logger: LoggerService) {}
 

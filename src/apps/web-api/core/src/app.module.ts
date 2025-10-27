@@ -1,3 +1,7 @@
+/**
+ * app.module
+ * モジュール定義
+ */
 import { ZodValidationPipe } from '@anatine/zod-nestjs';
 import { Logger, type MiddlewareConsumer, Module, type NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';

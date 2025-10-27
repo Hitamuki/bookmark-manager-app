@@ -1,3 +1,6 @@
+/**
+ * サンプル単体取得クエリを処理し、指定されたIDのデータを返却
+ */
 import { Inject, NotFoundException } from '@nestjs/common';
 import { type IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { SAMPLE_REPOSITORY, type SampleRepository } from '@/libs/domain/sample/repositories/sample.repository';

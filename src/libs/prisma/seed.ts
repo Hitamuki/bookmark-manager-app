@@ -1,7 +1,14 @@
+/**
+ * 開発・テスト用の初期データ投入とデータベース初期化
+ */
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+/**
+ * メイン処理
+ * データベースに初期データを投入する
+ */
 async function main() {
   console.log('Seeding started...');
   try {

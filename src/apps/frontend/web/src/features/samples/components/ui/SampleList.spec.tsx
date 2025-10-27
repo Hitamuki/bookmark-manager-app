@@ -1,3 +1,7 @@
+/**
+ * SampleList.specテストファイル
+ * テストケースを定義
+ */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
@@ -39,6 +43,9 @@ const queryClient = new QueryClient({
   },
 });
 
+/**
+ * renderWithClient関数
+ */
 const renderWithClient = (ui: React.ReactElement) => {
   return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
 };

@@ -1,3 +1,7 @@
+/**
+ * MswProvider
+ * モジュール定義
+ */
 'use client';
 
 if (process.env.NEXT_PUBLIC_API_MOCKING === 'enabled') {

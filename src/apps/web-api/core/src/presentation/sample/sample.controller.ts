@@ -1,3 +1,7 @@
+/**
+ * サンプルコントローラー
+ * HTTPリクエストを処理
+ */
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, ParseUUIDPipe, Post, Put, Query } from '@nestjs/common';
 // biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
 import { CommandBus, QueryBus } from '@nestjs/cqrs';

@@ -1,3 +1,6 @@
+/**
+ * サンプル作成コマンドを処理し、ビジネスルールを適用してデータを永続化
+ */
 import { BadRequestException, ConflictException, Inject } from '@nestjs/common';
 import { CommandHandler, type ICommandHandler } from '@nestjs/cqrs';
 import { ZodError } from 'zod';

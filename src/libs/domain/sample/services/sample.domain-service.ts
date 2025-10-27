@@ -1,3 +1,7 @@
+/**
+ * sample.domain-service
+ * モジュール定義
+ */
 import { Inject, Injectable } from '@nestjs/common';
 import { SAMPLE_REPOSITORY, type SampleRepository } from '@/libs/domain/sample/repositories/sample.repository';
 

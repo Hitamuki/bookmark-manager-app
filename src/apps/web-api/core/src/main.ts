@@ -1,3 +1,7 @@
+/**
+ * main
+ * モジュール定義
+ */
 import * as fs from 'node:fs';
 import path from 'node:path';
 import { patchNestjsSwagger } from '@anatine/zod-nestjs';
@@ -8,6 +12,9 @@ import { WinstonConfig } from '@/libs/infrastructure/logging/winston.config';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './presentation/filters/all-exceptions.filter';
 
+/**
+ * bootstrap関数
+ */
 async function bootstrap() {
   // Nestロガーの交換
   const logger = WinstonModule.createLogger(WinstonConfig());

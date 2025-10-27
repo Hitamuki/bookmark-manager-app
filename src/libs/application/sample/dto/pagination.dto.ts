@@ -1,3 +1,7 @@
+/**
+ * pagination.dto
+ * モジュール定義
+ */
 import { applyDecorators, type Type } from '@nestjs/common';
 import { ApiExtraModels, ApiOkResponse, ApiProperty, getSchemaPath } from '@nestjs/swagger';
 

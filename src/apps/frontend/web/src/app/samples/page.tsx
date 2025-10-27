@@ -1,3 +1,7 @@
+/**
+ * page
+ * モジュール定義
+ */
 import { Button } from '@heroui/react';
 import { PlusIcon } from 'lucide-react';
 import Link from 'next/link';

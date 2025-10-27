@@ -1,3 +1,7 @@
+/**
+ * sampleStore.specテストファイル
+ * テストケースを定義
+ */
 import { act } from 'react';
 import { describe, expect, it } from 'vitest';
 import { useSampleStore } from './sampleStore';

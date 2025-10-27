@@ -1,8 +1,15 @@
+/**
+ * ログ出力の設定（コンソール・MongoDB）とログレベル管理
+ */
 import * as winston from 'winston';
 import { format, transports } from 'winston';
 import 'winston-mongodb';
 const { combine, timestamp, colorize } = format;
 
+/**
+ * Winston設定を返す関数
+ * @returns Winston設定オブジェクト
+ */
 export const WinstonConfig = () => ({
   transports: [
     // コンソール出力

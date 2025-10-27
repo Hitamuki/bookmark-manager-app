@@ -1,3 +1,6 @@
+/**
+ * Prismaを使用したサンプルエンティティの永続化実装とデータベース操作
+ */
 import { Injectable } from '@nestjs/common';
 import { SampleEntity } from '@/libs/domain/sample/entities/sample.entity';
 import type { SampleRepository } from '@/libs/domain/sample/repositories/sample.repository';

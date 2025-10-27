@@ -1,3 +1,6 @@
+/**
+ * OpenAPIスキーマからTypeScriptクライアントコード生成の設定
+ */
 export default {
   'api-client': {
     input: {

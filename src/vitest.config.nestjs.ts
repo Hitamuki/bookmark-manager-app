@@ -1,3 +1,7 @@
+/**
+ * NestJS用のVitest設定ファイル
+ * バックエンドのテスト実行環境を設定
+ */
 import swc from 'unplugin-swc';
 import { defineConfig, mergeConfig } from 'vitest/config';
 import { sharedVitestConfig } from '../vitest.config';

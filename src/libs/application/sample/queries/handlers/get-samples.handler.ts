@@ -1,3 +1,6 @@
+/**
+ * サンプル一覧取得クエリを処理し、ページネーション対応でデータを返却
+ */
 import { Inject } from '@nestjs/common';
 import { type IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { SAMPLE_REPOSITORY, type SampleRepository } from '@/libs/domain/sample/repositories/sample.repository';

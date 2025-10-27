@@ -1,3 +1,7 @@
+/**
+ * global-teardown
+ * モジュール定義
+ */
 import { execSync } from 'node:child_process';
 import * as path from 'node:path';
 import type { FullConfig } from '@playwright/test';

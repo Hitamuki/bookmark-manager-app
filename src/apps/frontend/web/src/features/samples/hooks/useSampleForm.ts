@@ -1,3 +1,7 @@
+/**
+ * サンプルフォームフック
+ * カスタムReactフック
+ */
 'use client';
 
 import type { ChangeEvent } from 'react';
@@ -5,6 +9,9 @@ import { useEffect } from 'react';
 import { useSampleControllerGetSampleById } from '@/libs/api-client/endpoints/samples/samples';
 import { useSampleStore } from '../stores/sampleStore';
 
+/**
+ * useSampleForm関数
+ */
 export const useSampleForm = (isEdit: boolean, id?: string) => {
   const { editedSample, setEditedSample } = useSampleStore();
   const {

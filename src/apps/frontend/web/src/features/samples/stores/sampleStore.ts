@@ -1,3 +1,7 @@
+/**
+ * サンプルストア
+ * 状態管理ストア
+ */
 import { create } from 'zustand';
 import type { SampleDto } from '@/libs/api-client/model';
 

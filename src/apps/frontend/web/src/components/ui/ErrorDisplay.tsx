@@ -1,8 +1,14 @@
+/**
+ * エラー情報の統一的な表示UIとユーザーフレンドリーなメッセージ
+ */
 'use client';
 
 import { Card } from '@heroui/react';
 import { AlertCircle } from 'lucide-react';
 
+/**
+ * ErrorDisplay関数
+ */
 export const ErrorDisplay = ({ message, statusCode }: { message?: string; statusCode?: number }) => {
   return (
     <div className="flex justify-center">

@@ -1,3 +1,7 @@
+/**
+ * next.configファイル
+ * JavaScript設定・実行ファイル
+ */
 //@ts-check
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires

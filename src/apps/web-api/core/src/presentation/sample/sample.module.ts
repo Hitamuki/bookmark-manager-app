@@ -1,3 +1,7 @@
+/**
+ * sample.module
+ * モジュール定義
+ */
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { CreateSampleHandler } from '@/libs/application/sample/commands/handlers/create-sample.handler';

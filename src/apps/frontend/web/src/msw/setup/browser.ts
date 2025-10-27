@@ -1,3 +1,7 @@
+/**
+ * browser
+ * モジュール定義
+ */
 import { setupWorker } from 'msw/browser';
 import { getSamplesMock } from '@/libs/api-client/endpoints/samples/samples.msw';
 

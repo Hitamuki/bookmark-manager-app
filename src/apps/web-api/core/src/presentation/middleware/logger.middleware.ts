@@ -1,3 +1,7 @@
+/**
+ * logger.middleware
+ * モジュール定義
+ */
 // biome-ignore lint/style/useImportType: NestJS needs this for dependency injection
 import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';

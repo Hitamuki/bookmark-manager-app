@@ -1,3 +1,7 @@
+/**
+ * サンプル一覧コンポーネント
+ * UIコンポーネント
+ */
 'use client';
 
 import { Button, Pagination, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
@@ -14,6 +18,9 @@ import {
 } from '@/libs/api-client/endpoints/samples/samples';
 import type { SampleDto } from '@/libs/api-client/model';
 
+/**
+ * SampleList関数
+ */
 export const SampleList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const offset = (currentPage - 1) * PAGINATION.ITEMS_PER_PAGE;

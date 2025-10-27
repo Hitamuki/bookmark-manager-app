@@ -1,3 +1,7 @@
+/**
+ * index
+ * モジュール定義
+ */
 async function initMocks() {
   if (typeof window === 'undefined') {
     const { server } = await import('./server');

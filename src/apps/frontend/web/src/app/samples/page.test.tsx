@@ -1,3 +1,7 @@
+/**
+ * page.testテストファイル
+ * テストケースを定義
+ */
 import { screen, waitFor } from '@testing-library/react';
 import { HttpResponse, http } from 'msw';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';

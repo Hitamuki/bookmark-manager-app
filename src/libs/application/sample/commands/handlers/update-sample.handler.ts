@@ -1,3 +1,6 @@
+/**
+ * サンプル更新コマンドを処理し、データ整合性を保証して変更を適用
+ */
 import { BadRequestException, Inject, NotFoundException } from '@nestjs/common';
 import { CommandHandler, type ICommandHandler } from '@nestjs/cqrs';
 import { ZodError } from 'zod';

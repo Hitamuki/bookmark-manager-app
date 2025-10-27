@@ -1,3 +1,7 @@
+/**
+ * not-found
+ * モジュール定義
+ */
 import { Button } from '@heroui/react';
 import { Frown, House } from 'lucide-react';
 import Link from 'next/link';

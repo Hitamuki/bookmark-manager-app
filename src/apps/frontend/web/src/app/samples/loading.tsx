@@ -1,3 +1,7 @@
+/**
+ * loading
+ * モジュール定義
+ */
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
 export default function Loading() {

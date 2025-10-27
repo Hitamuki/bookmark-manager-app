@@ -1,3 +1,7 @@
+/**
+ * error
+ * モジュール定義
+ */
 'use client';
 
 import { Button } from '@heroui/react';

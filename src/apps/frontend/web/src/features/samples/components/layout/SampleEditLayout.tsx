@@ -1,3 +1,7 @@
+/**
+ * SampleEditLayoutコンポーネント
+ * UIコンポーネント
+ */
 'use client';
 
 import { BreadcrumbItem, Breadcrumbs } from '@heroui/react';
@@ -7,6 +11,9 @@ type SampleEditLayoutProps = {
   children: React.ReactNode;
 };
 
+/**
+ * SampleEditLayout関数
+ */
 export const SampleEditLayout = ({ children }: SampleEditLayoutProps) => {
   return (
     <div className="space-y-4">

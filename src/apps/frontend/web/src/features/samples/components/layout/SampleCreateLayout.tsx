@@ -1,3 +1,7 @@
+/**
+ * SampleCreateLayoutコンポーネント
+ * UIコンポーネント
+ */
 'use client';
 
 import { BreadcrumbItem, Breadcrumbs } from '@heroui/react';
@@ -7,6 +11,9 @@ type SampleCreateLayoutProps = {
   children: React.ReactNode;
 };
 
+/**
+ * SampleCreateLayout関数
+ */
 export const SampleCreateLayout = ({ children }: SampleCreateLayoutProps) => {
   return (
     <div className="space-y-4">

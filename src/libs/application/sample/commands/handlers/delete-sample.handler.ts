@@ -1,3 +1,6 @@
+/**
+ * サンプル削除コマンドを処理し、関連データを適切に処理して削除実行
+ */
 import { Inject, NotFoundException } from '@nestjs/common';
 import { CommandHandler, type ICommandHandler } from '@nestjs/cqrs';
 import { SAMPLE_REPOSITORY, type SampleRepository } from '@/libs/domain/sample/repositories/sample.repository';

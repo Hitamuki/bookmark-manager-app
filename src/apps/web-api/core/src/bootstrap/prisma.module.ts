@@ -1,3 +1,6 @@
+/**
+ * prisma.moduleの機能実装
+ */
 import { Global, Module } from '@nestjs/common';
 import { PrismaService } from '@/libs/infrastructure/prisma/prisma.service';
 
@@ -6,4 +9,8 @@ import { PrismaService } from '@/libs/infrastructure/prisma/prisma.service';
   providers: [PrismaService],
   exports: [PrismaService],
 })
+
+/**
+ * PrismaModuleの実装
+ */
 export class PrismaModule {}

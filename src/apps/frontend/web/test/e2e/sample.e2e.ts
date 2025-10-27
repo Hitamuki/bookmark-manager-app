@@ -1,3 +1,7 @@
+/**
+ * sample.e2e
+ * モジュール定義
+ */
 import { expect, test } from '@playwright/test';
 
 test('should display samples from API', async ({ page }) => {
