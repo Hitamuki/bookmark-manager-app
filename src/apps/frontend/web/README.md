@@ -29,6 +29,8 @@ pnpm nx run web:dev
 pnpm nx run web:test
 # E2Eテスト実行
 pnpm nx run web:test:e2e
+# Storybook
+pnpm nx run web:storybook
 ```
 
 ## ToDo
