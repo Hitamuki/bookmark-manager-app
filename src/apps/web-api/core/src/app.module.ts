@@ -2,11 +2,12 @@
  * app.module
  * モジュール定義
  */
-import { ZodValidationPipe } from '@anatine/zod-nestjs';
+
 import { Logger, type MiddlewareConsumer, Module, type NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
 import { CqrsModule } from '@nestjs/cqrs';
+import { ZodValidationPipe } from 'nestjs-zod';
 import { PrismaModule } from './bootstrap/prisma.module';
 import { LoggerMiddleware } from './presentation/middleware/logger.middleware';
 import { SampleModule } from './presentation/sample/sample.module';

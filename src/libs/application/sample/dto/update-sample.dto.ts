@@ -1,7 +1,7 @@
 /**
  * サンプル更新時のリクエストデータ検証とバリデーションルール定義
  */
-import { createZodDto } from '@anatine/zod-nestjs';
+import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
 /**

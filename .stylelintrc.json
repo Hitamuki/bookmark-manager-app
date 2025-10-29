@@ -1,5 +1,5 @@
 {
-  "extends": ["stylelint-config-recommended-scss", "stylelint-config-recess-order", "stylelint-config-tailwindcss"],
+  "extends": ["stylelint-config-standard", "stylelint-config-recess-order", "stylelint-config-tailwindcss"],
   "ignoreFiles": ["**/node_modules/**", "**/dist/**", "**/assets/**", "poc/**", "sandobox/**"],
   "overrides": [
     {
