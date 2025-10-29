@@ -8,14 +8,20 @@ export const metadata = {
 };
 
 import '@/styles/globals.css';
+import { Noto_Sans_JP } from 'next/font/google';
 import { HeroUiProvider } from '@/providers/HeroUiProvider';
 import MswProvider from '@/providers/MswProvider';
 import ReactQueryProvider from '../providers/ReactQueryProvider';
 
+const webFont = Noto_Sans_JP({
+  subsets: ['latin'],
+  variable: '--font-noto-sans-jp',
+});
+
 // ルートレイアウト（全ページ共通）
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="light">
+    <html lang="ja" className={`light ${webFont.className}`}>
       <body className="min-h-screen">
         <MswProvider>
           <ReactQueryProvider>
