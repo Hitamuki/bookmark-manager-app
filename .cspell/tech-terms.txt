@@ -24,3 +24,4 @@ unplugin
 isready
 transferrables
 autodocs
+Commitzen
