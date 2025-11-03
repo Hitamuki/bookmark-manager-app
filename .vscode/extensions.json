@@ -29,6 +29,7 @@
     // "ms-vsliveshare.vsliveshare",
     // ◆ AI
     "visualstudioexptteam.vscodeintellicode",
+    "anthropic.claude-code",
     "rooveterinaryinc.roo-cline",
     "github.copilot",
     "google.geminicodeassist",

@@ -2,3 +2,9 @@
 **/requirements.txt/**
 sandbox/**
 poc/**
+.claude/**
+**/dist
+**/.next
+**/coverage
+**/api-client/**
+**/.vscode/**

@@ -15,6 +15,7 @@ ignorePaths:
   - poc/**
   - sandbox/**
   - "**/storybook-static/**"
+  - .claude/**
 # 正規表現で無視する単語
 ignoreRegExpList: []
 # 正しいと見なす単語
