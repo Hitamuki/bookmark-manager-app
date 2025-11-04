@@ -25,6 +25,7 @@ const nextConfig = {
       ignore: [],
     },
   },
+  output: 'standalone',
   async rewrites() {
     return [
       {

@@ -8,3 +8,4 @@ poc/**
 **/coverage
 **/api-client/**
 **/.vscode/**
+infra/terraform/envs/staging/README.md

@@ -82,5 +82,10 @@
       "source.fixAll.stylelint": "always",
     },
   },
+  "[terraform]":{
+    "editor.defaultFormatter": "hashicorp.terraform",
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file"
+  }
   // ===== 未整理 =====
 }

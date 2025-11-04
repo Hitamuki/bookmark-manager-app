@@ -597,6 +597,17 @@ override.tf.json
 .terraformrc
 terraform.rc
 
+### Terragrunt ###
+# Terragrunt cache directories
+**/.terragrunt-cache/*
+
+# Terragrunt tfvars (機密情報を含む可能性があるため除外)
+**/terraform.tfvars
+
+# Terragrunt generated files
+**/backend.tf
+**/provider_override.tf
+
 # End of https://www.toptal.com/developers/gitignore/api/react,nextjs,reactnative,node,terraform,hugo,python
 
 # MkDocs documentation
