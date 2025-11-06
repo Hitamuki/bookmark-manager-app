@@ -25,3 +25,9 @@ variable "max_image_count" {
   type        = number
   default     = 10 # staging環境では10個まで保持
 }
+
+variable "force_delete" {
+  description = "If true, will delete the repository even if it contains images"
+  type        = bool
+  default     = false
+}

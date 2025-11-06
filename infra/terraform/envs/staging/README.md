@@ -29,7 +29,7 @@ Terragruntは、Terraformのラッパーツールで、以下のメリットが�
 - **DRY（Don't Repeat Yourself）**: 共通設定を一元管理し、重複を削減
 - **依存関係管理**: モジュール間の依存関係を自動的に解決
 - **バックエンド設定の一元化**: 環境ごとにバックエンド設定を複製する必要がない
-- **一括操作**: `terragrunt run-all` で全モジュールを一括適用可能
+- **一括操作**: `terragrunt run --all` で全モジュールを一括適用可能
 
 ## ディレクトリ構成
 
@@ -79,10 +79,10 @@ mise install
 cd infra/terraform/envs/staging/ecr
 
 # 初期化
-terragrunt init
+terragrunt run init
 
 # ECRリポジトリのみ先にデプロイ
-terragrunt apply
+terragrunt run apply
 ```
 
 ### 3. コンテナイメージのビルド＆プッシュ
@@ -91,11 +91,10 @@ terragrunt apply
 
 ```bash
 # プロジェクトルートに戻る
-cd ../../../../
 
 # AWSアカウントIDを取得
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-AWS_REGION="ap-northeast-1"
+AWS_REGION=$(aws configure get region)
 
 # ECRログイン
 aws ecr get-login-password --region ${AWS_REGION} | \
@@ -122,32 +121,32 @@ docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/bookmark-manag
 cd infra/terraform/envs/staging
 
 # 全モジュールを初期化
-terragrunt run-all init
+terragrunt run --all init
 
 # 実行計画の確認
-terragrunt run-all plan
+terragrunt run --all plan
 
 # 全モジュールを一括構築（依存関係順に自動実行）
-terragrunt run-all apply
+terragrunt run --all apply
 ```
 
 または、モジュール単位で構築する場合：
 
 ```bash
 cd network
-terragrunt apply
+terragrunt run apply
 
 cd ../security
-terragrunt apply
+terragrunt run apply
 
 cd ../compute
-terragrunt apply
+terragrunt run apply
 
 cd ../database
-terragrunt apply
+terragrunt run apply
 
 cd ../storage
-terragrunt apply
+terragrunt run apply
 ```
 
 ## 構築後の設定
@@ -157,7 +156,7 @@ terragrunt apply
 ```bash
 # データベースエンドポイント
 cd database
-terragrunt output db_cluster_endpoint
+terragrunt run output db_cluster_endpoint
 
 # DATABASE_URL（Prisma用）
 aws ssm get-parameter \
@@ -189,7 +188,7 @@ aws ssm put-parameter \
 
 ```bash
 cd compute
-terragrunt output alb_dns_name
+terragrunt run output alb_dns_name
 ```
 
 ブラウザでアクセスして動作確認してください。
@@ -212,7 +211,7 @@ aws ecr get-login-password --region ${AWS_REGION} | \
   docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
 # Webイメージの更新（バージョンタグ付き）
-docker build -t bookmark-manager-staging-web:v1.0.1 \
+docker build --platform linux/amd64 -t bookmark-manager-staging-web:v1.0.1 \
   -f src/apps/frontend/web/Dockerfile .
 docker tag bookmark-manager-staging-web:v1.0.1 \
   ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/bookmark-manager-staging-web:v1.0.1
@@ -222,7 +221,7 @@ docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/bookmark-manag
 docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/bookmark-manager-staging-web:latest
 
 # APIイメージの更新（バージョンタグ付き）
-docker build -t bookmark-manager-staging-api:v1.0.1 \
+docker build --platform linux/amd64 -t bookmark-manager-staging-api:v1.0.1 \
   -f src/apps/web-api/core/Dockerfile .
 docker tag bookmark-manager-staging-api:v1.0.1 \
   ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/bookmark-manager-staging-api:v1.0.1
@@ -250,7 +249,7 @@ aws ecs update-service \
 # 例: web_image = "${dependency.ecr.outputs.web_repository_url}:v1.0.1"
 
 cd infra/terraform/envs/staging/compute
-terragrunt apply
+terragrunt run apply
 ```
 
 ## メンテナンス
@@ -290,7 +289,7 @@ find . -type d -name ".terragrunt-cache" -exec rm -rf {} +
 cd infra/terraform/envs/staging
 
 # 全モジュールを一括削除（依存関係の逆順に自動実行）
-terragrunt run-all destroy
+terragrunt run --all destroy
 ```
 
 ## 想定月額コスト（概算）
@@ -397,10 +396,10 @@ cd infra/terraform/envs/staging
 
 # 各モジュールで既存stateをS3へ移行
 cd network
-terragrunt init -migrate-state
+terragrunt run init -migrate-state
 
 cd ../security
-terragrunt init -migrate-state
+terragrunt run init -migrate-state
 
 # ...他のモジュールも同様に実行
 ```
@@ -451,7 +450,7 @@ terragrunt graph-dependencies | dot -Tpng > dependencies.png
 ```bash
 # 全キャッシュをクリア
 cd infra/terraform/envs/staging
-terragrunt run-all init -reconfigure
+terragrunt run --all init -reconfigure
 ```
 
 ## よくある質問
@@ -463,7 +462,7 @@ A: Terragruntは、Terraformのラッパーツールです。Terraformの機能�
 - 設定の再利用（DRY原則）
 - モジュール間の依存関係管理
 - バックエンド設定の自動生成
-- 一括操作（run-all）
+- 一括操作（run --all）
 
 ### Q: 既存のTerraform設定から移行するには？
 
@@ -471,7 +470,7 @@ A: 以下の手順で移行できます：
 
 1. Terragruntの `terraform.source` を既存モジュールパスに設定
 2. `inputs` ブロックで変数を定義
-3. `terragrunt init` で初期化
+3. `terragrunt run init` で初期化
 4. 既存のstateファイルを移行（必要に応じて）
 
 ### Q: CI/CDとの統合は？
@@ -482,12 +481,12 @@ A: GitHub Actionsなどで以下のようなワークフローを作成します
 - name: Terragrunt Plan
   run: |
     cd infra/terraform/envs/staging
-    terragrunt run-all plan
+    terragrunt run --all plan
 
 - name: Terragrunt Apply
   run: |
     cd infra/terraform/envs/staging
-    terragrunt run-all apply -auto-approve
+    terragrunt run --all apply -auto-approve
 ```
 
 ## 参考資料

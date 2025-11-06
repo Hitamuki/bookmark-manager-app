@@ -3,9 +3,14 @@
 # ============================================================
 # コンテナイメージを保存するECRリポジトリを構築します。
 
-# 環境設定の継承
+# ルート設定の継承
 include "root" {
   path = find_in_parent_folders("root.hcl")
+}
+
+# 親環境設定の継承
+include "env" {
+  path = find_in_parent_folders("env.hcl")
 }
 
 # Terraformモジュールのソースパス
@@ -23,4 +28,7 @@ inputs = {
 
   # 保持するイメージの最大数（古いイメージは自動削除）
   max_image_count = 10
+
+  # イメージが残っていてもリポジトリを削除（staging環境のみtrue）
+  force_delete = true
 }

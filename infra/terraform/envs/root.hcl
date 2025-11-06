@@ -69,8 +69,19 @@ terraform {
   }
 }
 
+# ============================================================
+# 共通変数定義
+# ============================================================
+locals {
+  # 全環境共通のプロジェクト名
+  project_name = "bookmark-manager"
+}
+
 # 共通のinputs（全環境で使用される変数のデフォルト値）
 inputs = {
+  # プロジェクト名（全環境共通）
+  project_name = local.project_name
+
   # タグは各環境で上書き可能
   common_tags = {
     ManagedBy = "Terragrunt"

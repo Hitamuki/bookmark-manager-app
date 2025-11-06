@@ -18,21 +18,22 @@
 ![MongoDB](https://img.shields.io/badge/MongoDB-white.svg?logo=MongoDB)
 ![DBeaver](https://img.shields.io/badge/DBeaver-brown.svg?logo=DBeaver)
 
-| 名称                                                        | 概要                                                                                | バージョン                                                                 | 備考                                  |
-| ----------------------------------------------------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------- |
-| [AWS](https://docs.aws.amazon.com/ja_jp/)                   | クラウドインフラ基盤                                                                |                                                                            | 本番環境ホスティング                  |
-| [AWS CLI](https://docs.aws.amazon.com/cli/latest/)          | AWSサービスをコマンドラインから操作するためのツール                                 |                                                                            |                                       |
-| [Terraform](https://developer.hashicorp.com/terraform/docs) | IaC（Infrastructure as Code）ツール。AWSリソースの構築・変更・削除をコードで管理    |                                                                            |                                       |
-| [Terragrunt](https://terragrunt.gruntwork.io/docs/)         | Terraformのラッパーツール。肥大化しがちなtfファイルをモジュール単位で小さく管理可能 |                                                                            |                                       |
-| [terraform-docs](https://terraform-docs.io/)                | Terraformコードから自動的にドキュメントを生成するためのツール                       |                                                                            |                                       |
-| [TFLint](https://github.com/terraform-linters/tflint)       | Terraformコードの品質を向上させるための静的解析ツール                               |                                                                            |                                       |
-| [Datadog](https://docs.datadoghq.com/ja/)                   | モニタリング                                                                        |                                                                            |                                       |
-| [Sentry](https://docs.sentry.io/)                           | エラートラッキング / パフォーマンス監視                                             |                                                                            |                                       |
-| [Docker Compose](https://docs.docker.jp/index.html)         | コンテナ統合管理                                                                    | [3.9](https://docs.docker.jp/compose/compose-file/compose-versioning.html) |                                       |
-| [PostgreSQL](https://www.postgresql.org/docs/)              | メインDB（RDB）                                                                     | [17](https://www.postgresql.org/support/versioning/)                       | アプリデータ管理 / Prisma経由で永続化 |
-| [MongoDB](https://www.mongodb.com/ja-jp/docs/)              | ログDB（NoSQL）                                                                     | [8.0](https://www.mongodb.com/legal/support-policy/lifecycles)             |                                       |
-| [DBeaver](https://dbeaver.com/docs/dbeaver/)                | DBクライアント                                                                      |                                                                            |                                       |
-|                                                             |                                                                                     |                                                                            |                                       |
+| 名称                                                                                                                | 概要                                                                                                                                                                          | バージョン                                                                 | 備考                                  |
+| ------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------- |
+| [AWS](https://docs.aws.amazon.com/ja_jp/)                                                                           | クラウドインフラ基盤                                                                                                                                                          |                                                                            | 本番環境ホスティング                  |
+| [AWS CLI](https://docs.aws.amazon.com/cli/latest/)                                                                  | AWSサービスをコマンドラインから操作するためのツール                                                                                                                           |                                                                            |                                       |
+| [Session Manager Plugin](https://docs.aws.amazon.com/systems-manager/latest/userguide/what-is-systems-manager.html) | AWS Systems Manager（SSM） の機能の一部として動作するツールで、ローカル端末から AWS 上の EC2 インスタンスやその他のリソースに安全に接続するためのクライアント側コンポーネント |                                                                            |                                       |
+| [Terraform](https://developer.hashicorp.com/terraform/docs)                                                         | IaC（Infrastructure as Code）ツール。AWSリソースの構築・変更・削除をコードで管理                                                                                              |                                                                            |                                       |
+| [Terragrunt](https://terragrunt.gruntwork.io/docs/)                                                                 | Terraformのラッパーツール。肥大化しがちなtfファイルをモジュール単位で小さく管理可能                                                                                           |                                                                            |                                       |
+| [terraform-docs](https://terraform-docs.io/)                                                                        | Terraformコードから自動的にドキュメントを生成するためのツール                                                                                                                 |                                                                            |                                       |
+| [TFLint](https://github.com/terraform-linters/tflint)                                                               | Terraformコードの品質を向上させるための静的解析ツール                                                                                                                         |                                                                            |                                       |
+| [Datadog](https://docs.datadoghq.com/ja/)                                                                           | モニタリング                                                                                                                                                                  |                                                                            |                                       |
+| [Sentry](https://docs.sentry.io/)                                                                                   | エラートラッキング / パフォーマンス監視                                                                                                                                       |                                                                            |                                       |
+| [Docker Compose](https://docs.docker.jp/index.html)                                                                 | コンテナ統合管理                                                                                                                                                              | [3.9](https://docs.docker.jp/compose/compose-file/compose-versioning.html) |                                       |
+| [PostgreSQL](https://www.postgresql.org/docs/)                                                                      | メインDB（RDB）                                                                                                                                                               | [17](https://www.postgresql.org/support/versioning/)                       | アプリデータ管理 / Prisma経由で永続化 |
+| [MongoDB](https://www.mongodb.com/ja-jp/docs/)                                                                      | ログDB（NoSQL）                                                                                                                                                               | [8.0](https://www.mongodb.com/legal/support-policy/lifecycles)             |                                       |
+| [DBeaver](https://dbeaver.com/docs/dbeaver/)                                                                        | DBクライアント                                                                                                                                                                |                                                                            |                                       |
+|                                                                                                                     |                                                                                                                                                                               |                                                                            |                                       |
 
 ## アーキテクチャ構成図
 
@@ -264,35 +265,34 @@ aws ssm put-parameter \
 cd infra/terraform/envs/staging/ecr
 
 # 初期化
-terragrunt init
+terragrunt run init
 
 # ECRリポジトリのみ先にデプロイ
-terragrunt apply
+terragrunt run apply
 ```
 
 ##### ステップ2: コンテナイメージのビルド＆プッシュ
 
 ```bash
 # プロジェクトルートに戻る
-cd ../../../../
-
+# 以降はfishシェル用
 # AWSアカウントIDを取得
-AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-AWS_REGION="ap-northeast-1"
+set AWS_ACCOUNT_ID (aws sts get-caller-identity --query Account --output text)
+set AWS_REGION (aws configure get region)
 
 # ECRログイン
-aws ecr get-login-password --region ${AWS_REGION} | \
-  docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+aws ecr get-login-password --region $AWS_REGION | \
+  docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
 # Webイメージのビルド＆プッシュ
-docker build -t bookmark-manager-staging-web:latest -f src/apps/frontend/web/Dockerfile .
-docker tag bookmark-manager-staging-web:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/bookmark-manager-staging-web:latest
-docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/bookmark-manager-staging-web:latest
+docker build --platform linux/amd64 -t bookmark-manager-staging-web:latest -f src/apps/frontend/web/Dockerfile .
+docker tag bookmark-manager-staging-web:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/bookmark-manager-staging-web:latest
+docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/bookmark-manager-staging-web:latest
 
 # APIイメージのビルド＆プッシュ
-docker build -t bookmark-manager-staging-api:latest -f src/apps/web-api/core/Dockerfile .
-docker tag bookmark-manager-staging-api:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/bookmark-manager-staging-api:latest
-docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/bookmark-manager-staging-api:latest
+docker build --platform linux/amd64 -t bookmark-manager-staging-api:latest -f src/apps/web-api/core/Dockerfile .
+docker tag bookmark-manager-staging-api:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/bookmark-manager-staging-api:latest
+docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/bookmark-manager-staging-api:latest
 ```
 
 ##### ステップ3: 残りのインフラを構築
@@ -302,13 +302,15 @@ cd infra/terraform/envs/staging
 # TFLintでAWSプロバイダーのプラグインをインストール（初回のみ）
 tflint --init
 # 全モジュールを初期化
-terragrunt run-all init
+terragrunt run --all init
 # 実行計画の確認
-terragrunt run-all pla
+terragrunt run --all plan
 # インフラ構築（依存関係順に自動実行）
-terragrunt run-all apply
+terragrunt run --all apply
+# 作成済みリソースの確認
+terragrunt run --all state list
 # インフラ削除
-terragrunt run-all destroy
+terragrunt run --all destroy
 ```
 
 #### 個別モジュール操作
@@ -316,34 +318,120 @@ terragrunt run-all destroy
 ``` bash
 cd infra/terraform/envs/staging/network
 # 初期化
-terragrunt init
+terragrunt run init
 # 実行計画の確認
-terragrunt plan
+terragrunt run plan
 # 構築
-terragrunt apply
+terragrunt run apply
 # 削除
-terragrunt destroy
+terragrunt run destroy
 ```
 
 #### コマンド
 
 ``` bash
 # TFLint実行
-tflint
+tflint --recursive
+# .tflint.hclの設定が反映されない場合
+tflint --recursive --config "$(pwd)/.tflint.hcl"
 # 構文検証
+terragrunt run validate
 terraform validate
 # フォーマット
+terragrunt hcl fmt
 terraform fmt
+# Outputsを確認
+terragrunt run output
+# 現在の状態を確認
+terragrunt run show
+# Terragruntの管理下にあるリソースを確認
+terragrunt run state list
 # Terragruntキャッシュクリア
 find . -type d -name ".terragrunt-cache" -exec rm -rf {} +
 ```
 
+### Aurora PostgreSQLへのローカル接続
+
+#### 前提条件
+
+- AWS CLIがインストールされていること
+- [AWS Session Manager Plugin](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html)がインストールされていること
+- 適切なAWS認証情報が設定されていること
+- ECSタスクが実行中であること
+
+#### 準備
+
+```bash
+# macOS (Homebrew)
+brew install --cask session-manager-plugin
+
+# または手動インストール
+# https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html
+```
+
+#### 接続方法
+
+```bash
+# staging環境に接続（デフォルトポート: 5432）
+./scripts/connect_to_aurora.sh staging 5432
+
+# production環境に接続（ローカルポート: 5433）
+./scripts/connect_to_aurora.sh production 5433
+```
+
+スクリプトは以下を自動的に実行します。
+
+1. SSM Parameter Storeから接続情報を取得
+2. 実行中のECSタスクを検索
+3. SSMポートフォワーディングセッションを開始
+4. 接続情報を表示
+
+#### データベースクライアントでの接続
+
+**psqlコマンド:**
+
+```bash
+# 別ターミナルで実行（ポートフォワーディング中）
+psql postgresql://dbadmin:<PASSWORD>@localhost:5432/bookmarkdb
+```
+
+**DBeaver / DataGrip等:**
+
+- Host: `localhost`
+- Port: `5432`（スクリプトで指定したポート）
+- Database: `bookmarkdb`
+- Username: `dbadmin`
+- Password: （スクリプト実行時に表示される）
+
+#### トラブルシューティング
+
+**ECSタスクが見つからない場合:**
+
+```bash
+# タスクが実行中か確認
+aws ecs list-tasks \
+  --cluster bookmark-manager-staging-cluster \
+  --service-name bookmark-manager-staging-api-service
+
+# サービスの状態確認
+aws ecs describe-services \
+  --cluster bookmark-manager-staging-cluster \
+  --services bookmark-manager-staging-api-service
+```
+
+**ECS Execが有効でない場合:**
+
+ECSサービスで`enableExecuteCommand`を有効にする必要があります。Terraformで設定する場合は、[ecs.tf](terraform/modules/compute/ecs.tf)の`aws_ecs_service`リソースに以下を追加。
+
+```hcl
+enable_execute_command = true
+```
+
 ### TODO
 
+- マイグレーション自動実行
 - Terraformでインフラ構築
   - terraform-docs導入
-  - prod環境のTerragrunt設定作成
-  - S3バックエンドへの移行（チーム開発時）
 - CI/CD構築
   - GitHub ActionsでTerragruntを使用したAWSデプロイ
   - ECRへのコンテナイメージプッシュ自動化
@@ -351,3 +439,11 @@ find . -type d -name ".terragrunt-cache" -exec rm -rf {} +
 ## TBD
 
 - DatadogやSentryをTerraform管理
+- コスパ重視のホスティングサービスと切り分け
+  - Web：Vercel
+  - API：Render
+  - DB（PostgreSQL）：Supabase
+  - DB（MongoDB）：MongoDB Atlas
+- tfstateファイルをS3バックエンドへの移行（チーム開発時）
+- prod環境のTerragrunt設定作成（商用利用時）
+- Kubernetes、EKS移行（マイクロサービス化）

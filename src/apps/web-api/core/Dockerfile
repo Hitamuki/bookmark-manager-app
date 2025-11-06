@@ -11,22 +11,21 @@ WORKDIR /app
 # 依存関係のインストール
 FROM base AS deps
 COPY package.json pnpm-lock.yaml ./
+# postinstallスクリプトでPrismaが必要なのでスキーマをコピー
+COPY src/libs/prisma ./src/libs/prisma
 RUN corepack enable pnpm && pnpm install --frozen-lockfile
 
 # ビルドステージ
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/src/libs/prisma ./src/libs/prisma
 COPY . .
 
 # Nx環境変数の設定
 ENV NX_DAEMON=false
 
-# Prisma Client生成
-RUN corepack enable pnpm && \
-    pnpm prisma generate --schema=src/libs/prisma/schema.prisma
-
-# APIのビルド
-RUN pnpm nx build api-core --prod
+# APIのビルド (Prisma Clientは依存関係インストール時に生成済み)
+RUN corepack enable pnpm && pnpm nx build api-core --prod
 
 # 本番実行ステージ
 FROM base AS runner

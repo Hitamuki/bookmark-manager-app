@@ -11,6 +11,8 @@ WORKDIR /app
 # 依存関係のインストール
 FROM base AS deps
 COPY package.json pnpm-lock.yaml ./
+# postinstallスクリプトに必要なPrismaスキーマをコピー
+COPY src/libs/prisma ./src/libs/prisma
 RUN corepack enable pnpm && pnpm install --frozen-lockfile
 
 # ビルドステージ
@@ -23,7 +25,7 @@ ENV NX_DAEMON=false
 
 # Webアプリのビルド
 RUN corepack enable pnpm && \
-    pnpm nx build web --prod
+  pnpm nx build web --prod
 
 # 本番実行ステージ
 FROM base AS runner
@@ -32,18 +34,17 @@ ENV PORT=3000
 
 # 非rootユーザーの作成
 RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
+  adduser --system --uid 1001 nextjs
 
-# 必要なファイルのみコピー
-COPY --from=builder /app/dist/src/apps/frontend/web/.next/standalone ./
-COPY --from=builder /app/dist/src/apps/frontend/web/.next/static ./dist/src/apps/frontend/web/.next/static
-COPY --from=builder /app/dist/src/apps/frontend/web/public ./dist/src/apps/frontend/web/public
-
-# 権限設定
-RUN chown -R nextjs:nodejs /app
+# Next.jsのstandalone出力をコピー
+# Nxビルドの場合、出力は src/apps/frontend/web/.next に配置される
+COPY --from=builder --chown=nextjs:nodejs /app/src/apps/frontend/web/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/src/apps/frontend/web/.next/static ./src/apps/frontend/web/.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/src/apps/frontend/web/public ./src/apps/frontend/web/public
 
 USER nextjs
 
 EXPOSE 3000
 
-CMD ["node", "dist/src/apps/frontend/web/server.js"]
+# standalone出力のserver.jsを実行
+CMD ["node", "src/apps/frontend/web/server.js"]

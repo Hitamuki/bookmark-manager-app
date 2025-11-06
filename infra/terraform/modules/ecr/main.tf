@@ -7,6 +7,7 @@
 resource "aws_ecr_repository" "web" {
   name                 = "${var.project_name}-${var.environment}-web"
   image_tag_mutability = var.image_tag_mutability
+  force_delete         = var.force_delete
 
   # イメージスキャン設定
   image_scanning_configuration {
@@ -30,6 +31,7 @@ resource "aws_ecr_repository" "web" {
 resource "aws_ecr_repository" "api" {
   name                 = "${var.project_name}-${var.environment}-api"
   image_tag_mutability = var.image_tag_mutability
+  force_delete         = var.force_delete
 
   # イメージスキャン設定
   image_scanning_configuration {

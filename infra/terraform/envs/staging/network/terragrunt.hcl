@@ -3,9 +3,14 @@
 # ============================================================
 # VPC、サブネット、ルーティングテーブルを構築します。
 
-# 環境設定の継承
+# ルート設定の継承
 include "root" {
   path = find_in_parent_folders("root.hcl")
+}
+
+# 親環境設定の継承
+include "env" {
+  path = find_in_parent_folders("env.hcl")
 }
 
 # Terraformモジュールのソースパス
