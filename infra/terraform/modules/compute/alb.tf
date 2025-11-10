@@ -24,10 +24,10 @@ resource "aws_lb_target_group" "web" {
   health_check {
     enabled             = true
     healthy_threshold   = 2
-    unhealthy_threshold = 3
-    timeout             = 5
-    interval            = 30
-    path                = "/api/health"
+    unhealthy_threshold = 10  # 再起動を防ぐため増やす（デフォルト: 2）
+    timeout             = 10  # タイムアウトを長めに
+    interval            = 60  # チェック間隔を長めに（コスト削減）
+    path                = "/"
     matcher             = "200"
   }
 
@@ -49,9 +49,9 @@ resource "aws_lb_target_group" "api" {
   health_check {
     enabled             = true
     healthy_threshold   = 2
-    unhealthy_threshold = 3
-    timeout             = 5
-    interval            = 30
+    unhealthy_threshold = 10  # 再起動を防ぐため増やす（デフォルト: 2）
+    timeout             = 10  # タイムアウトを長めに
+    interval            = 60  # チェック間隔を長めに（コスト削減）
     path                = "/health"
     matcher             = "200"
   }
@@ -72,6 +72,23 @@ resource "aws_lb_listener" "http" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.web.arn
+  }
+}
+
+# Listener Rule for Health Check
+resource "aws_lb_listener_rule" "health" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 50
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.api.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/health"]
+    }
   }
 }
 

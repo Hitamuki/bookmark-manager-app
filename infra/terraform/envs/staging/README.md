@@ -2,18 +2,181 @@
 
 ## 概要
 
-Terragruntを使用したコスト最適化されたstaging環境のインフラ構成です。
+Terragruntを使用した**超コスト最適化**されたstaging環境のインフラ構成です。
 
-## コスト最適化のポイント
+**月額コスト: $60-70**（営業時間のみ稼働）、最大65%のコスト削減を実現しています。
+
+## 使用AWSサービス一覧
+
+| カテゴリ               | サービス                      | 用途                      | 月額コスト（概算） |
+| ---------------------- | ----------------------------- | ------------------------- | ------------------ |
+| **コンピューティング** | ECS Fargate                   | コンテナ実行（Web + API） | $20-25             |
+|                        | Lambda                        | ECS自動停止/起動          | $0.1未満           |
+|                        | EventBridge                   | スケジューラー            | $0 (無料枠)        |
+| **ネットワーク**       | VPC                           | ネットワーク基盤          | $0                 |
+|                        | ALB                           | ロードバランサー          | $17.4              |
+|                        | VPC Endpoint (Interface × 3)  | ECR/CloudWatch Logs       | $21.6              |
+| **データベース**       | RDS PostgreSQL (db.t4g.micro) | メインDB                  | $15                |
+| **ストレージ**         | S3                            | 静的アセット              | $1-5               |
+|                        | ECR                           | コンテナイメージ          | $0-1               |
+| **モニタリング**       | CloudWatch Logs               | ログ保存 (7日)            | $5-10              |
+| **セキュリティ**       | IAM                           | アクセス制御              | $0                 |
+|                        | Security Group                | ファイアウォール          | $0                 |
+|                        | SSM Parameter Store           | シークレット管理          | $0 (無料枠)        |
+| **合計**               |                               |                           | **$60-70/月**      |
+
+## AWS構成概要
+
+### アーキテクチャ構成図
+
+```mermaid
+graph TB
+    User[ユーザー<br>固定IPのみ許可]
+
+    subgraph AWS["AWS (ap-northeast-1)"]
+        subgraph VPC["VPC (10.0.0.0/16)"]
+            subgraph PublicSubnet["Public Subnet<br>(NAT Gateway削除でコスト削減)"]
+                ALB[ALB<br>ロードバランサー<br>IP制限あり]
+                ECS_Web[ECS Fargate<br>Next.js SSR<br>0.25 vCPU / 512 MB]
+                ECS_API[ECS Fargate<br>NestJS API<br>0.25 vCPU / 512 MB]
+            end
+
+            subgraph PrivateSubnet["Private Subnet"]
+                RDS[(RDS PostgreSQL<br>db.t4g.micro<br>Graviton2)]
+                VPCE[VPC Endpoints<br>ECR/CloudWatch]
+            end
+        end
+
+        Lambda[Lambda<br>ECS Scheduler<br>自動停止/起動]
+        EB[EventBridge<br>cron: 月-金 9-22時]
+        ECR[ECR<br>コンテナレジストリ]
+        S3[S3<br>静的アセット]
+        CW[CloudWatch Logs<br>7日保存]
+        SSM[SSM Parameter Store<br>DB接続情報等]
+    end
+
+    User -->|HTTPS| ALB
+    ALB --> ECS_Web
+    ALB --> ECS_API
+    ECS_Web --> RDS
+    ECS_API --> RDS
+    ECS_Web -.VPC Endpoint.- ECR
+    ECS_API -.VPC Endpoint.- ECR
+    ECS_Web -.VPC Endpoint.- CW
+    ECS_API -.VPC Endpoint.- CW
+    ECS_Web --> S3
+    ECS_Web --> SSM
+    ECS_API --> SSM
+
+    EB -->|起動: 9:00 JST| Lambda
+    EB -->|停止: 22:00 JST| Lambda
+    Lambda -->|UpdateService| ECS_Web
+    Lambda -->|UpdateService| ECS_API
+
+    style RDS fill:#f9f,stroke:#333,stroke-width:2px
+    style Lambda fill:#ff9,stroke:#333,stroke-width:2px
+    style EB fill:#ff9,stroke:#333,stroke-width:2px
+```
+
+### Terragrunt依存関係図
+
+```mermaid
+graph TD
+    Root[root.hcl<br>共通設定]
+    Env[staging/env.hcl<br>環境設定]
+
+    ECR[ecr<br>コンテナレジストリ]
+    Network[network<br>VPC/サブネット<br>NAT削除]
+    Security[security<br>IAM/SG<br>IP制限]
+    Database[database<br>RDS PostgreSQL<br>db.t4g.micro]
+    Compute[compute<br>ECS/ALB<br>自動停止/起動]
+    Storage[storage<br>S3バケット]
+
+    Root --> Env
+    Env --> ECR
+    Env --> Network
+    Network --> Security
+    Security --> Database
+    Security --> Compute
+    ECR --> Compute
+    Network --> Compute
+    Network --> Database
+
+    style Compute fill:#ff9,stroke:#333,stroke-width:3px
+    style Database fill:#f9f,stroke:#333,stroke-width:3px
+    style Network fill:#9ff,stroke:#333,stroke-width:3px
+```
+
+### ネットワーク構成
+
+```
+Internet (固定IPのみ)
+    ↓
+┌─────────────────────────────────────────────┐
+│ Public Subnet (NAT Gateway削除)             │
+│   - ALB (IP制限あり)                        │
+│   - ECS Fargate (Web + API)                 │
+│     ※パブリックIP割り当て                   │
+└─────────────────┬───────────────────────────┘
+                  │
+┌─────────────────▼───────────────────────────┐
+│ Private Subnet                              │
+│   - RDS PostgreSQL (db.t4g.micro)           │
+│   - VPC Endpoints:                          │
+│     • ECR API (Interface)                   │
+│     • ECR DKR (Interface)                   │
+│     • S3 (Gateway - 無料)                   │
+│     • CloudWatch Logs (Interface)           │
+└─────────────────────────────────────────────┘
+```
+
+## コスト最適化施策
+
+### 実装済みの最適化
+
+#### 1. ECS自動停止/起動 ⭐ 重要
+
+- **削減効果**: ECS稼働時間 65%削減
+- **実装**:
+  - EventBridge + Lambda によるスケジューラー
+  - 月〜金 9:00-22:00 JST のみ稼働
+  - 土日・営業時間外は自動停止（desired_count = 0）
+- **設定**: [compute/auto_schedule.tf](../../modules/compute/auto_schedule.tf)
+
+#### 2. RDS PostgreSQL採用 ⭐ 重要
+
+- **削減効果**: 月額 $28削減（65%削減）
+- **変更**: Aurora Serverless v2 → RDS PostgreSQL (db.t4g.micro)
+- **メリット**: Graviton2プロセッサでコスト最適化
+- **設定**: [database/rds.tf](../../modules/database/rds.tf)
+
+#### 3. NAT Gateway削除 ⭐ 重要
+
+- **削減効果**: 月額 $32削減
+- **変更**: ECSタスクをパブリックサブネットに配置
+- **セキュリティ**: ALBで固定IP制限 ([terraform.tfvars.example](terraform.tfvars.example))
+- **設定**: [network/terragrunt.hcl](network/terragrunt.hcl) で `enable_nat_gateway = false`
+
+#### 4. VPC Endpoint使用
+
+- **削減効果**: NAT Gatewayデータ転送料 月額$400-500削減
+- **実装**: ECR、S3、CloudWatch LogsへのプライベートアクセスVPC Endpoint使用
+- **実績**: 15時間で279GB転送 → $17.32のデータ転送料が発生（VPC Endpoint導入前）
+
+#### 5. その他の最適化
 
 - **ECS Fargate**: CPU 256 (0.25 vCPU) / Memory 512 MB / 各1タスク
-- **Aurora Serverless v2**: 最小0.5 ACU、最大1.0 ACU、シングルインスタンス
-- **NAT Gateway**: 単一NAT Gateway（マルチAZ構成ではない）
 - **S3**: バージョニング無効、ライフサイクルルール適用
 - **CloudWatch Logs**: 7日間保存
 - **ECS Container Insights**: 無効化
 - **WAF**: 無効化（必要に応じて有効化）
 - **削除保護**: 無効化
+
+### 推奨事項
+
+- **使わない時は必ずリソース削除**: `terragrunt run-all destroy`
+- **開発中は必要最小限のリソースのみ稼働**
+- **固定IP設定**: [terraform.tfvars.example](terraform.tfvars.example) を参照してIP制限を設定
 
 ## 前提条件
 
@@ -56,11 +219,21 @@ infra/terraform/envs/staging/
 以下の順序でインフラを構築します：
 
 ```
-1. ECRリポジトリ作成
+1. 固定IP設定（terraform.tfvars作成）
    ↓
-2. コンテナイメージのビルド＆プッシュ
+2. Lambda関数のビルド（TypeScript → JavaScript）
    ↓
-3. 残りのインフラ構築（network → security → compute → database → storage）
+3. インフラ構築（terragrunt run --all apply）
+   - ECRリポジトリ作成
+   - network → security → compute → database → storage
+   ↓
+4. Prismaマイグレーション実行
+   - .env.stagingにDATABASE_URLを設定
+   - pnpm prisma migrate deploy
+   ↓
+5. コンテナイメージのビルド＆プッシュ
+   ↓
+6. ECS再デプロイ
 ```
 
 ## 初期セットアップ
@@ -71,51 +244,53 @@ infra/terraform/envs/staging/
 mise install
 ```
 
-### 2. ECRリポジトリの作成
+### 2. 固定IP設定（セキュリティ強化）
 
-まず、コンテナイメージを保存するECRリポジトリを作成します。
-
-```bash
-cd infra/terraform/envs/staging/ecr
-
-# 初期化
-terragrunt run init
-
-# ECRリポジトリのみ先にデプロイ
-terragrunt run apply
-```
-
-### 3. コンテナイメージのビルド＆プッシュ
-
-プロジェクトルートに戻り、コンテナイメージをビルドしてECRにプッシュします。
+ALBへのアクセスを特定のIPアドレスのみに制限します。
 
 ```bash
-# プロジェクトルートに戻る
+cd infra/terraform/envs/staging
 
-# AWSアカウントIDを取得
-AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-AWS_REGION=$(aws configure get region)
+# サンプルファイルをコピー
+cp terraform.tfvars.example terraform.tfvars
 
-# ECRログイン
-aws ecr get-login-password --region ${AWS_REGION} | \
-  docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+# 自分のIPアドレスを確認
+curl -s https://checkip.amazonaws.com
 
-# Webイメージのビルド＆プッシュ
-docker build -t bookmark-manager-staging-web:latest \
-  -f src/apps/frontend/web/Dockerfile .
-docker tag bookmark-manager-staging-web:latest \
-  ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/bookmark-manager-staging-web:latest
-docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/bookmark-manager-staging-web:latest
-
-# APIイメージのビルド＆プッシュ
-docker build -t bookmark-manager-staging-api:latest \
-  -f src/apps/web-api/core/Dockerfile .
-docker tag bookmark-manager-staging-api:latest \
-  ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/bookmark-manager-staging-api:latest
-docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/bookmark-manager-staging-api:latest
+# terraform.tfvarsを編集して固定IPを設定
+# 例:
+# allowed_cidr_blocks = [
+#   "203.0.113.10/32",  # オフィスIP
+#   "198.51.100.20/32", # 自宅IP
+# ]
 ```
 
-### 4. 残りのインフラ構築
+**注意**:
+- `terraform.tfvars`は`.gitignore`に含まれており、Gitにコミットされません
+- `/32`は単一IPアドレスを指定します
+- 複数のIPを許可する場合は、配列にIPを追加してください
+
+### 3. Lambda関数のビルド（ECS自動停止/起動）
+
+Lambda関数はTypeScriptで記述されていますが、AWS Lambdaは直接TypeScriptを実行できないため、JavaScriptにトランスパイルする必要があります。
+
+#### esbuildでビルド
+
+```bash
+cd infra/terraform/modules/compute/lambda
+
+# esbuildでTypeScriptをバンドル
+npx esbuild ecs_scheduler.ts \
+  --bundle \
+  --platform=node \
+  --target=node20 \
+  --outfile=ecs_scheduler.js
+
+# ビルド成功を確認
+ls -lh ecs_scheduler.js
+```
+
+### 3. インフラ構築
 
 ```bash
 cd infra/terraform/envs/staging
@@ -130,23 +305,127 @@ terragrunt run --all plan
 terragrunt run --all apply
 ```
 
-または、モジュール単位で構築する場合：
+### 4. Prismaマイグレーションの実行
+
+データベースが構築されたら、Prismaマイグレーションを実行してテーブルを作成します。
+
+**重要**: RDSはプライベートサブネットにあるため、ローカルから直接アクセスできません。SSMポートフォワーディング経由で接続する必要があります。
+
+#### ステップ1: 環境変数ファイルの準備
 
 ```bash
-cd network
-terragrunt run apply
+# プロジェクトルートで実行
 
-cd ../security
-terragrunt run apply
+# SSM Parameter StoreからDATABASE_URLを取得して設定
+# localhost経由でアクセスするため、エンドポイントをlocalhostに変更
+aws ssm get-parameter \
+  --name "/bookmark-manager/staging/DATABASE_URL" \
+  --with-decryption \
+  --query "Parameter.Value" \
+  --output text
 
-cd ../compute
-terragrunt run apply
+# 取得したURLのホスト部分をlocalhostに置き換えて.env.stagingに設定
+# 例: postgresql://dbadmin:PASSWORD@localhost:5432/bookmarkdb
+```
 
-cd ../database
-terragrunt run apply
+`.env.staging`の例：
+```
+DATABASE_URL="postgresql://dbadmin:YOUR_PASSWORD@localhost:5432/bookmarkdb"
+```
 
-cd ../storage
-terragrunt run apply
+#### ステップ2: SSMポートフォワーディングの開始
+
+別ターミナルで、ECS経由でRDSへのポートフォワーディングを確立します。
+
+```bash
+# 別ターミナルで実行
+./scripts/connect_to_aurora.sh staging 5432
+
+# 以下の情報が表示されます:
+# - ホスト: localhost
+# - ポート: 5432
+# - データベース: bookmarkdb
+# - ユーザー名: dbadmin
+# - パスワード: (表示されます)
+```
+
+**トラブルシューティング**:
+- ECSタスクが実行中でない場合、先にECSサービスを起動してください
+- `enableExecuteCommand`が無効の場合、Terraformで有効化が必要です
+
+#### ステップ3: マイグレーションの実行
+
+ポートフォワーディングが確立したら、元のターミナルでマイグレーションを実行します。
+
+```bash
+# .env.stagingを使用してマイグレーション実行
+pnpm dotenv -e .env.staging -- prisma migrate deploy \
+  --schema=src/libs/prisma/schema.prisma
+
+# シードデータの投入（必要に応じて）
+pnpm dotenv -e .env.staging -- prisma db seed
+```
+
+**注意**:
+- `migrate deploy`は本番環境用のマイグレーションコマンドで、プロンプトなしで実行されます
+- ローカル開発では`migrate dev`を使用しますが、staging/production環境では`migrate deploy`を使用します
+- ポートフォワーディングが確立している間のみマイグレーションが可能です
+
+#### ステップ4: マイグレーション確認
+
+```bash
+# Prisma Studioでテーブルを確認
+pnpm dotenv -e .env.staging -- prisma studio
+
+# または、psqlコマンドで確認（ポートフォワーディング確立中）
+psql "postgresql://dbadmin:<PASSWORD>@localhost:5432/bookmarkdb"
+
+# テーブル一覧を表示
+\dt
+
+# 接続を終了
+\q
+```
+
+#### ステップ5: ポートフォワーディングの終了
+
+マイグレーションが完了したら、ポートフォワーディングを終了します。
+
+```bash
+# ポートフォワーディングを実行しているターミナルで Ctrl+C を押す
+```
+
+### 5. コンテナイメージのビルド＆プッシュ
+
+プロジェクトルートに戻り、コンテナイメージをビルドしてECRにプッシュ
+
+```bash
+# プロジェクトルートに戻る
+# 以降はfishシェル用
+# AWSアカウントIDを取得
+set AWS_ACCOUNT_ID (aws sts get-caller-identity --query Account --output text)
+set AWS_REGION (aws configure get region)
+
+# ECRログイン
+aws ecr get-login-password --region $AWS_REGION | \
+  docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
+# Webイメージのビルド＆プッシュ
+docker build --platform linux/amd64 -t bookmark-manager-staging-web:latest -f src/apps/frontend/web/Dockerfile .
+docker tag bookmark-manager-staging-web:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/bookmark-manager-staging-web:latest
+docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/bookmark-manager-staging-web:latest
+
+# APIイメージのビルド＆プッシュ
+docker build --platform linux/amd64 -t bookmark-manager-staging-api:latest -f src/apps/web-api/core/Dockerfile .
+docker tag bookmark-manager-staging-api:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/bookmark-manager-staging-api:latest
+docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/bookmark-manager-staging-api:latest
+```
+
+### 6. ECS再デプロイ
+
+```bash
+aws ecs update-service --cluster bookmark-manager-staging-cluster --service bookmark-manager-staging-api --force-new-deployment --query 'service.{ServiceName:serviceName,Status:status,DesiredCount:desiredCount}'
+aws ecs update-service --cluster bookmark-manager-staging-cluster --service bookmark-manager-staging-web --force-new-deployment --query 'service.{ServiceName:serviceName,Status:status,DesiredCount:desiredCount}'
 ```
 
 ## 構築後の設定
@@ -172,10 +451,10 @@ SSM Parameter Storeに環境変数を設定：
 
 ```bash
 # JWT_SECRET
-aws ssm put-parameter \
-  --name "/bookmark-manager/staging/JWT_SECRET" \
-  --value "your-secret-key" \
-  --type "SecureString"
+# aws ssm put-parameter \
+#   --name "/bookmark-manager/staging/JWT_SECRET" \
+#   --value "your-secret-key" \
+#   --type "SecureString"
 
 # MongoDB接続文字列（別途MongoDB Atlas設定が必要）
 aws ssm put-parameter \
@@ -292,16 +571,97 @@ cd infra/terraform/envs/staging
 terragrunt run --all destroy
 ```
 
-## 想定月額コスト（概算）
+## 想定月額コスト
 
-- **ECS Fargate**: 約$15-20（2タスク、24時間稼働）
-- **Aurora Serverless v2**: 約$50-80（0.5-1.0 ACU、シングルインスタンス）
-- **NAT Gateway**: 約$35-40
-- **ALB**: 約$20-25
-- **S3**: 約$1-5（データ量による）
-- **その他（CloudWatch、データ転送など）**: 約$10-20
+### コスト比較
 
-**合計**: 約$130-190/月
+| 運用パターン               | 月額コスト | 削減率  | 備考                                |
+| -------------------------- | ---------- | ------- | ----------------------------------- |
+| **24時間稼働（最適化前）** | $145-170   | -       | 旧構成（Aurora + NAT Gateway）      |
+| **24時間稼働（最適化後）** | $80-90     | 45%     | RDS + NAT削除 + IP制限              |
+| **営業時間のみ（推奨）**   | **$60-70** | **65%** | **月〜金 9-22時 + 自動停止/起動** ⭐ |
+
+### 詳細内訳（営業時間のみ稼働の場合）
+
+| リソース                          | 料金体系                                       | 月額コスト（概算） | 備考                              |
+| --------------------------------- | ---------------------------------------------- | ------------------ | --------------------------------- |
+| **RDS PostgreSQL (db.t4g.micro)** | $0.016/時間                                    | **$11.5**          | 24時間稼働、Graviton2             |
+| **ECS Fargate (Web)**             | vCPU: $0.04656/時間<br>Memory: $0.00511/GB時間 | **$7.5**           | 0.25 vCPU + 0.5 GB、営業時間のみ  |
+| **ECS Fargate (API)**             | vCPU: $0.04656/時間<br>Memory: $0.00511/GB時間 | **$7.5**           | 0.25 vCPU + 0.5 GB、営業時間のみ  |
+| **ALB**                           | $0.0243/時間 + LCU料金                         | **$17.4**          | 時間料金 + 使用量課金             |
+| **VPC Endpoint (Interface × 3)**  | $0.01/時間 × 3                                 | **$21.6**          | ECR API, ECR DKR, CloudWatch Logs |
+| **Lambda (ECS Scheduler)**        | リクエスト + 実行時間                          | **$0.05未満**      | 1日2回実行                        |
+| **S3**                            | ストレージ + リクエスト                        | **$1-5**           | データ量による                    |
+| **CloudWatch Logs**               | 取り込み + 保存                                | **$5-10**          | ログ量による、7日保存             |
+| **その他**                        | データ転送、ECR等                              | **$1-5**           | -                                 |
+
+**合計: 約$60-70/月**（営業時間のみ稼働）
+
+### コスト削減の内訳
+
+| 削減施策                 | 削減効果                      | 実装状況    |
+| ------------------------ | ----------------------------- | ----------- |
+| ECS自動停止/起動         | ECS稼働時間 65%削減           | ✅ 実装済み  |
+| Aurora → RDS             | 月額 $28削減（65%削減）       | ✅ 実装済み  |
+| NAT Gateway削除          | 月額 $32削減                  | ✅ 実装済み  |
+| VPC Endpoint使用         | データ転送料 月額$400-500削減 | ✅ 実装済み  |
+| Container Insights無効化 | 月額 $10削減                  | ✅ 実装済み  |
+| CloudWatch Logs 7日保存  | 月額 $5-10削減                | ✅ 実装済み  |
+| **合計削減効果**         | **月額 $75-145削減**          | **65%削減** |
+
+### 使わない時はリソース削除
+
+**削減効果: 100%（$0/月）**
+
+```bash
+# 作業終了時
+cd infra/terraform/envs/staging
+terragrunt run-all destroy
+
+# 必要な時だけ
+terragrunt run-all apply
+```
+
+## コスト監視
+
+### データ転送量の監視
+
+NAT Gatewayのデータ転送量を監視し、異常な増加を検知：
+
+```bash
+# CloudWatch Alarms設定例（1日10GB以上でアラート）
+aws cloudwatch put-metric-alarm \
+  --alarm-name staging-nat-high-traffic \
+  --metric-name BytesOutToSource \
+  --namespace AWS/NATGateway \
+  --statistic Sum \
+  --period 86400 \
+  --threshold 10737418240 \
+  --comparison-operator GreaterThanThreshold \
+  --evaluation-periods 1
+```
+
+### コスト確認コマンド
+
+```bash
+# 今月のコストを確認
+aws ce get-cost-and-usage \
+  --time-period Start=$(date -u -d "1 day ago" +%Y-%m-%d),End=$(date -u +%Y-%m-%d) \
+  --granularity DAILY \
+  --metrics BlendedCost \
+  --group-by Type=DIMENSION,Key=SERVICE \
+  --output table
+
+# NAT Gatewayのデータ転送量を確認
+aws cloudwatch get-metric-statistics \
+  --namespace AWS/NATGateway \
+  --metric-name BytesOutToSource \
+  --dimensions Name=NatGatewayId,Value=<NAT_GATEWAY_ID> \
+  --start-time $(date -u -d "1 day ago" +%Y-%m-%dT%H:%M:%S) \
+  --end-time $(date -u +%Y-%m-%dT%H:%M:%S) \
+  --period 3600 \
+  --statistics Sum
+```
 
 ## State管理（ローカル vs S3バックエンド）
 
@@ -425,6 +785,140 @@ MongoDB Atlasは別途設定が必要です：
 
 ## トラブルシューティング
 
+### Lambda関数のデプロイエラー
+
+**症状**: `terragrunt apply`実行時に以下のエラーが発生
+
+```
+Error: error creating Lambda Function: InvalidParameterValueException:
+Uploaded file must be a non-empty zip
+```
+
+**原因**: TypeScriptファイル(.ts)をそのままzipにしようとしている
+
+**対策**:
+
+1. **Lambda関数をJavaScriptにビルド**:
+
+   ```bash
+   cd infra/terraform/modules/compute/lambda
+
+   # esbuildでビルド
+   npx esbuild ecs_scheduler.ts \
+     --bundle \
+     --platform=node \
+     --target=node20 \
+     --outfile=ecs_scheduler.js
+
+   # 成功を確認
+   ls -lh ecs_scheduler.js
+   ```
+
+2. **Terraformを再実行**:
+
+   ```bash
+   cd infra/terraform/envs/staging/compute
+   terragrunt run apply
+   ```
+
+### Lambda関数のテスト
+
+ECS自動停止/起動が正しく動作するか確認:
+
+```bash
+# Lambda関数を手動実行（停止テスト）
+aws lambda invoke \
+  --function-name bookmark-manager-staging-ecs-scheduler \
+  --payload '{"action":"stop"}' \
+  --cli-binary-format raw-in-base64-out \
+  response.json
+
+# 結果を確認
+cat response.json
+
+# Lambda関数を手動実行（起動テスト）
+aws lambda invoke \
+  --function-name bookmark-manager-staging-ecs-scheduler \
+  --payload '{"action":"start"}' \
+  --cli-binary-format raw-in-base64-out \
+  response.json
+
+# ECSタスク数を確認
+aws ecs describe-services \
+  --cluster bookmark-manager-staging-cluster \
+  --services bookmark-manager-staging-web bookmark-manager-staging-api \
+  --query 'services[*].[serviceName,desiredCount,runningCount]' \
+  --output table
+
+# Lambda関数のログを確認
+aws logs tail /aws/lambda/bookmark-manager-staging-ecs-scheduler --follow
+```
+
+### ECSタスクが再起動を繰り返す場合（重要）
+
+**症状**: Dockerイメージの繰り返しpullによりNAT Gatewayデータ転送料が高騰
+
+**原因**:
+1. ヘルスチェック失敗による再起動ループ
+2. アプリケーションの起動時間がヘルスチェック猶予期間より長い
+3. メモリ不足によるOOMKill
+
+**対策** (実装済み):
+
+1. **ヘルスチェック猶予期間の設定**
+   ```hcl
+   health_check_grace_period_seconds = 120
+   ```
+   アプリケーション起動後120秒間はヘルスチェック失敗を無視
+
+2. **unhealthy_thresholdの増加**
+   ```hcl
+   unhealthy_threshold = 10  # デフォルト: 2-3
+   ```
+   10回連続で失敗するまでタスクを再起動しない
+
+3. **ヘルスチェック間隔の延長**
+   ```hcl
+   interval = 60  # 60秒ごとにチェック（デフォルト: 30秒）
+   ```
+
+4. **デプロイサーキットブレーカー**
+   ```hcl
+   deployment_circuit_breaker {
+     enable   = true
+     rollback = true
+   }
+   ```
+   失敗したデプロイを自動ロールバック
+
+**確認コマンド**:
+
+```bash
+# ECSタスクの停止理由を確認
+aws ecs describe-tasks \
+  --cluster bookmark-manager-staging-cluster \
+  --tasks $(aws ecs list-tasks \
+    --cluster bookmark-manager-staging-cluster \
+    --service-name bookmark-manager-staging-api-service \
+    --query 'taskArns[0]' --output text) \
+  --query 'tasks[0].stoppedReason'
+
+# CloudWatch Logsで起動ログを確認
+aws logs tail /ecs/bookmark-manager-staging-api --follow
+
+# タスクのイベント履歴を確認
+aws ecs describe-services \
+  --cluster bookmark-manager-staging-cluster \
+  --services bookmark-manager-staging-api-service \
+  --query 'services[0].events[0:10]'
+```
+
+**アプリケーション側の対策**:
+
+1. `/health` エンドポイントを軽量にする
+2. 起動時の重い処理を遅延実行
+3. グレースフルシャットダウンの実装
+
 ### Terragruntが依存関係を解決できない場合
 
 ```bash
@@ -438,6 +932,7 @@ terragrunt graph-dependencies | dot -Tpng > dependencies.png
 2. CloudWatch Logsでエラーを確認
 3. セキュリティグループの設定を確認
 4. コンテナイメージが正しいか確認
+5. メモリ/CPUリソースが十分か確認
 
 ### データベースに接続できない場合
 

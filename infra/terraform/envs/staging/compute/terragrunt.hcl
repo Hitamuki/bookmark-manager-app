@@ -105,4 +105,9 @@ inputs = {
       value = "http://bookmark-manager-compute-alb-458087604.ap-northeast-1.elb.amazonaws.com"
     }
   ]
+
+  # ECS自動停止/起動設定（コスト削減）
+  enable_auto_schedule = true
+  schedule_start_cron  = "cron(0 0 ? * MON-FRI *)"  # 月〜金 9:00 JST (0:00 UTC)
+  schedule_stop_cron   = "cron(0 13 ? * MON-FRI *)" # 月〜金 22:00 JST (13:00 UTC)
 }

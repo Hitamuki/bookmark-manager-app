@@ -13,8 +13,19 @@ variable "vpc_id" {
   type        = string
 }
 
+variable "vpc_cidr" {
+  description = "VPC CIDR block"
+  type        = string
+}
+
 variable "allowed_cidr_blocks" {
-  description = "Allowed CIDR blocks for ALB access"
+  description = "Allowed CIDR blocks for ALB access (固定IPアドレス)"
   type        = list(string)
-  default     = ["0.0.0.0/0"]
+  default     = []
+}
+
+variable "enable_dynamic_ip" {
+  description = "Enable dynamic IP address detection (terraform apply実行時のIPアドレスを自動取得)"
+  type        = bool
+  default     = true
 }

@@ -28,7 +28,7 @@ export const WinstonConfig = () => ({
     }),
     // MongoDB出力
     new transports.MongoDB({
-      db: process.env.MONGO_LOG_URI,
+      db: process.env.MONGODB_URI,
       collection: 'app_logs',
       options: {},
       tryReconnect: true,

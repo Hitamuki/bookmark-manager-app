@@ -12,8 +12,8 @@ locals {
   # 基本設定
   # project_nameはroot.hclから取得
   project_name = local.root_config.locals.project_name
-  # 環境名は親ディレクトリ名から自動取得
-  environment = basename(get_terragrunt_dir())
+  # 環境名は親ディレクトリ名から自動取得（staging, production など）
+  environment = basename(dirname(get_terragrunt_dir()))
   aws_region  = "ap-northeast-1"
 
   # 共通タグ

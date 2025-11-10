@@ -3,12 +3,16 @@
  * モジュール定義
  */
 
+import { HttpModule } from '@nestjs/axios';
 import { Logger, type MiddlewareConsumer, Module, type NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
 import { CqrsModule } from '@nestjs/cqrs';
+import { MongooseModule } from '@nestjs/mongoose';
+import { TerminusModule } from '@nestjs/terminus';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { PrismaModule } from './bootstrap/prisma.module';
+import { HealthController } from './presentation/health/health.controller';
 import { LoggerMiddleware } from './presentation/middleware/logger.middleware';
 import { SampleModule } from './presentation/sample/sample.module';
 
@@ -20,8 +24,16 @@ import { SampleModule } from './presentation/sample/sample.module';
       useClass: ZodValidationPipe,
     },
   ],
-  controllers: [],
-  imports: [ConfigModule.forRoot(), CqrsModule.forRoot(), PrismaModule, SampleModule],
+  controllers: [HealthController],
+  imports: [
+    ConfigModule.forRoot(),
+    CqrsModule.forRoot(),
+    HttpModule,
+    MongooseModule.forRoot(process.env.MONGODB_URI || ''),
+    PrismaModule,
+    SampleModule,
+    TerminusModule,
+  ],
   exports: [],
 })
 
@@ -33,7 +45,8 @@ export class AppModule implements NestModule {
       .apply(LoggerMiddleware)
       .exclude(
         // 除外ルート
+        '/health',
       )
-      .forRoutes('*');
+      .forRoutes('*path');
   }
 }

@@ -1,3 +1,16 @@
+# ============================================================
+# Locals - CIDR Blocks Configuration
+# ============================================================
+locals {
+  # 動的IPと固定IPを結合
+  # - var.enable_dynamic_ip が true の場合: 実行時のIPアドレス + 固定IP
+  # - var.enable_dynamic_ip が false の場合: 固定IPのみ
+  all_allowed_cidrs = var.enable_dynamic_ip ? concat(
+    [local.my_ip_cidr],      # 動的に取得した現在のIP
+    var.allowed_cidr_blocks  # terraform.tfvarsで指定した固定IP
+  ) : var.allowed_cidr_blocks
+}
+
 # ALB Security Group
 resource "aws_security_group" "alb" {
   name        = "${var.project_name}-${var.environment}-alb-sg"
@@ -10,7 +23,7 @@ resource "aws_security_group" "alb" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = var.allowed_cidr_blocks
+    cidr_blocks = local.all_allowed_cidrs
   }
 
   # HTTPS
@@ -19,7 +32,7 @@ resource "aws_security_group" "alb" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = var.allowed_cidr_blocks
+    cidr_blocks = local.all_allowed_cidrs
   }
 
   # Outbound

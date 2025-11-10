@@ -80,13 +80,17 @@ resource "aws_ecs_task_definition" "api" {
 
       environment = var.api_environment
 
-      # SSM Parameter Storeから環境変数を取得する場合
-      # secrets = [
-      #   {
-      #     name      = "DATABASE_URL"
-      #     valueFrom = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/${var.project_name}/${var.environment}/DATABASE_URL"
-      #   }
-      # ]
+      # SSM Parameter Storeから機密情報を取得
+      secrets = [
+        {
+          name      = "DATABASE_URL"
+          valueFrom = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/${var.project_name}/${var.environment}/DATABASE_URL"
+        },
+        {
+          name      = "MONGODB_URI"
+          valueFrom = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/${var.project_name}/${var.environment}/MONGODB_URI"
+        }
+      ]
 
       logConfiguration = {
         logDriver = "awslogs"
@@ -98,7 +102,7 @@ resource "aws_ecs_task_definition" "api" {
       }
 
       healthCheck = {
-        command     = ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3001/health || exit 1"]
+        command     = ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3001/api/health || exit 1"]
         interval    = 30
         timeout     = 5
         retries     = 3

@@ -1,0 +1,43 @@
+# ============================================================
+# Staging Environment Variables (Example)
+# ============================================================
+# このファイルをコピーして terraform.tfvars を作成してください
+# cp terraform.tfvars.example terraform.tfvars
+
+# ============================================================
+# セキュリティ設定
+# ============================================================
+
+# 動的IP検出の有効化（デフォルト: true）
+# true: terraform plan/apply実行時のIPアドレスを自動取得して許可
+# false: allowed_cidr_blocksに指定したIPのみ許可
+enable_dynamic_ip = true
+
+# ALBへのアクセスを許可する固定IPアドレス（CIDR形式）
+# 注意: 動的IP検出が有効な場合、実行時のIPアドレスが自動的に追加されます
+# 例: オフィス、VPN、CI/CDサーバーなどの固定IPアドレス
+allowed_cidr_blocks = [
+  # 固定IPがある場合はここに記載（任意）
+  # "203.0.113.0/32",  # オフィスIP（例）
+  # "198.51.100.0/32", # VPN IP（例）
+]
+
+# 使用例:
+# 1. 動的IPのみ使用（推奨 - 自宅/カフェなど場所を問わずアクセス可能）
+#    enable_dynamic_ip = true
+#    allowed_cidr_blocks = []
+#
+# 2. 動的IP + 固定IP併用（CI/CDサーバーなど固定IPも許可したい場合）
+#    enable_dynamic_ip = true
+#    allowed_cidr_blocks = ["203.0.113.0/32"]
+#
+# 3. 固定IPのみ（従来の方式）
+#    enable_dynamic_ip = false
+#    allowed_cidr_blocks = ["203.0.113.0/32", "198.51.100.0/32"]
+
+# 注意:
+# - /32 は単一IPアドレスを指定します
+# - /24 はサブネット全体を指定します (例: 192.168.1.0/24)
+# - セキュリティのため、必要最小限のIPのみを許可してください
+# - terraform.tfvars は .gitignore に追加されているため、Gitにコミットされません
+# - 動的IP検出により、異なる場所からのterraform操作が容易になります

@@ -8,6 +8,12 @@ variable "environment" {
   type        = string
 }
 
+variable "use_aurora" {
+  description = "Use Aurora Serverless v2 (true) or RDS PostgreSQL (false)"
+  type        = bool
+  default     = false  # デフォルトはRDS（staging環境用）
+}
+
 variable "vpc_id" {
   description = "VPC ID"
   type        = string
@@ -23,9 +29,9 @@ variable "db_security_group_id" {
   type        = string
 }
 
-# Aurora Configuration
+# RDS PostgreSQL Configuration
 variable "engine_version" {
-  description = "Aurora PostgreSQL engine version"
+  description = "PostgreSQL engine version"
   type        = string
   default     = "16.4"
 }
@@ -43,27 +49,27 @@ variable "db_username" {
 }
 
 variable "instance_class" {
-  description = "Database instance class"
+  description = "Database instance class (db.t4g.micro for Staging, db.t4g.small for Production)"
   type        = string
-  default     = "db.serverless"  # Serverless v2
+  default     = "db.t4g.micro"
 }
 
-variable "instance_count" {
-  description = "Number of database instances"
+variable "allocated_storage" {
+  description = "Initial allocated storage in GB"
   type        = number
-  default     = 1  # staging環境は1インスタンス
+  default     = 20
 }
 
-variable "min_capacity" {
-  description = "Minimum Aurora Serverless v2 capacity (ACU)"
+variable "max_allocated_storage" {
+  description = "Maximum allocated storage for autoscaling in GB"
   type        = number
-  default     = 0.5  # 最小0.5 ACU
+  default     = 100
 }
 
-variable "max_capacity" {
-  description = "Maximum Aurora Serverless v2 capacity (ACU)"
-  type        = number
-  default     = 1.0  # staging環境は1.0 ACUで十分
+variable "enabled_cloudwatch_logs_exports" {
+  description = "List of log types to export to CloudWatch"
+  type        = list(string)
+  default     = ["postgresql", "upgrade"]
 }
 
 variable "backup_retention_period" {
@@ -94,4 +100,26 @@ variable "skip_final_snapshot" {
   description = "Skip final snapshot on deletion"
   type        = bool
   default     = true  # staging環境ではスキップ
+}
+
+# ============================================================
+# Aurora Serverless v2 固有の変数
+# ============================================================
+
+variable "min_capacity" {
+  description = "Aurora Serverless v2 minimum capacity (ACU)"
+  type        = number
+  default     = 0.5
+}
+
+variable "max_capacity" {
+  description = "Aurora Serverless v2 maximum capacity (ACU)"
+  type        = number
+  default     = 1.0
+}
+
+variable "instance_count" {
+  description = "Number of Aurora cluster instances"
+  type        = number
+  default     = 1
 }

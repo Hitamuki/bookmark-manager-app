@@ -110,3 +110,34 @@ variable "api_environment" {
   }))
   default = []
 }
+
+# Auto Scheduling Configuration
+variable "enable_auto_schedule" {
+  description = "Enable ECS auto stop/start schedule"
+  type        = bool
+  default     = false
+}
+
+variable "schedule_start_cron" {
+  description = "Cron expression for starting ECS tasks (UTC). Default: 9:00 JST (0:00 UTC) on weekdays"
+  type        = string
+  default     = "cron(0 0 ? * MON-FRI *)"
+}
+
+variable "schedule_stop_cron" {
+  description = "Cron expression for stopping ECS tasks (UTC). Default: 22:00 JST (13:00 UTC) on weekdays"
+  type        = string
+  default     = "cron(0 13 ? * MON-FRI *)"
+}
+
+variable "aws_region" {
+  description = "AWS region"
+  type        = string
+  default     = "ap-northeast-1"
+}
+
+variable "common_tags" {
+  description = "Common tags to apply to all resources"
+  type        = map(string)
+  default     = {}
+}

@@ -112,6 +112,8 @@ Infrastructure as Code (IaC) を活用し、Terraform により、AWS上にWeb�
 | ネットワーク基盤 | VPC                 | AWS上に構築する専用のネットワーク空間。他のユーザーのVPCと完全に分離される                   |
 | ネットワーク基盤 | Public Subnet       | インターネットから直接アクセス可能なサブネット。ALBなどパブリック向けリソースを配置          |
 | ネットワーク基盤 | Private Subnet      | インターネットから直接アクセスできないサブネット。ECSタスクやDBなどの内部リソースを配置      |
+| ネットワーク基盤 | NAT Gateway         | Private Subnetからインターネットへのアウトバウンド通信を可能にする（料金注意）               |
+| ネットワーク基盤 | VPC Endpoint        | AWSサービス（ECR、S3等）へのプライベート接続。NAT Gatewayのデータ転送料を削減                |
 | ロードバランサー | ALB                 | ECSタスク（Next.js SSRアプリ・Web APIコンテナ）へのHTTP/HTTPSトラフィックをルーティング      |
 | コンテナ実行基盤 | ECS on Fargate      | コンテナをサーバーレスで実行。Next.js SSRアプリとWeb APIをそれぞれ独立したサービスとして稼働 |
 | 静的アセット     | S3                  | 画像・CSS・JSなどの静的アセットを保存し、CloudFront経由で配信                                |
@@ -151,6 +153,7 @@ infra/terraform/
  │   │    ├── vpc.tf
  │   │    ├── subnet.tf
  │   │    ├── route_table.tf
+ │   │    ├── vpc_endpoints.tf    # VPC Endpoint（コスト削減）
  │   │    ├── variables.tf
  │   │    └── outputs.tf
  │   ├── security/                 # セキュリティ関連管理
@@ -362,11 +365,7 @@ find . -type d -name ".terragrunt-cache" -exec rm -rf {} +
 #### 準備
 
 ```bash
-# macOS (Homebrew)
 brew install --cask session-manager-plugin
-
-# または手動インストール
-# https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html
 ```
 
 #### 接続方法
@@ -435,6 +434,7 @@ enable_execute_command = true
 - CI/CD構築
   - GitHub ActionsでTerragruntを使用したAWSデプロイ
   - ECRへのコンテナイメージプッシュ自動化
+- コストアラート設定（CloudWatch Alarms）
 
 ## TBD
 

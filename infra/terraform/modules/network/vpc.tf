@@ -18,8 +18,9 @@ resource "aws_internet_gateway" "main" {
   }
 }
 
-# Elastic IP for NAT Gateway（コスト最適化: 単一NAT Gateway）
+# Elastic IP for NAT Gateway（コスト削減: Staging環境では無効化可能）
 resource "aws_eip" "nat" {
+  count  = var.enable_nat_gateway ? 1 : 0
   domain = "vpc"
 
   tags = {
@@ -29,9 +30,10 @@ resource "aws_eip" "nat" {
   depends_on = [aws_internet_gateway.main]
 }
 
-# NAT Gateway（コスト最適化: 1つのみ）
+# NAT Gateway（コスト削減: Staging環境では無効化可能）
 resource "aws_nat_gateway" "main" {
-  allocation_id = aws_eip.nat.id
+  count         = var.enable_nat_gateway ? 1 : 0
+  allocation_id = aws_eip.nat[0].id
   subnet_id     = aws_subnet.public[0].id
 
   tags = {

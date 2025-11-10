@@ -28,4 +28,7 @@ inputs = {
     "ap-northeast-1a",
     "ap-northeast-1c"
   ]
+
+  # NAT Gateway設定（コスト削減: Staging環境では無効化）
+  enable_nat_gateway = false
 }

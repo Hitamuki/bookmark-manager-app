@@ -10,9 +10,10 @@ WORKDIR /app
 
 # 依存関係のインストール
 FROM base AS deps
+# プロジェクトルートからのビルドを想定
 COPY package.json pnpm-lock.yaml ./
 # postinstallスクリプトでPrismaが必要なのでスキーマをコピー
-COPY src/libs/prisma ./src/libs/prisma
+COPY src/libs/prisma/ ./src/libs/prisma/
 RUN corepack enable pnpm && pnpm install --frozen-lockfile
 
 # ビルドステージ
@@ -36,10 +37,20 @@ ENV PORT=3001
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nestjs
 
-# 必要なファイルのみコピー
+# 元のpackage.jsonとlock fileを使用して本番依存関係をインストール
+COPY --from=deps /app/package.json ./package.json
+COPY --from=deps /app/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=deps /app/src/libs/prisma ./src/libs/prisma
+
+# 本番用依存関係のみインストール
+# --ignore-scriptsでpostinstall/prepareスクリプトをスキップ後、Prismaのみ手動生成
+RUN corepack enable pnpm && \
+    pnpm install --prod --frozen-lockfile --ignore-scripts && \
+    pnpm prisma generate --schema=src/libs/prisma/schema.prisma && \
+    pnpm store prune
+
+# ビルド成果物のコピー
 COPY --from=builder /app/dist/src/apps/web-api/core ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/src/libs/prisma ./src/libs/prisma
 
 # 権限設定
 RUN chown -R nestjs:nodejs /app
