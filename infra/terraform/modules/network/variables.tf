@@ -31,3 +31,15 @@ variable "enable_nat_gateway" {
   type        = bool
   default     = true
 }
+
+variable "enable_bastion" {
+  description = "Enable Bastion host for database access"
+  type        = bool
+  default     = true
+}
+
+variable "bastion_instance_type" {
+  description = "EC2 instance type for Bastion host"
+  type        = string
+  default     = "t3.nano"
+}

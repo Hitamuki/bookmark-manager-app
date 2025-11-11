@@ -30,13 +30,17 @@ export class AllExceptionsFilter implements ExceptionFilter {
       parsedMessage = message;
     }
 
-    this.logger.error('', (exception as Error).stack, {
+    // エラー詳細をログ出力
+    const errorDetails = {
       timestamp: new Date().toISOString(),
       statusCode: status,
       httpMethod: request.method,
       url: request.url,
       message: parsedMessage,
-    });
+      stack: (exception as Error).stack,
+    };
+
+    this.logger.error(JSON.stringify(errorDetails, null, 2));
 
     response.status(status).json({
       timestamp: new Date().toISOString(),

@@ -372,10 +372,10 @@ brew install --cask session-manager-plugin
 
 ```bash
 # staging環境に接続（デフォルトポート: 5432）
-./scripts/connect_to_aurora.sh staging 5432
+./scripts/connect_to_awsdb.sh staging 5432
 
 # production環境に接続（ローカルポート: 5433）
-./scripts/connect_to_aurora.sh production 5433
+./scripts/connect_to_awsdb.sh production 5433
 ```
 
 スクリプトは以下を自動的に実行します。

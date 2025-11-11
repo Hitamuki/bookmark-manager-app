@@ -31,4 +31,8 @@ inputs = {
 
   # NAT Gateway設定（コスト削減: Staging環境では無効化）
   enable_nat_gateway = false
+
+  # Bastion設定
+  enable_bastion        = true
+  bastion_instance_type = "t3.nano"  # 最小インスタンス（月額$3-4）
 }

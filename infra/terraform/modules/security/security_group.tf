@@ -106,3 +106,18 @@ resource "aws_security_group" "db" {
     Name = "${var.project_name}-${var.environment}-db-sg"
   }
 }
+
+# Database Security Group Rule for Bastion
+# Bastion Security Groupがnetwork moduleで作成されるため、
+# 別途ルールとして追加
+resource "aws_security_group_rule" "db_from_bastion" {
+  count = var.bastion_security_group_id != null ? 1 : 0
+
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  source_security_group_id = var.bastion_security_group_id
+  security_group_id        = aws_security_group.db.id
+  description              = "Allow PostgreSQL from Bastion"
+}

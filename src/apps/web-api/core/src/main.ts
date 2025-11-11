@@ -28,9 +28,7 @@ async function bootstrap() {
   });
 
   const globalPrefix = 'api';
-  app.setGlobalPrefix(globalPrefix, {
-    exclude: ['health'],
-  });
+  app.setGlobalPrefix(globalPrefix);
 
   // Swagger設定 TODO: ローカル環境のみ
   const swaggerConfig = new DocumentBuilder()

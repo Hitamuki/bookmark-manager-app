@@ -29,3 +29,9 @@ variable "enable_dynamic_ip" {
   type        = bool
   default     = true
 }
+
+variable "bastion_security_group_id" {
+  description = "Bastion Security Group ID from network module"
+  type        = string
+  default     = null
+}

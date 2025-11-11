@@ -1,19 +1,20 @@
 #!/bin/bash
-# scripts/connect_to_aurora.sh
+# scripts/connect_to_awsdb.sh
 # Aurora PostgreSQLへのSSMセッションマネージャー経由での接続スクリプト
+# Bastion (EC2) 経由でRDSに接続します
 #
 # 使い方:
-#   ./scripts/connect_to_aurora.sh [環境名] [ローカルポート]
+#   ./scripts/connect_to_awsdb.sh [環境名] [ローカルポート]
 #
 # 例:
-#   ./scripts/connect_to_aurora.sh staging 5432
-#   ./scripts/connect_to_aurora.sh production 5433
+#   ./scripts/connect_to_awsdb.sh staging 5432
+#   ./scripts/connect_to_awsdb.sh production 5433
 #
 # 前提条件:
 #   - AWS CLIがインストールされていること
 #   - AWS Session Manager Pluginがインストールされていること
 #   - 適切なAWS認証情報が設定されていること
-#   - ECSタスクが実行中であること
+#   - Bastion EC2インスタンスが起動していること
 
 set -e
 
@@ -70,58 +71,28 @@ fi
 echo -e "${GREEN}✅ DBエンドポイント: ${DB_ENDPOINT}${NC}"
 echo ""
 
-# 2. ECSクラスターとサービス情報を取得
-echo -e "${YELLOW}📡 ECSタスク情報を取得中...${NC}"
+# 2. Bastion EC2インスタンス情報を取得
+echo -e "${YELLOW}📡 Bastion EC2インスタンス情報を取得中...${NC}"
 
-CLUSTER_NAME="${PROJECT_NAME}-${ENV}-cluster"
-SERVICE_NAME="${PROJECT_NAME}-${ENV}-api-service"
-
-# 実行中のタスクARNを取得
-TASK_ARN=$(aws ecs list-tasks \
-  --cluster "${CLUSTER_NAME}" \
-  --service-name "${SERVICE_NAME}" \
-  --desired-status RUNNING \
-  --query "taskArns[0]" \
+# Bastionインスタンスを名前タグで検索
+BASTION_INSTANCE_ID=$(aws ec2 describe-instances \
+  --filters \
+    "Name=tag:Name,Values=${PROJECT_NAME}-${ENV}-bastion" \
+    "Name=instance-state-name,Values=running" \
+  --query "Reservations[0].Instances[0].InstanceId" \
   --output text 2>/dev/null || echo "")
 
-if [ -z "$TASK_ARN" ] || [ "$TASK_ARN" = "None" ]; then
-  echo -e "${RED}❌ エラー: 実行中のECSタスクが見つかりませんでした${NC}"
-  echo -e "${YELLOW}以下のコマンドでタスクが実行中か確認してください:${NC}"
-  echo "  aws ecs list-tasks --cluster ${CLUSTER_NAME} --service-name ${SERVICE_NAME}"
-  exit 1
-fi
-
-echo -e "${GREEN}✅ タスクARN: ${TASK_ARN}${NC}"
-
-# タスクの詳細情報を取得
-TASK_DETAILS=$(aws ecs describe-tasks \
-  --cluster "${CLUSTER_NAME}" \
-  --tasks "${TASK_ARN}" \
-  --query "tasks[0]" \
-  --output json)
-
-# ランタイムIDを取得
-RUNTIME_ID=$(echo "$TASK_DETAILS" | jq -r '.containers[0].runtimeId' 2>/dev/null || echo "")
-
-if [ -z "$RUNTIME_ID" ] || [ "$RUNTIME_ID" = "null" ]; then
-  echo -e "${RED}❌ エラー: ランタイムIDが取得できませんでした${NC}"
-  exit 1
-fi
-
-# タスクIDを取得（ARNから抽出）
-TASK_ID=$(echo "$TASK_ARN" | awk -F/ '{print $NF}')
-
-# ECS Execが有効か確認
-ENABLE_EXECUTE_COMMAND=$(echo "$TASK_DETAILS" | jq -r '.enableExecuteCommand' 2>/dev/null || echo "false")
-
-if [ "$ENABLE_EXECUTE_COMMAND" != "true" ]; then
-  echo -e "${YELLOW}⚠️  警告: ECS Execが有効になっていません${NC}"
-  echo -e "${YELLOW}ECSサービスでenableExecuteCommandを有効にする必要があります${NC}"
+if [ -z "$BASTION_INSTANCE_ID" ] || [ "$BASTION_INSTANCE_ID" = "None" ]; then
+  echo -e "${RED}❌ エラー: 実行中のBastionインスタンスが見つかりませんでした${NC}"
+  echo -e "${YELLOW}以下のコマンドでインスタンスが実行中か確認してください:${NC}"
+  echo "  aws ec2 describe-instances --filters \"Name=tag:Name,Values=${PROJECT_NAME}-${ENV}-bastion\" \"Name=instance-state-name,Values=running\""
   echo ""
+  echo -e "${YELLOW}Bastionインスタンスが停止している場合は、起動してください:${NC}"
+  echo "  aws ec2 start-instances --instance-ids <instance-id>"
+  exit 1
 fi
 
-echo -e "${GREEN}✅ タスクID: ${TASK_ID}${NC}"
-echo -e "${GREEN}✅ ランタイムID: ${RUNTIME_ID}${NC}"
+echo -e "${GREEN}✅ Bastionインスタンス: ${BASTION_INSTANCE_ID}${NC}"
 echo ""
 
 # 3. SSMセッションマネージャーでポートフォワーディング開始
@@ -145,18 +116,15 @@ echo -e "  Username: dbadmin"
 echo -e "  Password: ${DB_PASSWORD}"
 echo ""
 echo -e "${GREEN}DATABASE_URL:${NC}"
-echo -e "  ${DATABASE_URL//:*@/:***@}"
+echo -e "  postgresql://dbadmin:***@localhost:${LOCAL_PORT}/bookmarkdb?schema=public"
 echo ""
 echo -e "${BLUE}========================================${NC}"
 echo -e "${YELLOW}Ctrl+C で切断します${NC}"
 echo ""
 
-# ECS Execターゲット形式
-ECS_TARGET="ecs:${CLUSTER_NAME}_${TASK_ID}_${RUNTIME_ID}"
-
-# SSMセッション開始
+# SSMセッション開始（Bastion経由でRDSへポートフォワーディング）
 aws ssm start-session \
-  --target "${ECS_TARGET}" \
+  --target "${BASTION_INSTANCE_ID}" \
   --document-name AWS-StartPortForwardingSessionToRemoteHost \
   --parameters "{
     \"host\":[\"${DB_ENDPOINT}\"],

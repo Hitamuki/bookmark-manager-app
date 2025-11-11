@@ -3,7 +3,6 @@
  * モジュール定義
  */
 
-import { HttpModule } from '@nestjs/axios';
 import { Logger, type MiddlewareConsumer, Module, type NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
@@ -28,7 +27,6 @@ import { SampleModule } from './presentation/sample/sample.module';
   imports: [
     ConfigModule.forRoot(),
     CqrsModule.forRoot(),
-    HttpModule,
     MongooseModule.forRoot(process.env.MONGODB_URI || ''),
     PrismaModule,
     SampleModule,
@@ -45,7 +43,7 @@ export class AppModule implements NestModule {
       .apply(LoggerMiddleware)
       .exclude(
         // 除外ルート
-        '/health',
+        '/api/health',
       )
       .forRoutes('*path');
   }

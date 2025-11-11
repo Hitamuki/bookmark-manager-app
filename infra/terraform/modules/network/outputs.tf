@@ -27,3 +27,18 @@ output "internet_gateway_id" {
   description = "Internet Gateway ID"
   value       = aws_internet_gateway.main.id
 }
+
+output "bastion_instance_id" {
+  description = "Bastion EC2 Instance ID"
+  value       = var.enable_bastion ? aws_instance.bastion[0].id : null
+}
+
+output "bastion_instance_private_ip" {
+  description = "Bastion EC2 Instance Private IP"
+  value       = var.enable_bastion ? aws_instance.bastion[0].private_ip : null
+}
+
+output "bastion_security_group_id" {
+  description = "Bastion Security Group ID"
+  value       = var.enable_bastion ? aws_security_group.bastion[0].id : null
+}

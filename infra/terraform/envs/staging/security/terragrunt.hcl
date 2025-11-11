@@ -23,8 +23,9 @@ dependency "network" {
   config_path = "../network"
 
   mock_outputs = {
-    vpc_id   = "vpc-mock-id"
-    vpc_cidr = "10.0.0.0/16"
+    vpc_id                    = "vpc-mock-id"
+    vpc_cidr                  = "10.0.0.0/16"
+    bastion_security_group_id = null
   }
 }
 
@@ -33,6 +34,9 @@ inputs = {
   # networkモジュールの出力を参照
   vpc_id   = dependency.network.outputs.vpc_id
   vpc_cidr = dependency.network.outputs.vpc_cidr
+
+  # Bastion Security Group ID
+  bastion_security_group_id = dependency.network.outputs.bastion_security_group_id
 
   # ALBへのアクセス許可CIDR（セキュリティ強化: 特定IPのみ許可）
   # - 動的IP検出が有効な場合、terraform apply実行時のIPアドレスが自動追加されます

@@ -4,13 +4,16 @@
 
 Terragruntを使用した**超コスト最適化**されたstaging環境のインフラ構成です。
 
-**月額コスト: $60-70**（営業時間のみ稼働）、最大65%のコスト削減を実現しています。
+**月額コスト: $63-74**（営業時間のみ稼働）、最大65%のコスト削減を実現しています。
+
+**新機能**: Bastion EC2インスタンス（t3.nano）を追加し、SSM Session Manager経由でRDSに安全に接続できます。
 
 ## 使用AWSサービス一覧
 
 | カテゴリ               | サービス                      | 用途                      | 月額コスト（概算） |
 | ---------------------- | ----------------------------- | ------------------------- | ------------------ |
 | **コンピューティング** | ECS Fargate                   | コンテナ実行（Web + API） | $20-25             |
+|                        | EC2 (t3.nano)                 | Bastion Host              | $3-4               |
 |                        | Lambda                        | ECS自動停止/起動          | $0.1未満           |
 |                        | EventBridge                   | スケジューラー            | $0 (無料枠)        |
 | **ネットワーク**       | VPC                           | ネットワーク基盤          | $0                 |
@@ -23,7 +26,7 @@ Terragruntを使用した**超コスト最適化**されたstaging環境のイ�
 | **セキュリティ**       | IAM                           | アクセス制御              | $0                 |
 |                        | Security Group                | ファイアウォール          | $0                 |
 |                        | SSM Parameter Store           | シークレット管理          | $0 (無料枠)        |
-| **合計**               |                               |                           | **$60-70/月**      |
+| **合計**               |                               |                           | **$63-74/月**      |
 
 ## AWS構成概要
 
@@ -32,6 +35,7 @@ Terragruntを使用した**超コスト最適化**されたstaging環境のイ�
 ```mermaid
 graph TB
     User[ユーザー<br>固定IPのみ許可]
+    Dev[開発者<br>SSM Session Manager]
 
     subgraph AWS["AWS (ap-northeast-1)"]
         subgraph VPC["VPC (10.0.0.0/16)"]
@@ -39,6 +43,7 @@ graph TB
                 ALB[ALB<br>ロードバランサー<br>IP制限あり]
                 ECS_Web[ECS Fargate<br>Next.js SSR<br>0.25 vCPU / 512 MB]
                 ECS_API[ECS Fargate<br>NestJS API<br>0.25 vCPU / 512 MB]
+                Bastion[EC2 Bastion<br>t3.nano<br>DB接続用踏み台]
             end
 
             subgraph PrivateSubnet["Private Subnet"]
@@ -56,10 +61,12 @@ graph TB
     end
 
     User -->|HTTPS| ALB
+    Dev -->|SSM Session| Bastion
     ALB --> ECS_Web
     ALB --> ECS_API
     ECS_Web --> RDS
     ECS_API --> RDS
+    Bastion -.Port Forward.- RDS
     ECS_Web -.VPC Endpoint.- ECR
     ECS_API -.VPC Endpoint.- ECR
     ECS_Web -.VPC Endpoint.- CW
@@ -74,6 +81,7 @@ graph TB
     Lambda -->|UpdateService| ECS_API
 
     style RDS fill:#f9f,stroke:#333,stroke-width:2px
+    style Bastion fill:#9f9,stroke:#333,stroke-width:2px
     style Lambda fill:#ff9,stroke:#333,stroke-width:2px
     style EB fill:#ff9,stroke:#333,stroke-width:2px
 ```
@@ -110,18 +118,21 @@ graph TD
 ### ネットワーク構成
 
 ```
-Internet (固定IPのみ)
-    ↓
+Internet (固定IPのみ) / 開発者 (SSM Session Manager)
+    ↓                          ↓
 ┌─────────────────────────────────────────────┐
 │ Public Subnet (NAT Gateway削除)             │
 │   - ALB (IP制限あり)                        │
 │   - ECS Fargate (Web + API)                 │
 │     ※パブリックIP割り当て                   │
+│   - EC2 Bastion (t3.nano)                   │
+│     ※SSM Session Manager経由でアクセス      │
 └─────────────────┬───────────────────────────┘
                   │
 ┌─────────────────▼───────────────────────────┐
 │ Private Subnet                              │
 │   - RDS PostgreSQL (db.t4g.micro)           │
+│     ※ECS + Bastionからのアクセスのみ許可    │
 │   - VPC Endpoints:                          │
 │     • ECR API (Interface)                   │
 │     • ECR DKR (Interface)                   │
@@ -335,11 +346,11 @@ DATABASE_URL="postgresql://dbadmin:YOUR_PASSWORD@localhost:5432/bookmarkdb"
 
 #### ステップ2: SSMポートフォワーディングの開始
 
-別ターミナルで、ECS経由でRDSへのポートフォワーディングを確立します。
+別ターミナルで、Bastion EC2経由でRDSへのポートフォワーディングを確立します。
 
 ```bash
 # 別ターミナルで実行
-./scripts/connect_to_aurora.sh staging 5432
+./scripts/connect_to_awsdb.sh staging 5432
 
 # 以下の情報が表示されます:
 # - ホスト: localhost
@@ -350,8 +361,8 @@ DATABASE_URL="postgresql://dbadmin:YOUR_PASSWORD@localhost:5432/bookmarkdb"
 ```
 
 **トラブルシューティング**:
-- ECSタスクが実行中でない場合、先にECSサービスを起動してください
-- `enableExecuteCommand`が無効の場合、Terraformで有効化が必要です
+- Bastionインスタンスが停止している場合、起動してください
+- SSM Session Manager Pluginがインストールされていることを確認してください
 
 #### ステップ3: マイグレーションの実行
 
@@ -363,7 +374,8 @@ pnpm dotenv -e .env.staging -- prisma migrate deploy \
   --schema=src/libs/prisma/schema.prisma
 
 # シードデータの投入（必要に応じて）
-pnpm dotenv -e .env.staging -- prisma db seed
+pnpm dotenv -e .env.staging -- prisma db seed \
+  --schema=src/libs/prisma/schema.prisma
 ```
 
 **注意**:
@@ -375,7 +387,8 @@ pnpm dotenv -e .env.staging -- prisma db seed
 
 ```bash
 # Prisma Studioでテーブルを確認
-pnpm dotenv -e .env.staging -- prisma studio
+pnpm dotenv -e .env.staging -- prisma studio \
+  --schema=src/libs/prisma/schema.prisma
 
 # または、psqlコマンドで確認（ポートフォワーディング確立中）
 psql "postgresql://dbadmin:<PASSWORD>@localhost:5432/bookmarkdb"
@@ -586,6 +599,7 @@ terragrunt run --all destroy
 | リソース                          | 料金体系                                       | 月額コスト（概算） | 備考                              |
 | --------------------------------- | ---------------------------------------------- | ------------------ | --------------------------------- |
 | **RDS PostgreSQL (db.t4g.micro)** | $0.016/時間                                    | **$11.5**          | 24時間稼働、Graviton2             |
+| **EC2 Bastion (t3.nano)**         | $0.0052/時間                                   | **$3.7**           | 24時間稼働、DB接続用              |
 | **ECS Fargate (Web)**             | vCPU: $0.04656/時間<br>Memory: $0.00511/GB時間 | **$7.5**           | 0.25 vCPU + 0.5 GB、営業時間のみ  |
 | **ECS Fargate (API)**             | vCPU: $0.04656/時間<br>Memory: $0.00511/GB時間 | **$7.5**           | 0.25 vCPU + 0.5 GB、営業時間のみ  |
 | **ALB**                           | $0.0243/時間 + LCU料金                         | **$17.4**          | 時間料金 + 使用量課金             |
@@ -595,7 +609,7 @@ terragrunt run --all destroy
 | **CloudWatch Logs**               | 取り込み + 保存                                | **$5-10**          | ログ量による、7日保存             |
 | **その他**                        | データ転送、ECR等                              | **$1-5**           | -                                 |
 
-**合計: 約$60-70/月**（営業時間のみ稼働）
+**合計: 約$63-74/月**（営業時間のみ稼働）
 
 ### コスト削減の内訳
 
