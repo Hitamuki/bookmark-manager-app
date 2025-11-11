@@ -25,3 +25,7 @@ isready
 transferrables
 autodocs
 Commitzen
+tfvars
+tfstate
+tflint
+awscli

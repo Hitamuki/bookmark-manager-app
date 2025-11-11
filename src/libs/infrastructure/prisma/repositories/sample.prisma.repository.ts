@@ -52,8 +52,6 @@ export class SamplePrismaRepository implements SampleRepository {
       isDeleted: sampleEntity.isDeleted,
       createdBy: sampleEntity.createdBy,
       createdAt: sampleEntity.createdAt,
-      updatedBy: sampleEntity.updatedBy,
-      updatedAt: sampleEntity.updatedAt,
     };
     await this.prisma.sample.create({ data });
   }

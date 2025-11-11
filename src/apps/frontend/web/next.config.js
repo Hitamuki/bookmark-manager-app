@@ -25,11 +25,14 @@ const nextConfig = {
       ignore: [],
     },
   },
+  output: 'standalone',
   async rewrites() {
+    // ECS環境ではALB経由、ローカルではlocalhost:4000
+    const apiUrl = process.env.API_URL || 'http://localhost:4000';
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:4000/api/:path*',
+        destination: `${apiUrl}/api/:path*`,
       },
     ];
   },

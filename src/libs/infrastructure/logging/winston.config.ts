@@ -10,28 +10,47 @@ const { combine, timestamp, colorize } = format;
  * Winston設定を返す関数
  * @returns Winston設定オブジェクト
  */
-export const WinstonConfig = () => ({
-  transports: [
-    // コンソール出力
-    new transports.Console({
-      level: 'info',
-      format: combine(
-        colorize({ all: true }),
-        timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-        winston.format.printf(({ timestamp, level, message, context, trace }) => {
-          const traceStr = trace ? `${trace}` : '';
-          const messageStr = typeof message === 'object' ? JSON.stringify(message, null, 2) : message;
-          const contextStr = context ? (typeof context === 'object' ? JSON.stringify(context) : `[${context}]`) : '';
-          return `${timestamp} ${level} ${contextStr} ${messageStr} ${traceStr}`;
-        }),
-      ),
+export const WinstonConfig = () => {
+  // ローカル環境ではカラー表示、本番環境ではカラーなし
+  const isLocal = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'local';
+
+  // カラー表示設定を条件付きで追加
+  const formatters = [
+    timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    ...(isLocal ? [colorize({ level: true })] : []),
+    winston.format.printf(({ timestamp, level, message, context, trace }) => {
+      // messageが既にJSON文字列の場合はそのまま、オブジェクトの場合はJSON化
+      const messageStr = typeof message === 'object' ? JSON.stringify(message, null, 2) : message;
+
+      // contextとtraceは存在する場合のみ追加
+      const parts = [timestamp, level];
+      if (context) {
+        const contextStr = typeof context === 'object' ? JSON.stringify(context) : `[${context}]`;
+        parts.push(contextStr);
+      }
+      parts.push(messageStr);
+      if (trace) {
+        parts.push(trace);
+      }
+
+      return parts.join(' ');
     }),
-    // MongoDB出力
-    new transports.MongoDB({
-      db: process.env.MONGO_LOG_URI,
-      collection: 'app_logs',
-      options: {},
-      tryReconnect: true,
-    }),
-  ],
-});
+  ];
+
+  return {
+    transports: [
+      // コンソール出力
+      new transports.Console({
+        level: 'info',
+        format: combine(...formatters),
+      }),
+      // MongoDB出力
+      new transports.MongoDB({
+        db: process.env.MONGODB_URI,
+        collection: 'app_logs',
+        options: {},
+        tryReconnect: true,
+      }),
+    ],
+  };
+};

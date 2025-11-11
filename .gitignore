@@ -127,7 +127,9 @@ web_modules/
 .env.development.local
 .env.test.local
 .env.production.local
-.env.local
+.env.staging
+.env.stg
+.env.prod
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -596,6 +598,17 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+### Terragrunt ###
+# Terragrunt cache directories
+**/.terragrunt-cache/*
+
+# Terragrunt tfvars (機密情報を含む可能性があるため除外)
+**/terraform.tfvars
+
+# Terragrunt generated files
+**/backend.tf
+**/provider_override.tf
 
 # End of https://www.toptal.com/developers/gitignore/api/react,nextjs,reactnative,node,terraform,hugo,python
 

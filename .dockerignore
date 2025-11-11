@@ -1,0 +1,79 @@
+# ============================================================
+# Docker Build Exclusions
+# ============================================================
+# Dockerイメージビルド時に除外するファイル・ディレクトリ
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# CI/CD
+.github
+.circleci
+.gitlab-ci.yml
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Node.js
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Build outputs (コンテナ内でビルドするため除外)
+dist
+.next
+out
+build
+
+# Test
+coverage
+.nyc_output
+test-results
+playwright-report
+
+# Nx
+.nx/cache
+.nx/workspace-data
+
+# Environment files (機密情報を含むため除外)
+.env
+.env.local
+.env.*.local
+*.env
+
+# Documentation
+docs
+*.md
+!README.md
+
+# Terraform
+infra
+
+# Docker関連
+Dockerfile*
+.dockerignore
+docker-compose*.yml
+
+# Logs
+logs
+*.log
+
+# Temporary files
+tmp
+temp
+*.tmp
+
+# Storybook
+storybook-static
+
+# Prisma (生成ファイルはコンテナ内で生成)
+**/generated/prisma

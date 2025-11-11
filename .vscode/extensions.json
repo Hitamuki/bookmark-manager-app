@@ -65,6 +65,9 @@
     "vincaslt.highlight-matching-tag",
     "nrwl.angular-console",
     "bradlc.vscode-tailwindcss",
+    // ◆ IaC
+    "hashicorp.terraform",
+    "hashicorp.hcl",
     // ◆ Testing
     "vitest.explorer",
     "ms-playwright.playwright",

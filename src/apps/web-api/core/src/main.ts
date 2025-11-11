@@ -22,7 +22,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { logger });
 
   app.enableCors({
-    origin: 'http://localhost:3000', // 許可するオリジン
+    origin: process.env.ALLOWED_ORIGINS?.split(',') || 'http://localhost:3000',
     methods: 'GET,PUT,PATCH,POST,DELETE', // 許可するHTTPメソッド
     credentials: true, // TODO: Cookie を送信する場合に設定
   });

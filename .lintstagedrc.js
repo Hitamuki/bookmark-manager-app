@@ -1,5 +1,13 @@
 // 除外対象のディレクトリ
-const EXCLUDED_DIRS = ['poc', 'sandbox', '.vscode', '.claude', 'src/libs/api-client', 'src/apps/frontend/web/public'];
+const EXCLUDED_DIRS = [
+  'poc',
+  'sandbox',
+  '.vscode',
+  '.claude',
+  'src/libs/api-client',
+  'src/apps/frontend/web/public',
+  'infra/terraform/modules/compute/lambda/ecs_scheduler.js',
+];
 
 const shouldInclude = (filePath) => {
   // 絶対パスから相対パスに変換

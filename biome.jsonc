@@ -33,7 +33,8 @@
       "!**/sandbox",
       "!**/*.{md,html,scss,yml,yaml,toml}",
       "!**/api-client",
-      "!**/src/apps/frontend/web/public/mockServiceWorker.js"
+      "!**/src/apps/frontend/web/public/mockServiceWorker.js",
+      "!infra/terraform/modules/compute/lambda/ecs_scheduler.js"
     ]
   },
   "assist": { "actions": { "source": { "organizeImports": "on" } } },

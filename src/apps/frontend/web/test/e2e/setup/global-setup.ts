@@ -64,13 +64,13 @@ async function globalSetup(_config: FullConfig) {
   });
   console.log('Prisma seeding completed.');
 
-  process.env.MONGO_LOG_URI = 'mongodb://user:password@localhost:27018/logs_e2e?authSource=admin';
+  process.env.MONGODB_URI = 'mongodb://user:password@localhost:27018/logs_e2e?authSource=admin';
 
   // Start NestJS server
   console.log('Starting NestJS server...');
   const nestjsProcess = exec('pnpm nx run api-core:serve:e2e', {
     cwd: rootDir,
-    env: { ...process.env, DATABASE_URL: process.env.DATABASE_URL, MONGO_LOG_URI: process.env.MONGO_LOG_URI }, // Ensure DATABASE_URL and MONGO_LOG_URI are passed
+    env: { ...process.env, DATABASE_URL: process.env.DATABASE_URL, MONGODB_URI: process.env.MONGODB_URI }, // Ensure DATABASE_URL and MONGODB_URI are passed
   });
 
   nestjsProcess.stdout?.on('data', (data: string) => {
