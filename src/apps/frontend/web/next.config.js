@@ -31,8 +31,9 @@ const nextConfig = {
     const apiUrl = process.env.API_URL || 'http://localhost:4000';
     return [
       {
-        source: '/api/:path*',
-        destination: `${apiUrl}/api/:path*`,
+        // /api/health-frontend 以外の /api/* をバックエンドAPIへプロキシ
+        source: '/api/:path((?!health-frontend).*)',
+        destination: `${apiUrl}/api/:path`,
       },
     ];
   },

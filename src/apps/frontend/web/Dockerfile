@@ -32,6 +32,9 @@ FROM base AS runner
 ENV NODE_ENV=production
 ENV PORT=3000
 
+# ヘルスチェック用にwgetをインストール
+RUN apk add --no-cache wget
+
 # 非rootユーザーの作成
 RUN addgroup --system --gid 1001 nodejs && \
   adduser --system --uid 1001 nextjs
