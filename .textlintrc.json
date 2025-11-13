@@ -9,6 +9,8 @@
       }
     },
     "no-mix-dearu-desumasu": true,
-    "spellcheck-tech-word": true
+    "spellcheck-tech-word": {
+      "allow": ["単体テスト"]
+    }
   }
 }

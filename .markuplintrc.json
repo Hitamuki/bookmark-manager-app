@@ -10,7 +10,7 @@
     "\\.html?$": "@markuplint/html-parser"
   },
   "parserOptions": {},
-  "excludeFiles": ["docs/**", "**/node_modules/**", "**/dist/**"],
+  "excludeFiles": ["docs/**", "**/node_modules/**", "**/dist/**", "infra/dast/reports/**"],
   "rules": {
     "attr-value-quotes": {
       "severity": "warning",

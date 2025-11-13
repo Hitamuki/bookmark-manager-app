@@ -633,3 +633,6 @@ site*/
 
 # Storybook
 storybook-static
+
+# OWASP ZAP
+infra/dast/reports

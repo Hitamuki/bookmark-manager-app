@@ -2,6 +2,9 @@
   "ignores": [".git", "node_modules", ".nx", "sandbox", "poc", ".claude/**", "infra/terraform/envs/staging/README.md"],
   "config": {
     "MD013": false,
-    "MD034": false
+    "MD034": false,
+    "MD024": {
+      "siblings_only": true
+    }
   }
 }

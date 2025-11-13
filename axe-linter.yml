@@ -6,5 +6,6 @@ exclude:
   - "**/out/**"
   - "**/*.test.{js,ts,jsx,tsx}"
   - "**/__tests__/**"
+  - "**/reports/**"
 global-components:
 global-libraries:

@@ -1,0 +1,113 @@
+# OWASP ZAP Baseline Scan Configuration
+# このファイルはDASTテスト（動的アプリケーションセキュリティテスト）の設定を定義します
+
+# スキャン対象の除外パス
+# ヘルスチェックや静的リソースなど、脆弱性スキャンが不要なパスを指定
+excludePaths:
+  # ヘルスチェックエンドポイント
+  - "*/api/health*"
+  - "*/api/health-frontend*"
+
+  # 静的アセット（誤検知を防ぐため）
+  - "*/_next/static/*"
+  - "*/favicon.ico"
+  - "*/robots.txt"
+
+# スキャンから除外するルール（誤検知が多いルールをコメントアウト）
+disableRules:
+  # 開発環境特有の警告を無効化（必要に応じて調整）
+  # - 10021  # X-Content-Type-Options header missing
+  # - 10020  # X-Frame-Options header missing
+
+# アラートフィルター（誤検知の抑制）
+alertFilters:
+  # Content Security Policy (CSP) の警告を情報レベルに変更
+  - ruleId: 10038
+    newRisk: "Informational"
+    context: "http://bookmark-manager-staging-alb-*"
+
+# スキャンポリシー
+scanPolicy:
+  # ベースラインスキャンでは受動的スキャンのみ実行
+  # （能動的攻撃は行わず、トラフィック観察のみ）
+  passiveScanOnly: true
+
+  # スキャンの強度（Low, Medium, High）
+  # ベースラインではMediumを推奨
+  strength: "Medium"
+
+  # アラート閾値（この閾値以上の脆弱性が見つかった場合にビルド失敗）
+  # Low, Medium, High, Informational
+  failOnRisk: "High"
+
+# 認証設定（将来的に認証機能実装時に使用）
+# authentication:
+#   type: "form"
+#   loginUrl: "http://bookmark-manager-staging-alb-491287683.ap-northeast-1.elb.amazonaws.com/login"
+#   username: "${AUTH_USERNAME}"
+#   password: "${AUTH_PASSWORD}"
+#   usernameField: "email"
+#   passwordField: "password"
+#   loggedInIndicator: "Logout"
+#   loggedOutIndicator: "Login"
+
+# コンテキスト設定
+contexts:
+  - name: "Staging Environment"
+    urls:
+      - "http://bookmark-manager-staging-alb-491287683.ap-northeast-1.elb.amazonaws.com.*"
+    includePaths:
+      - "http://bookmark-manager-staging-alb-491287683.ap-northeast-1.elb.amazonaws.com/.*"
+    excludePaths:
+      - "http://bookmark-manager-staging-alb-491287683.ap-northeast-1.elb.amazonaws.com/api/health.*"
+      - "http://bookmark-manager-staging-alb-491287683.ap-northeast-1.elb.amazonaws.com/_next/static/.*"
+
+# スパイダー設定（クローリング設定）
+spider:
+  maxDuration: 10  # 最大10分間クローリング
+  maxDepth: 5      # 最大階層数
+  maxChildren: 10  # 1ページあたりの最大リンク数
+  acceptCookies: true
+  handleODataParametersVisited: true
+
+# Ajaxスパイダー設定（JavaScript実行を伴うクローリング）
+ajaxSpider:
+  enabled: true
+  maxDuration: 5   # 最大5分間
+  maxCrawlDepth: 3
+  numberOfBrowsers: 1
+
+# レポート設定
+reporting:
+  # 生成するレポート形式
+  formats:
+    - html
+    - json
+    - xml
+
+  # レポートに含める最小リスクレベル
+  minRiskLevel: "Low"
+
+  # 詳細レベル
+  detailLevel: "Medium"
+
+# タイムアウト設定
+timeout:
+  # 全体のスキャンタイムアウト（分）
+  total: 30
+
+  # 個別リクエストのタイムアウト（秒）
+  request: 60
+
+# プロキシ設定（必要に応じて）
+# proxy:
+#   host: "proxy.example.com"
+#   port: 8080
+
+# カスタムヘッダー（必要に応じて）
+# customHeaders:
+#   - name: "X-Custom-Header"
+#     value: "CustomValue"
+
+# ログレベル
+logLevel: "INFO"  # DEBUG, INFO, WARN, ERROR
