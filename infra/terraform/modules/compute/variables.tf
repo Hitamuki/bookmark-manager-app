@@ -141,3 +141,16 @@ variable "common_tags" {
   type        = map(string)
   default     = {}
 }
+
+# Datadog設定
+variable "enable_datadog" {
+  description = "Enable Datadog Agent sidecar"
+  type        = bool
+  default     = false
+}
+
+variable "app_version" {
+  description = "Application version for Datadog tagging"
+  type        = string
+  default     = "1.0.0"
+}

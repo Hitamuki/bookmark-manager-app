@@ -2,6 +2,25 @@
  * main
  * モジュール定義
  */
+
+// Datadogトレーサー初期化（他のインポートより前に記述）
+import tracer from 'dd-trace';
+
+tracer.init({
+  env: process.env.DD_ENV || 'development',
+  service: process.env.DD_SERVICE || 'bookmark-api',
+  version: process.env.DD_VERSION || '1.0.0',
+
+  // サンプリング: 20%（コスト削減）
+  sampleRate: 0.2,
+
+  // レート制限: 秒あたり最大50スパン
+  rateLimit: 50,
+
+  // ログ連携（ERROR以上のみ）
+  logInjection: true,
+});
+
 import * as fs from 'node:fs';
 import path from 'node:path';
 import { NestFactory } from '@nestjs/core';

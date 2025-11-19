@@ -63,9 +63,11 @@ inputs = {
   ecs_task_role_arn           = dependency.security.outputs.ecs_task_role_arn
 
   # Web (Next.js) コンテナ設定（コスト最適化）
-  web_cpu    = 256 # 0.25 vCPU
-  web_memory = 512 # 512 MB
-  web_count  = 1   # 1タスク
+  # Datadog Agentサイドカー追加のため、CPU/メモリを増加
+  # Fargate制約: CPU 256では512/1024/2048MBのみ有効
+  web_cpu    = 512  # 0.5 vCPU (Datadog Agent必要)
+  web_memory = 1024 # 1024 MB (Webコンテナ768MB + Datadog Agent 256MB)
+  web_count  = 1    # 1タスク
   web_image  = "${dependency.ecr.outputs.web_repository_url}:latest"
 
   # 環境変数（必要に応じて追加）
@@ -80,14 +82,20 @@ inputs = {
     },
     {
       name  = "API_URL"
-      value = "http://bookmark-manager-compute-alb-458087604.ap-northeast-1.elb.amazonaws.com"
+      value = "http://bookmark-manager-staging-alb-491287683.ap-northeast-1.elb.amazonaws.com"
+    },
+    {
+      name  = "NEXT_PUBLIC_SENTRY_DSN"
+      value = "https://8145f9f0127b9487fc67e4940fa0e6b8@o4510377330999296.ingest.us.sentry.io/4510380263014400"
     }
   ]
 
   # API (NestJS) コンテナ設定（コスト最適化）
-  api_cpu    = 256 # 0.25 vCPU
-  api_memory = 512 # 512 MB
-  api_count  = 1   # 1タスク
+  # Datadog Agentサイドカー追加のため、CPU/メモリを増加
+  # Fargate制約: CPU 256では512/1024/2048MBのみ有効
+  api_cpu    = 512  # 0.5 vCPU (Datadog Agent必要)
+  api_memory = 1024 # 1024 MB (APIコンテナ768MB + Datadog Agent 256MB)
+  api_count  = 1    # 1タスク
   api_image  = "${dependency.ecr.outputs.api_repository_url}:latest"
 
   # 環境変数（必要に応じて追加）
@@ -102,7 +110,7 @@ inputs = {
     },
     {
       name  = "ALLOWED_ORIGINS"
-      value = "http://bookmark-manager-compute-alb-458087604.ap-northeast-1.elb.amazonaws.com"
+      value = "http://bookmark-manager-staging-alb-491287683.ap-northeast-1.elb.amazonaws.com"
     }
   ]
 
@@ -110,4 +118,8 @@ inputs = {
   enable_auto_schedule = true
   schedule_start_cron  = "cron(0 0 ? * MON-FRI *)"  # 月〜金 9:00 JST (0:00 UTC)
   schedule_stop_cron   = "cron(0 13 ? * MON-FRI *)" # 月〜金 22:00 JST (13:00 UTC)
+
+  # Datadog監視設定
+  enable_datadog = true
+  app_version    = "1.0.0"
 }

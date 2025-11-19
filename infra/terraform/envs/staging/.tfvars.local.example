@@ -1,0 +1,23 @@
+# ============================================================
+# ローカル開発用の設定ファイル（サンプル）
+# ============================================================
+#
+# 使い方:
+# 1. このファイルをコピー: cp .tfvars.local.example .tfvars.local
+# 2. .tfvars.local を編集して実際の値を設定
+# 3. .tfvars.local は .gitignore に含まれているため Git にコミットされません
+#
+# Sentry設定の取得方法:
+# - organization_slug: Settings > Organization Settings > General Settings
+# - team_slug: Settings > Teams > チーム名をクリック > URLの末尾
+# - auth_token: Settings > Developer Settings > Internal Integrations で作成
+#
+
+inputs = {
+  # Sentry設定
+  sentry_organization = "your-organization-slug"  # 例: bookmark-manager
+  sentry_team         = "your-team-slug"          # 例: backend-team
+
+  # アラート設定
+  alert_email = "your-email@example.com"  # 例: admin@example.com
+}

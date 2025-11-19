@@ -20,6 +20,10 @@ FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# ビルド引数の定義（Sentry DSN）
+ARG NEXT_PUBLIC_SENTRY_DSN
+ENV NEXT_PUBLIC_SENTRY_DSN=${NEXT_PUBLIC_SENTRY_DSN}
+
 # Nx環境変数の設定
 ENV NX_DAEMON=false
 
@@ -29,11 +33,8 @@ RUN corepack enable pnpm && \
 
 # 本番実行ステージ
 FROM base AS runner
-ENV NODE_ENV=production
+# NODE_ENVは実行時に環境変数で設定（staging, productionなど）
 ENV PORT=3000
-
-# ヘルスチェック用にwgetをインストール
-RUN apk add --no-cache wget
 
 # 非rootユーザーの作成
 RUN addgroup --system --gid 1001 nodejs && \

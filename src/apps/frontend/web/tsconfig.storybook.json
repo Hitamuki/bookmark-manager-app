@@ -20,6 +20,7 @@
     ".storybook/*.ts",
     "src/**/*.ts",
     "src/**/*.css",
+    "*.ts",
     "../../../libs/api-client/**/*.ts",
     ".storybook/preview.tsx"
   ]

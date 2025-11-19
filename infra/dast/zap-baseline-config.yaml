@@ -6,7 +6,7 @@
 excludePaths:
   # ヘルスチェックエンドポイント
   - "*/api/health*"
-  - "*/api/health-frontend*"
+  - "*/health*"
 
   # 静的アセット（誤検知を防ぐため）
   - "*/_next/static/*"
@@ -64,16 +64,16 @@ contexts:
 
 # スパイダー設定（クローリング設定）
 spider:
-  maxDuration: 10  # 最大10分間クローリング
-  maxDepth: 5      # 最大階層数
-  maxChildren: 10  # 1ページあたりの最大リンク数
+  maxDuration: 10 # 最大10分間クローリング
+  maxDepth: 5 # 最大階層数
+  maxChildren: 10 # 1ページあたりの最大リンク数
   acceptCookies: true
   handleODataParametersVisited: true
 
 # Ajaxスパイダー設定（JavaScript実行を伴うクローリング）
 ajaxSpider:
   enabled: true
-  maxDuration: 5   # 最大5分間
+  maxDuration: 5 # 最大5分間
   maxCrawlDepth: 3
   numberOfBrowsers: 1
 
@@ -110,4 +110,4 @@ timeout:
 #     value: "CustomValue"
 
 # ログレベル
-logLevel: "INFO"  # DEBUG, INFO, WARN, ERROR
+logLevel: "INFO" # DEBUG, INFO, WARN, ERROR

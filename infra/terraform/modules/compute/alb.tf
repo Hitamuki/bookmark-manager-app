@@ -27,7 +27,7 @@ resource "aws_lb_target_group" "web" {
     unhealthy_threshold = 10  # 再起動を防ぐため増やす（デフォルト: 2）
     timeout             = 10  # タイムアウトを長めに
     interval            = 60  # チェック間隔を長めに（コスト削減）
-    path                = "/api/health-frontend"  # Next.jsフロントエンド専用（/api/healthはバックエンド）
+    path                = "/health"  # Next.jsフロントエンド専用（/api/healthはバックエンド）
     matcher             = "200"
   }
 

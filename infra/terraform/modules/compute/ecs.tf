@@ -36,9 +36,15 @@ resource "aws_cloudwatch_log_group" "api" {
 resource "aws_ecs_service" "web" {
   name            = "${var.project_name}-${var.environment}-web"
   cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.web.arn
+  task_definition = "${aws_ecs_task_definition.web.family}:${aws_ecs_task_definition.web.revision}"
   desired_count   = var.web_count
   launch_type     = "FARGATE"
+
+  # SSMセッションマネージャー経由でのコンテナアクセスを可能にする
+  enable_execute_command = true
+
+  # 新しいイメージがプッシュされた際に自動的に最新タスク定義を使用
+  force_new_deployment = true
 
   # ヘルスチェック猶予期間（アプリケーション起動待ち）
   health_check_grace_period_seconds = 120
@@ -77,12 +83,15 @@ resource "aws_ecs_service" "web" {
 resource "aws_ecs_service" "api" {
   name            = "${var.project_name}-${var.environment}-api"
   cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.api.arn
+  task_definition = "${aws_ecs_task_definition.api.family}:${aws_ecs_task_definition.api.revision}"
   desired_count   = var.api_count
   launch_type     = "FARGATE"
 
   # SSMセッションマネージャー経由でのDB接続を可能にする
   enable_execute_command = true
+
+  # 新しいイメージがプッシュされた際に自動的に最新タスク定義を使用
+  force_new_deployment = true
 
   # ヘルスチェック猶予期間（アプリケーション起動待ち）
   health_check_grace_period_seconds = 120

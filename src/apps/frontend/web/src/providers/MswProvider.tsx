@@ -4,7 +4,8 @@
  */
 'use client';
 
-if (process.env.NEXT_PUBLIC_API_MOCKING === 'enabled') {
+// MSWはローカル開発環境でのみ有効化
+if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_API_MOCKING === 'enabled') {
   require('../msw/setup');
 }
 

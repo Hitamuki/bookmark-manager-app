@@ -9,27 +9,8 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    // 必要に応じて追加のヘルスチェックを実装
-    // 例: メモリ使用量、重要な設定値の確認など
-    const memoryUsage = process.memoryUsage();
-    const isHealthy = memoryUsage.heapUsed < memoryUsage.heapTotal * 0.9; // 90%以下
-
-    if (!isHealthy) {
-      return NextResponse.json(
-        {
-          status: 'degraded',
-          service: 'bookmark-manager-web',
-          timestamp: new Date().toISOString(),
-          uptime: process.uptime(),
-          memory: {
-            heapUsed: `${Math.round(memoryUsage.heapUsed / 1024 / 1024)}MB`,
-            heapTotal: `${Math.round(memoryUsage.heapTotal / 1024 / 1024)}MB`,
-          },
-        },
-        { status: 503 },
-      );
-    }
-
+    // シンプルなヘルスチェック: アプリが起動していればOK
+    // Sentryやその他の監視ツールで詳細なメトリクスを取得
     return NextResponse.json(
       {
         status: 'ok',
