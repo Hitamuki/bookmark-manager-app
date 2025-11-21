@@ -23,7 +23,7 @@ inputs = {
   # VPC設定
   vpc_cidr = "10.0.0.0/16"
 
-  # アベイラビリティゾーン
+  # アベイラビリティゾーン（RDS要件のため2つ必要）
   availability_zones = [
     "ap-northeast-1a",
     "ap-northeast-1c"

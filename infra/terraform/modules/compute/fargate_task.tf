@@ -27,36 +27,45 @@ resource "aws_ecs_task_definition" "web" {
         }
       ]
 
-      environment = concat(var.web_environment, var.enable_datadog ? [
-        {
-          name  = "DD_ENV"
-          value = var.environment
-        },
-        {
-          name  = "DD_SERVICE"
-          value = "${var.project_name}-web"
-        },
-        {
-          name  = "DD_VERSION"
-          value = var.app_version
-        },
-        {
-          name  = "DD_TRACE_AGENT_URL"
-          value = "http://localhost:8126"
-        },
-        {
-          name  = "DD_TRACE_SAMPLING_RULES"
-          value = "[{\"sample_rate\":0.2}]"
-        },
-        {
-          name  = "DD_TRACE_RATE_LIMIT"
-          value = "50"
-        },
-        {
-          name  = "DD_TRACE_LOG_LEVEL"
-          value = "error"
-        }
-      ] : [])
+      environment = concat(
+        var.web_environment,
+        [
+          {
+            name  = "API_URL"
+            value = "http://${aws_lb.main.dns_name}"
+          }
+        ],
+        var.enable_datadog ? [
+          {
+            name  = "DD_ENV"
+            value = var.environment
+          },
+          {
+            name  = "DD_SERVICE"
+            value = "${var.project_name}-web"
+          },
+          {
+            name  = "DD_VERSION"
+            value = var.app_version
+          },
+          {
+            name  = "DD_TRACE_AGENT_URL"
+            value = "http://localhost:8126"
+          },
+          {
+            name  = "DD_TRACE_SAMPLING_RULES"
+            value = "[{\"sample_rate\":0.2}]"
+          },
+          {
+            name  = "DD_TRACE_RATE_LIMIT"
+            value = "50"
+          },
+          {
+            name  = "DD_TRACE_LOG_LEVEL"
+            value = "error"
+          }
+        ] : []
+      )
 
       # SSM Parameter Storeから機密情報を取得
       secrets = [
@@ -159,36 +168,45 @@ resource "aws_ecs_task_definition" "api" {
         }
       ]
 
-      environment = concat(var.api_environment, var.enable_datadog ? [
-        {
-          name  = "DD_ENV"
-          value = var.environment
-        },
-        {
-          name  = "DD_SERVICE"
-          value = "${var.project_name}-api"
-        },
-        {
-          name  = "DD_VERSION"
-          value = var.app_version
-        },
-        {
-          name  = "DD_TRACE_AGENT_URL"
-          value = "http://localhost:8126"
-        },
-        {
-          name  = "DD_TRACE_SAMPLING_RULES"
-          value = "[{\"sample_rate\":0.2}]"
-        },
-        {
-          name  = "DD_TRACE_RATE_LIMIT"
-          value = "50"
-        },
-        {
-          name  = "DD_TRACE_LOG_LEVEL"
-          value = "error"
-        }
-      ] : [])
+      environment = concat(
+        var.api_environment,
+        [
+          {
+            name  = "ALLOWED_ORIGINS"
+            value = "http://${aws_lb.main.dns_name}"
+          }
+        ],
+        var.enable_datadog ? [
+          {
+            name  = "DD_ENV"
+            value = var.environment
+          },
+          {
+            name  = "DD_SERVICE"
+            value = "${var.project_name}-api"
+          },
+          {
+            name  = "DD_VERSION"
+            value = var.app_version
+          },
+          {
+            name  = "DD_TRACE_AGENT_URL"
+            value = "http://localhost:8126"
+          },
+          {
+            name  = "DD_TRACE_SAMPLING_RULES"
+            value = "[{\"sample_rate\":0.2}]"
+          },
+          {
+            name  = "DD_TRACE_RATE_LIMIT"
+            value = "50"
+          },
+          {
+            name  = "DD_TRACE_LOG_LEVEL"
+            value = "error"
+          }
+        ] : []
+      )
 
       # SSM Parameter Storeから機密情報を取得
       secrets = [

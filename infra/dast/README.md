@@ -77,7 +77,7 @@ DASTテストを実行する前に、自分のIPアドレスをセキュリテ�
 
 ```bash
 # 特定のURLをテスト
-./run-zap-scan.sh -t http://bookmark-manager-staging-alb-491287683.ap-northeast-1.elb.amazonaws.com/api
+./run-zap-scan.sh -t http://bookmark-manager-staging-alb-2010620542.ap-northeast-1.elb.amazonaws.com/api
 ```
 
 #### フルスキャン（能動的攻撃を含む）
@@ -179,7 +179,7 @@ scanPolicy:
 3. **ネットワーク接続の問題**
 
    ```bash
-   curl -v http://bookmark-manager-staging-alb-491287683.ap-northeast-1.elb.amazonaws.com/samples
+   curl -v http://bookmark-manager-staging-alb-2010620542.ap-northeast-1.elb.amazonaws.com/samples
    ```
 
 ### Dockerイメージのプルに失敗

@@ -4,9 +4,9 @@
 
 Terragruntを使用した**超コスト最適化**されたstaging環境のインフラ構成です。
 
-**月額コスト: $90.20-101.20**（営業時間のみ稼働 + Datadog監視）、最大46%のコスト削減を実現しています。
+**月額コスト: $83-94**（営業時間のみ稼働 + Datadog監視）、最大53%のコスト削減を実現しています。
 
-**Datadog未使用の場合: $63-74**（最大65%削減）
+**Datadog未使用の場合: $56-67**（最大70%削減）
 
 **Secrets Manager追加コスト: +$1.20/月**（3つのシークレット × $0.40）
 
@@ -14,26 +14,27 @@ Terragruntを使用した**超コスト最適化**されたstaging環境のイ�
 
 ## 使用AWSサービス一覧
 
-| カテゴリ               | サービス                      | 用途                          | 月額コスト（概算）                                                          |
-| ---------------------- | ----------------------------- | ----------------------------- | --------------------------------------------------------------------------- |
-| **コンピューティング** | ECS Fargate                   | コンテナ実行（Web + API）     | $20-25                                                                      |
-|                        | EC2 (t3.nano)                 | Bastion Host                  | $3-4                                                                        |
-|                        | Lambda                        | ECS自動停止/起動              | $0.1未満                                                                    |
-|                        | EventBridge                   | スケジューラー                | $0 (無料枠)                                                                 |
-| **ネットワーク**       | VPC                           | ネットワーク基盤              | $0                                                                          |
-|                        | ALB                           | ロードバランサー              | $17.4                                                                       |
-|                        | VPC Endpoint (Interface × 3)  | ECR/CloudWatch Logs           | $21.6                                                                       |
-| **データベース**       | RDS PostgreSQL (db.t4g.micro) | メインDB                      | $11.5                                                                       |
-| **ストレージ**         | S3                            | 静的アセット                  | $1-5                                                                        |
-|                        | ECR                           | コンテナイメージ              | $0-1                                                                        |
-| **モニタリング**       | CloudWatch Logs               | ログ保存 (7日)                | $5-10                                                                       |
-|                        | Datadog Infrastructure Pro    | ECS + RDS監視（オプション）   | $25.8                                                                       |
-|                        | Sentry                        | Next.jsエラー監視（無料）     | $0                                                                          |
-| **セキュリティ**       | IAM                           | アクセス制御                  | $0                                                                          |
-|                        | Security Group                | ファイアウォール              | $0                                                                          |
-|                        | SSM Parameter Store           | 設定値管理（Sentry DSN）      | $0 (無料枠)                                                                 |
-|                        | Secrets Manager               | 機密情報管理（3シークレット） | $1.20                                                                       |
-| **合計**               |                               |                               | **$90.20-101.20/月**<br>（Datadog含む）<br>**$63-74/月**<br>（Datadog無し） |
+| カテゴリ               | サービス                      | 用途                          | 月額コスト（概算）                                                   |
+| ---------------------- | ----------------------------- | ----------------------------- | -------------------------------------------------------------------- |
+| **コンピューティング** | ECS Fargate                   | コンテナ実行（Web + API）     | $20-25                                                               |
+|                        | EC2 (t3.nano)                 | Bastion Host                  | $3-4                                                                 |
+|                        | Lambda                        | ECS自動停止/起動              | $0.1未満                                                             |
+|                        | EventBridge                   | スケジューラー                | $0 (無料枠)                                                          |
+| **ネットワーク**       | VPC                           | ネットワーク基盤              | $0                                                                   |
+|                        | ALB                           | ロードバランサー              | $17.4                                                                |
+|                        | VPC Endpoint (Interface × 2)  | ECR API/DKR                   | $14.4                                                                |
+|                        | VPC Endpoint (Gateway)        | S3                            | $0 (無料)                                                            |
+| **データベース**       | RDS PostgreSQL (db.t4g.micro) | メインDB                      | $11.5                                                                |
+| **ストレージ**         | S3                            | 静的アセット                  | $1-5                                                                 |
+|                        | ECR                           | コンテナイメージ              | $0-1                                                                 |
+| **モニタリング**       | CloudWatch Logs               | ログ保存 (7日)                | $5-10                                                                |
+|                        | Datadog Infrastructure Pro    | ECS + RDS監視（オプション）   | $25.8                                                                |
+|                        | Sentry                        | Next.jsエラー監視（無料）     | $0                                                                   |
+| **セキュリティ**       | IAM                           | アクセス制御                  | $0                                                                   |
+|                        | Security Group                | ファイアウォール              | $0                                                                   |
+|                        | SSM Parameter Store           | 設定値管理（Sentry DSN）      | $0 (無料枠)                                                          |
+|                        | Secrets Manager               | 機密情報管理（3シークレット） | $1.20                                                                |
+| **合計**               |                               |                               | **$83-94/月**<br>（Datadog含む）<br>**$56-67/月**<br>（Datadog無し） |
 
 ## AWS構成概要
 
@@ -55,7 +56,7 @@ graph TB
 
             subgraph PrivateSubnet["Private Subnet"]
                 RDS[(RDS PostgreSQL<br>db.t4g.micro<br>Graviton2)]
-                VPCE[VPC Endpoints<br>ECR/CloudWatch]
+                VPCE[VPC Endpoints<br>ECR API/DKR<br>S3 Gateway]
             end
         end
 
@@ -76,9 +77,10 @@ graph TB
     Bastion -.Port Forward.- RDS
     ECS_Web -.VPC Endpoint.- ECR
     ECS_API -.VPC Endpoint.- ECR
-    ECS_Web -.VPC Endpoint.- CW
-    ECS_API -.VPC Endpoint.- CW
-    ECS_Web --> S3
+    ECS_Web -.VPC Endpoint.- S3
+    ECS_API -.VPC Endpoint.- S3
+    ECS_Web --> CW
+    ECS_API --> CW
     ECS_Web --> SSM
     ECS_API --> SSM
 
@@ -106,6 +108,7 @@ graph TD
     Database[database<br>RDS PostgreSQL<br>db.t4g.micro]
     Compute[compute<br>ECS/ALB<br>自動停止/起動]
     Storage[storage<br>S3バケット]
+    Monitoring[monitoring<br>Datadog/Sentry<br>監視設定]
 
     Root --> Env
     Env --> ECR
@@ -116,10 +119,13 @@ graph TD
     ECR --> Compute
     Network --> Compute
     Network --> Database
+    Compute --> Monitoring
+    Database --> Monitoring
 
     style Compute fill:#ff9,stroke:#333,stroke-width:3px
     style Database fill:#f9f,stroke:#333,stroke-width:3px
     style Network fill:#9ff,stroke:#333,stroke-width:3px
+    style Monitoring fill:#f99,stroke:#333,stroke-width:2px
 ```
 
 ### ネットワーク構成
@@ -141,10 +147,9 @@ Internet (固定IPのみ) / 開発者 (SSM Session Manager)
 │   - RDS PostgreSQL (db.t4g.micro)           │
 │     ※ECS + Bastionからのアクセスのみ許可    │
 │   - VPC Endpoints:                          │
-│     • ECR API (Interface)                   │
-│     • ECR DKR (Interface)                   │
+│     • ECR API (Interface - $7.2/月)         │
+│     • ECR DKR (Interface - $7.2/月)         │
 │     • S3 (Gateway - 無料)                   │
-│     • CloudWatch Logs (Interface)           │
 └─────────────────────────────────────────────┘
 ```
 
@@ -178,7 +183,8 @@ Internet (固定IPのみ) / 開発者 (SSM Session Manager)
 #### 4. VPC Endpoint使用
 
 - **削減効果**: NAT Gatewayデータ転送料 月額$400-500削減
-- **実装**: ECR、S3、CloudWatch LogsへのプライベートアクセスVPC Endpoint使用
+- **実装**: ECR（API/DKR）、S3へのプライベートアクセスにVPC Endpoint使用
+- **コスト**: Interface型 × 2（ECR API/DKR）= $14.4/月、Gateway型（S3）= 無料
 - **実績**: 15時間で279GB転送 → $17.32のデータ転送料が発生（VPC Endpoint導入前）
 
 #### 5. その他の最適化
@@ -192,603 +198,9 @@ Internet (固定IPのみ) / 開発者 (SSM Session Manager)
 
 ### 推奨事項
 
-- **使わない時は必ずリソース削除**: `terragrunt run-all destroy`
+- **使わない時は必ずリソース削除**: `terragrunt run --all destroy`
 - **開発中は必要最小限のリソースのみ稼働**
 - **固定IP設定**: [terraform.tfvars.example](terraform.tfvars.example) を参照してIP制限を設定
-
-## Datadog + Sentry監視（オプション）
-
-### 概要
-
-DatadogとSentryを組み合わせた効率的なモニタリング構成です。
-
-**月額コスト: $25.8**（Datadog のみ、Sentryは無料枠）
-
-- **Sentry**: Next.jsのエラー監視（無料枠: 月間5,000イベント）
-- **Datadog**: ECS + RDS監視（Infrastructure Pro Plan）
-
-### 監視対象
-
-| 対象                    | サービス | 監視内容                       | 稼働時間          |
-| ----------------------- | -------- | ------------------------------ | ----------------- |
-| Next.js                 | Sentry   | エラー監視、セッションリプレイ | 24時間            |
-| ECS Fargate (Web + API) | Datadog  | APM、メトリクス、ログ          | 月〜金 9:00-22:00 |
-| RDS PostgreSQL          | Datadog  | CloudWatch統合、CPU/接続数     | 24時間            |
-
-### コスト削減施策
-
-#### 1. ECS自動停止/起動との連携 ⭐ 重要
-
-- **削減効果**: ECSホスト課金 64%削減（$30 → $10.8）
-- **仕組み**:
-  - ECSタスク停止時、Datadog Agentサイドカーも自動停止
-  - 営業時間外（22:00-9:00、土日）は課金なし
-  - High Watermark Plan (HWMP) により上位1%のスパイク除外
-
-**月間稼働時間**:
-- ECS: 260時間/月（週5日×13時間×4週）
-- RDS: 720時間/月（24時間稼働）
-
-#### 2. CloudWatch統合の活用
-
-- **RDS監視**: CloudWatch統合で十分（staging環境）
-- **追加コスト**: なし（無料枠内）
-- **Lambda関数**: 不要
-
-#### 3. サンプリング設定
-
-**Sentry (Next.js)**:
-```typescript
-Sentry.init({
-  sampleRate: 1.0,              // エラーは全て記録
-  tracesSampleRate: 0.05,       // トレース5%
-  replaysSessionSampleRate: 0,  // 通常リプレイ無効
-  replaysOnErrorSampleRate: 0.1, // エラー時10%
-});
-```
-
-**Datadog (NestJS)**:
-```typescript
-tracer.init({
-  sampleRate: 0.2,  // 20%サンプリング
-  rateLimit: 50,    // 最大50スパン/秒
-});
-```
-
-**環境変数設定**:
-```bash
-DD_TRACE_SAMPLING_RULES='[{"sample_rate":0.2}]'
-DD_TRACE_RATE_LIMIT=50
-DD_TRACE_LOG_LEVEL=error  # ERROR以上のみ
-```
-
-#### 4. メトリクス送信間隔の調整
-
-```yaml
-# datadog.yaml (オプション)
-collect_interval: 60  # 60秒間隔（デフォルト: 15秒）
-```
-
-### セットアップ手順
-
-#### 前提条件
-
-1. **Sentryアカウント作成**
-   - [Sentry.io](https://sentry.io/)でアカウント作成（無料）
-   - 組織とチームを作成
-
-2. **Datadogアカウント作成**
-   - [Datadog](https://www.datadoghq.com/)でアカウント作成
-   - 14日間無料トライアル利用可能
-   - Infrastructure Pro Planを選択
-
-#### Step 1: パッケージインストール
-
-```bash
-# ルートディレクトリで実行
-pnpm install
-```
-
-追加されたパッケージ:
-- `@sentry/nextjs`: Sentry SDK for Next.js
-- `dd-trace`: Datadog APM for Node.js
-
-#### Step 2: ローカル設定ファイル作成
-
-```bash
-cd infra/terraform/envs/staging
-
-# サンプルファイルをコピー
-cp .tfvars.local.example .tfvars.local
-
-# 実際の値を設定（エディタで編集）
-vi .tfvars.local
-```
-
-**`.tfvars.local`の内容例**:
-```hcl
-inputs = {
-  sentry_organization = "<Sentry組織スラッグ>" 
-  sentry_team         = "<Sentryチームスラッグ>"
-  alert_email         = "<アラート通知先>"
-}
-```
-
-**Sentry設定値の取得方法**:
-
-| 項目                  | 取得場所                                            |
-| --------------------- | --------------------------------------------------- |
-| `sentry_organization` | Settings > Organization Settings > General Settings |
-| `sentry_team`         | Settings > Teams > チーム名をクリック > URLの末尾   |
-
-#### Step 3: Sentry Auth Tokenの取得と保存
-
-1. **Sentry Internal Integrationを作成** ⚠️ **重要**
-
-   **作成手順**:
-   - Settings > Developer Settings > [Internal Integrations](https://sentry.io/settings/account/api/applications/)
-   - **New Internal Integration** をクリック
-   - **Name**: `Terraform Staging`
-   - **Webhook URL**: （空欄でOK）
-   - **必須Permissions（権限）** - これらがないとTerraformでエラーになります：
-     - ✅ **Project**: `Admin`（プロジェクト作成・削除・変更）
-     - ✅ **Team**: `Read`（チーム情報取得）
-     - ✅ **Organization**: `Read`（組織情報取得）
-     - ✅ **Issue & Event**: `Write`（アラート設定作成）
-   - **Save Changes** をクリック
-   - 生成されたトークンをコピー（`sntrys_xxxxx...`、表示は1回のみ！）
-
-   **⚠️ 旧Auth Tokenを使用する場合**:
-   - Settings > Developer Settings > [Auth Tokens](https://sentry.io/settings/account/api/auth-tokens/)
-   - "Create New Token" → Scopes: `project:admin`, `org:read`, `team:read`, `alerts:write`
-
-2. **AWS Secrets Managerに保存**
-
-```bash
-# Sentry Auth Token保存（Terraform Provider用）
-aws secretsmanager create-secret \
-  --name "sentry/auth_token" \
-  --description "Sentry Auth Token for Terraform Provider" \
-  --secret-string "your-sentry-internal-integration-token" \
-  --region ap-northeast-1
-
-# 形式確認（デバッグ用）
-aws secretsmanager get-secret-value --secret-id sentry/auth_token --query 'SecretString' --output text | head -c 20 && echo "..."
-```
-
-3. **ローカル設定ファイルを作成**
-
-```bash
-cd infra/terraform/envs/staging
-
-# サンプルをコピー
-cp .tfvars.local.example .tfvars.local
-
-# エディタで編集
-vim .tfvars.local
-```
-
-`.tfvars.local`の内容（Step 2で確認した値を設定）：
-```hcl
-inputs = {
-  # Sentry設定
-  sentry_organization = "hitamuki"           # Organization Slug
-  sentry_team         = "bookmark-manager"   # Team Slug
-
-  # アラート設定
-  alert_email = "hitamuki024@gmail.com"
-}
-```
-
-4. **確認: 全てのシークレットが作成されているか**
-
-```bash
-# 作成済みシークレット一覧を確認
-aws secretsmanager list-secrets \
-  --query 'SecretList[?contains(Name, `sentry`) || contains(Name, `datadog`)].Name' \
-  --output table
-
-# 期待される出力:
-# ----------------------------
-# |       ListSecrets        |
-# +--------------------------+
-# |  datadog/api_key         |
-# |  datadog/app_key         |
-# |  sentry/auth_token       |
-# +--------------------------+
-```
-
-#### Step 4: Datadog設定
-
-1. **Datadog API KeyとApp Keyを取得**
-
-**API Key（データ送信用）**:
-- Datadog > Organization Settings > [API Keys](https://app.datadoghq.com/organization-settings/api-keys)
-- **New Key** をクリック
-- **Name**: `Staging Environment`
-- 生成されたキーをコピー
-
-**App Key（Terraform用）**:
-- Datadog > Organization Settings > [Application Keys](https://app.datadoghq.com/organization-settings/application-keys)
-- **New Key** をクリック
-- **Name**: `bookmark-manager`
-- 生成されたキーをコピー
-
-2. **AWS Secrets Managerに保存**
-
-**Datadog API Keyの作成手順**:
-1. Datadog UI → Organization Settings → API Keys
-2. "New Key" をクリック
-3. Name: `staging-api-key`（任意）
-4. 作成されたKeyをコピー（32文字の16進数）
-
-**Datadog Application Keyの作成手順** ⚠️ **重要**:
-1. Datadog UI → Organization Settings → Application Keys
-2. "New Key" をクリック
-3. Name: `terraform-staging`
-4. **必須スコープ**を選択（これらがないとTerraformで403エラーになります）：
-   - ✅ `dashboards_read` - ダッシュボード読み取り
-   - ✅ `dashboards_write` - ダッシュボード作成
-   - ✅ `monitors_read` - モニター読み取り
-   - ✅ `monitors_write` - モニター作成
-   - ✅ `monitors_downtime` - ダウンタイム設定（オプション）
-5. 作成されたKeyをコピー（40文字の英数字）
-
-```bash
-# API Key保存（Datadog Agent用）
-# ⚠️ 注意: ダブルクォートや余分な文字を含めないこと
-aws secretsmanager create-secret \
-  --name "datadog/api_key" \
-  --description "Datadog API Key for Datadog Agent" \
-  --secret-string "your-datadog-api-key-32-chars" \
-  --region ap-northeast-1
-
-# App Key保存（Terraform Provider用）
-# ⚠️ 注意: 上記で作成した適切なスコープ付きのKeyを使用
-aws secretsmanager create-secret \
-  --name "datadog/app_key" \
-  --description "Datadog App Key for Terraform Provider" \
-  --secret-string "your-datadog-app-key-40-chars" \
-  --region ap-northeast-1
-
-# 保存した値の形式確認（デバッグ用）
-aws secretsmanager get-secret-value --secret-id datadog/api_key --query 'SecretString' --output text | wc -c  # 33が正常（32文字+改行）
-aws secretsmanager get-secret-value --secret-id datadog/app_key --query 'SecretString' --output text | wc -c  # 41が正常（40文字+改行）
-```
-
-3. **Datadog Agentサイドカーを有効化**（compute/terragrunt.hcl）
-
-```hcl
-inputs = {
-  # ...既存の設定...
-
-  # Datadog有効化
-  enable_datadog = true
-  app_version    = "1.0.0"
-}
-```
-
-4. **Terraform apply**（環境変数不要！）
-
-```bash
-# monitoring: Sentry + Datadog モニター・ダッシュボード作成
-cd infra/terraform/envs/staging/monitoring
-terragrunt apply
-```
-
-**注意**: API Key/App Keyは全てSecrets Managerから自動取得されるため、`export`コマンドは不要です！
-
-**作成されるリソース**:
-- ✅ Sentryプロジェクト: `bookmark-manager-web-staging`
-- ✅ Sentry DSN → SSM Parameter Store: `/bookmark-manager/staging/SENTRY_DSN`
-- ✅ Sentryアラート: Critical Errors - staging
-- ✅ Datadogモニター × 3（APIエラーレート、レイテンシ、RDS CPU）
-- ✅ Datadogダッシュボード: Bookmark Manager - staging
-
-5. **Sentry DSNを取得してアプリケーションに設定**
-
-**方法1: SSM Parameter Storeから取得**（推奨）
-```bash
-# コマンドで取得
-aws ssm get-parameter \
-  --name "/bookmark-manager/staging/SENTRY_DSN" \
-  --with-decryption \
-  --query "Parameter.Value" \
-  --output text
-
-# 出力例:
-# https://8145f9f0127b9487fc67e4940fa0e6b8@o4510377330999296.ingest.us.sentry.io/4510380263014400
-```
-
-**方法2: Sentry UIから取得**
-1. https://hitamuki.sentry.io/settings/projects/bookmark-manager-web-staging/keys/
-2. 「Client Keys (DSN)」セクション
-3. 「DSN (Public)」をコピー
-
-**compute/terragrunt.hclに追加**:
-```hcl
-web_environment = [
-  # ... 既存の設定 ...
-  {
-    name  = "NEXT_PUBLIC_SENTRY_DSN"
-    value = "https://8145f9f0127b9487fc67e4940fa0e6b8@o4510377330999296.ingest.us.sentry.io/4510380263014400"
-  }
-]
-
-# Datadog監視設定も追加
-enable_datadog = true
-app_version    = "1.0.0"
-```
-
-**⚠️ セキュリティ注意**:
-- Sentry DSNは**公開情報**なので、Gitにコミットしても問題ありません
-- ブラウザのJavaScriptに埋め込まれるため、誰でも見ることができます
-- DSNでできることは「エラーを送信する」だけです（読み取りや削除は不可）
-
-6. **Datadog Agent + Sentry DSNをECSに適用**
-
-```bash
-cd infra/terraform/envs/staging/compute
-terragrunt apply
-```
-
-**適用される変更**:
-- ✅ ECSタスク定義にDatadog Agentサイドカーコンテナを追加
-- ✅ Next.jsコンテナに`NEXT_PUBLIC_SENTRY_DSN`環境変数を追加
-- ✅ Datadog環境変数（DD_ENV, DD_SERVICE, DD_VERSION等）を自動設定
-- ✅ Secrets ManagerからDatadog API Keyを自動取得
-
-**Datadog Agentサイドカーの役割**:
-- APM（Application Performance Monitoring）トレース収集
-- ログ収集（CloudWatch Logs経由）
-- カスタムメトリクス収集
-- ECS/Fargateメタデータ収集
-
-7. **RDS CloudWatch統合を有効化**（Datadog側）
-
-RDSメトリクスをDatadogで表示するには、AWS統合が必要です：
-
-**手順**:
-1. Datadog UI（https://ap1.datadoghq.com/）にログイン
-2. Integrations → AWS を検索
-3. "Add AWS Account" をクリック
-4. 以下の情報を入力：
-   - **Account ID**: `058570289018`
-   - **Regions**: `ap-northeast-1` を選択
-5. **Role Name**: DatadogがCloudFormationテンプレートを提供
-6. **Collect metrics from**: `RDS` を選択
-7. 保存
-
-詳細: https://docs.datadoghq.com/ja/integrations/amazon_web_services/
-
-#### Step 5: 動作確認
-
-### Sentry（エラー監視）
-
-**アクセス方法**:
-1. Sentry UIにログイン: https://sentry.io/
-2. Organization: `hitamuki`
-3. Project: `bookmark-manager-web-staging`
-4. 直接リンク: https://sentry.io/organizations/hitamuki/projects/bookmark-manager-web-staging/
-
-**確認内容**:
-- **Issues**: エラー一覧（新規エラー、頻出エラー）
-- **Performance**: パフォーマンス監視（トレースサンプリング: 5%）
-- **Alerts**: 設定したアラートルール
-  - Settings → Alerts → "Critical Errors - staging"
-
-**テスト方法**:
-```typescript
-// Next.jsアプリでテストエラーを発生させる
-throw new Error("Sentry test error from staging!");
-```
-
-ブラウザで実行後、Sentry UI → Issues で確認できます。
-
----
-
-### Datadog（インフラ・APM監視）
-
-**アクセス方法**:
-- Datadog UI: https://ap1.datadoghq.com/ （AP1リージョン）
-
-**1. ダッシュボード**:
-- 直接リンク: https://ap1.datadoghq.com/dashboard/n3w-s3y-enf/bookmark-manager---staging
-- メニュー: Dashboards → "Bookmark Manager - staging"
-
-**表示内容**:
-- API Request Rate（リクエスト数）
-- API Error Rate（エラー数）
-- API Latency P95（95パーセンタイルレイテンシ）
-- RDS CPU Utilization（RDS CPU使用率）
-- RDS Database Connections（DB接続数）
-
-**2. モニター（アラート）**:
-- メニュー: Monitors → Manage Monitors
-- 設定済みモニター:
-  - `[staging] High Error Rate on Bookmark API` (ID: 10540299)
-  - `[staging] High Latency on Bookmark API` (ID: 10540300)
-  - `[staging] High CPU Usage on RDS PostgreSQL` (ID: 10540298)
-
-**直接リンク**:
-- https://ap1.datadoghq.com/monitors/10540299
-- https://ap1.datadoghq.com/monitors/10540300
-- https://ap1.datadoghq.com/monitors/10540298
-
-**3. APM（アプリケーション監視）**:
-- メニュー: APM → Services
-- サービス名:
-  - `bookmark-manager-web` (Next.js)
-  - `bookmark-manager-api` (NestJS)
-
-⚠️ **注意**: ECSタスクが起動してDatadog Agentが稼働するまで表示されません。
-
-**4. ログ確認**:
-- メニュー: Logs → Live Tail
-- フィルター: `service:bookmark-manager-web` または `service:bookmark-manager-api`
-
-**5. Infrastructure**:
-- メニュー: Infrastructure → Containers
-- ECSタスクの状態、メトリクスを確認
-
-### トラブルシューティング
-
-#### Terragrunt実行時のエラー
-
-**エラー: `Error: failed to perform health check` (Sentry)**
-
-```
-Error: failed to perform health check
-  with provider["registry.terraform.io/jianyuan/sentry"]
-Sentry API is not available, Please check the authentication token
-```
-
-**原因と対処法**:
-1. **Auth Tokenの権限不足** - Internal Integrationで以下のPermissionsが必要：
-   - Project: `Admin`
-   - Organization: `Read`
-   - Team: `Read`
-   - Issue & Event: `Write`
-2. **Organization Slugが間違っている** - `.tfvars.local`の`sentry_organization`を確認
-3. **Tokenが無効** - Secrets Managerの値を確認：
-   ```bash
-   aws secretsmanager get-secret-value --secret-id sentry/auth_token --query 'SecretString' --output text
-   ```
-
-**エラー: `Error: 403 Forbidden` (Datadog)**
-
-```
-Error: 403 Forbidden
-  with provider["registry.terraform.io/datadog/datadog"]
-```
-
-**原因と対処法**:
-1. **Application Keyのスコープ不足** ⚠️ **最も多い原因**
-   - Datadog UIで新しいApp Keyを作成し、以下のスコープを付与：
-     - `dashboards_read`
-     - `dashboards_write`
-     - `monitors_read`
-     - `monitors_write`
-   - Secrets Managerを更新：
-     ```bash
-     aws secretsmanager update-secret --secret-id datadog/app_key --secret-string 'YOUR_NEW_APP_KEY'
-     ```
-
-2. **API Key/App Keyの形式が不正** - 余分なダブルクォートや改行が含まれている：
-   ```bash
-   # 形式確認
-   aws secretsmanager get-secret-value --secret-id datadog/api_key --query 'SecretString' --output text | wc -c  # 33が正常
-   aws secretsmanager get-secret-value --secret-id datadog/app_key --query 'SecretString' --output text | wc -c  # 41が正常
-
-   # ダブルクォートを削除
-   CURRENT=$(aws secretsmanager get-secret-value --secret-id datadog/api_key --query 'SecretString' --output text)
-   CLEAN=$(echo $CURRENT | tr -d '"')
-   aws secretsmanager update-secret --secret-id datadog/api_key --secret-string "$CLEAN"
-   ```
-
-3. **API Keyが無効** - Datadog UIで新しいAPI Keyを作成
-
-**エラー: `Error: Duplicate data configuration`**
-
-```
-Error: Duplicate data "aws_secretsmanager_secret" configuration
-  A aws_secretsmanager_secret data resource named "datadog_api_key" was already declared
-```
-
-**原因**: `datadog.tf`と`providers.tf`で同じdata sourceを定義している
-
-**対処法**: 最新のコードでは修正済み。キャッシュをクリア：
-```bash
-cd infra/terraform/envs/staging/monitoring
-rm -rf .terragrunt-cache
-terragrunt init
-```
-
-**エラー: `Error: Missing required argument "teams"`**
-
-```
-Error: Missing required argument
-  on sentry.tf line 7, in resource "sentry_project" "web":
-  The argument "teams" is required, but no definition was found.
-```
-
-**原因**: Sentry Providerのバージョンが新しく、`team`から`teams`（配列）に変更された
-
-**対処法**: 最新のコードでは修正済み（`teams = [var.sentry_team]`）
-
-#### ECS/Datadog Agent実行時のエラー
-
-**エラー: Datadog AgentがAPI Keyを取得できない**
-
-**確認コマンド**:
-```bash
-# ECSタスクログ確認
-aws logs tail /ecs/bookmark-manager/staging/web --filter-pattern "datadog" --follow
-
-# IAM権限確認
-aws iam get-role-policy \
-  --role-name bookmark-manager-staging-ecs-task-execution \
-  --policy-name bookmark-manager-staging-ecs-secrets
-```
-
-**対処法**: IAM権限が不足している場合、`infra/terraform/modules/security/iam.tf`を確認
-
-### 料金プラン比較
-
-| プラン                        | 月額コスト | 含まれる内容                        |
-| ----------------------------- | ---------- | ----------------------------------- |
-| **Infrastructure Pro**        | $15/ホスト | インフラ監視、100カスタムメトリクス |
-| **Infrastructure Enterprise** | $23/ホスト | Pro + 200カスタムメトリクス         |
-| **APM Pro**                   | $31/ホスト | インフラ + APM + トレーシング       |
-
-**staging環境の実際のコスト**:
-- ECS 2ホスト（Web + API）: $15 × 2 × 36% = **$10.8/月**
-- RDS 1ホスト: $15 × 1 × 100% = **$15/月**
-- **合計: $25.8/月**
-
-### 注意事項
-
-1. **Secrets Manager料金**: 以下の3つのシークレットで$1.20/月（各$0.40）
-   - `datadog/api_key`: Datadog APIキー（Agent用）
-   - `datadog/app_key`: Datadog Appキー（Terraform用）
-   - `sentry/auth_token`: Sentry認証トークン（Terraform用）
-2. **ホスト停止遅延**: ECS停止後、Datadog課金除外まで最大2時間
-3. **High Watermark Plan**: 必ず選択すること（上位1%のスパイク除外）
-4. **データ転送料**: Datadog/Sentry APIへの送信は無料（AWS内）
-5. **無料トライアル**: Datadog 14日間、機能確認後に本導入判断
-6. **Sentry DSN**: 公開情報のためSSM Parameter Storeで管理
-7. **Sentry Auth Token**: Terraform実行時のみ必要、Secrets Managerで管理
-
-### セキュリティ設計
-
-| 項目                  | 保存場所                           | 用途                            | アクセス権限                                 |
-| --------------------- | ---------------------------------- | ------------------------------- | -------------------------------------------- |
-| **Sentry DSN**        | SSM Parameter Store (SecureString) | Next.jsアプリ実行時（公開可能） | ECS Task Execution Role                      |
-| **Sentry Auth Token** | Secrets Manager                    | Terraform実行時のみ（機密情報） | Terraform Provider                           |
-| **Datadog API Key**   | Secrets Manager                    | Datadog Agent実行時（機密情報） | ECS Task Execution Role + Terraform Provider |
-| **Datadog App Key**   | Secrets Manager                    | Terraform実行時のみ（機密情報） | Terraform Provider                           |
-
-**運用の利点**:
-- ✅ **環境変数不要**: `export`コマンドを毎回実行する必要なし
-- ✅ **自動取得**: Terraformが自動的にSecrets Managerから取得
-- ✅ **チーム共有**: AWS IAMでアクセス制御、チーム開発が容易
-- ✅ **CI/CD対応**: GitHub ActionsやCodePipelineで簡単に利用可能
-- ✅ **セキュア**: ローテーション可能、監査ログ記録
-
-### 関連ファイル
-
-**アプリケーション設定**:
-- Next.js Sentry設定: [`src/apps/frontend/web/instrumentation-client.ts`](../../../src/apps/frontend/web/instrumentation-client.ts)
-- NestJS Datadog設定: [`src/apps/web-api/core/src/main.ts`](../../../src/apps/web-api/core/src/main.ts)
-
-**Terraform設定**:
-- Monitoring Module: [`modules/monitoring/`](../../modules/monitoring/)
-  - [`sentry.tf`](../../modules/monitoring/sentry.tf): Sentryプロジェクト・アラート
-  - [`datadog.tf`](../../modules/monitoring/datadog.tf): Datadogモニター・ダッシュボード
-  - [`providers.tf`](../../modules/monitoring/providers.tf): Sentry/Datadog Provider設定
-- Terragrunt設定: [`envs/staging/monitoring/`](monitoring/)
-- ローカル設定: [`envs/staging/.tfvars.local`](.tfvars.local)（Gitignore対象）
-- サンプル設定: [`envs/staging/.tfvars.local.example`](.tfvars.local.example)
 
 ## 前提条件
 
@@ -806,6 +218,79 @@ Terragruntは、Terraformのラッパーツールで、以下のメリットが�
 - **バックエンド設定の一元化**: 環境ごとにバックエンド設定を複製する必要がない
 - **一括操作**: `terragrunt run --all` で全モジュールを一括適用可能
 
+## クイックスタート
+
+staging環境を新規構築する際の全体フローです。詳細な手順は[初期構築手順](#初期構築手順)を参照してください。
+
+### 構築フロー概要
+
+```mermaid
+graph TD
+    A[1. Terragruntインストール] --> B[2. 固定IP設定]
+    B --> C[3. Lambda関数ビルド]
+    C --> D[4. インフラ構築]
+    D --> E[5. Prismaマイグレーション]
+    E --> F[6. 環境変数設定]
+    F --> G[7. コンテナビルド＆プッシュ]
+    G --> H[8. ECS再デプロイ]
+    H --> I{Datadog + Sentry<br/>監視必要?}
+    I -->|Yes| J[9. 監視設定]
+    I -->|No| K[完了]
+    J --> K
+```
+
+### 最小限のコマンド
+
+```bash
+# 1. Terragruntインストール
+mise install
+
+# 2. 固定IP設定
+cd infra/terraform/envs/staging
+cp terraform.tfvars.example terraform.tfvars
+# terraform.tfvarsを編集してIPアドレスを設定
+
+# 3. Lambda関数ビルド
+cd ../../modules/compute/lambda
+npx esbuild ecs_scheduler.ts --bundle --platform=node --target=node20 --outfile=ecs_scheduler.js
+
+# 4. インフラ構築
+cd ../../../envs/staging
+terragrunt run --all init
+terragrunt run --all apply
+
+# 5. Prismaマイグレーション
+# (別ターミナルでSSMポートフォワーディング実行)
+./scripts/connect_to_awsdb.sh staging 5432
+# (元のターミナルで)
+pnpm dotenv -e .env.staging -- prisma migrate deploy --schema=src/libs/prisma/schema.prisma
+
+# 6. 環境変数設定
+aws ssm put-parameter \
+  --name "/bookmark-manager/staging/MONGODB_URI" \
+  --value "mongodb+srv://username:password@cluster.mongodb.net/database" \
+  --type "SecureString"
+
+# 7. コンテナビルド＆プッシュ
+# プロジェクトルートで実行
+docker build --platform linux/amd64 -f src/apps/frontend/web/Dockerfile -t bookmark-manager-staging-web:latest .
+docker build --platform linux/amd64 -f src/apps/web-api/core/Dockerfile -t bookmark-manager-staging-api:latest .
+# ECRにプッシュ（詳細は初期構築手順を参照）
+
+# 8. ECS再デプロイ
+aws ecs update-service --cluster bookmark-manager-staging-cluster --service bookmark-manager-staging-web --force-new-deployment
+aws ecs update-service --cluster bookmark-manager-staging-cluster --service bookmark-manager-staging-api --force-new-deployment
+
+# 9. (オプション) Datadog + Sentry監視設定
+# 詳細は「Datadog + Sentry監視設定」セクションを参照
+```
+
+### 次のステップ
+
+- **詳細な手順**: [初期構築手順](#初期構築手順)
+- **監視設定**: [Datadog + Sentry監視設定](#datadog--sentry監視設定)
+- **更新手順**: [デプロイ（更新時）](#デプロイ更新時)
+
 ## ディレクトリ構成
 
 ``` txt
@@ -821,34 +306,45 @@ infra/terraform/envs/staging/
 ├── compute/
 │   └── terragrunt.hcl     # ECS、ALB、タスク定義
 ├── database/
-│   └── terragrunt.hcl     # Aurora、SSM Parameter Store
-└── storage/
-    └── terragrunt.hcl     # S3バケット
+│   └── terragrunt.hcl     # RDS PostgreSQL、SSM Parameter Store
+├── storage/
+│   └── terragrunt.hcl     # S3バケット
+└── monitoring/
+    └── terragrunt.hcl     # Datadog、Sentry監視設定
 ```
 
-## デプロイフロー
+## 初期構築手順
+
+新規にstaging環境を構築する際の詳細な手順です。
+
+### 構築フロー
 
 以下の順序でインフラを構築します：
 
 ```
-1. 固定IP設定（terraform.tfvars作成）
+1. Terragruntインストール
    ↓
-2. Lambda関数のビルド（TypeScript → JavaScript）
+2. 固定IP設定（terraform.tfvars作成）
    ↓
-3. インフラ構築（terragrunt run --all apply）
+3. Lambda関数のビルド（TypeScript → JavaScript）
+   ↓
+4. インフラ構築（terragrunt run --all apply）
    - ECRリポジトリ作成
    - network → security → compute → database → storage
    ↓
-4. Prismaマイグレーション実行
+5. Prismaマイグレーション実行
    - .env.stagingにDATABASE_URLを設定
    - pnpm prisma migrate deploy
    ↓
-5. コンテナイメージのビルド＆プッシュ
+6. 環境変数の設定
+   - MongoDB接続文字列をSSM Parameter Storeに設定
    ↓
-6. ECS再デプロイ
+7. コンテナイメージのビルド＆プッシュ
+   ↓
+8. ECS再デプロイ
+   ↓
+9. (オプション) Datadog + Sentry監視設定
 ```
-
-## 初期セットアップ
 
 ### 1. Terragruntのインストール
 
@@ -886,8 +382,6 @@ curl -s https://checkip.amazonaws.com
 
 Lambda関数はTypeScriptで記述されていますが、AWS Lambdaは直接TypeScriptを実行できないため、JavaScriptにトランスパイルする必要があります。
 
-#### esbuildでビルド
-
 ```bash
 cd infra/terraform/modules/compute/lambda
 
@@ -902,7 +396,7 @@ npx esbuild ecs_scheduler.ts \
 ls -lh ecs_scheduler.js
 ```
 
-### 3. インフラ構築
+### 4. インフラ構築
 
 ```bash
 cd infra/terraform/envs/staging
@@ -917,13 +411,23 @@ terragrunt run --all plan
 terragrunt run --all apply
 ```
 
-### 4. Prismaマイグレーションの実行
+**構築されるリソース**:
+- ECRリポジトリ（Web + API）
+- VPC、サブネット、ルーティング
+- セキュリティグループ、IAMロール
+- ECS Cluster、ALB、タスク定義
+- RDS PostgreSQL (db.t4g.micro)
+- S3バケット
+- Lambda関数（ECS自動停止/起動）
+- EventBridge スケジューラー
+
+### 5. Prismaマイグレーションの実行
 
 データベースが構築されたら、Prismaマイグレーションを実行してテーブルを作成します。
 
 **重要**: RDSはプライベートサブネットにあるため、ローカルから直接アクセスできません。SSMポートフォワーディング経由で接続する必要があります。
 
-#### ステップ1: 環境変数ファイルの準備
+**ステップ1: 環境変数ファイルの準備**
 
 ```bash
 # プロジェクトルートで実行
@@ -945,7 +449,7 @@ aws ssm get-parameter \
 DATABASE_URL="postgresql://dbadmin:YOUR_PASSWORD@localhost:5432/bookmarkdb"
 ```
 
-#### ステップ2: SSMポートフォワーディングの開始
+**ステップ2: SSMポートフォワーディングの開始**
 
 別ターミナルで、Bastion EC2経由でRDSへのポートフォワーディングを確立します。
 
@@ -965,7 +469,7 @@ DATABASE_URL="postgresql://dbadmin:YOUR_PASSWORD@localhost:5432/bookmarkdb"
 - Bastionインスタンスが停止している場合、起動してください
 - SSM Session Manager Pluginがインストールされていることを確認してください
 
-#### ステップ3: マイグレーションの実行
+**ステップ3: マイグレーションの実行**
 
 ポートフォワーディングが確立したら、元のターミナルでマイグレーションを実行します。
 
@@ -984,7 +488,7 @@ pnpm dotenv -e .env.staging -- prisma db seed \
 - ローカル開発では`migrate dev`を使用しますが、staging/production環境では`migrate deploy`を使用します
 - ポートフォワーディングが確立している間のみマイグレーションが可能です
 
-#### ステップ4: マイグレーション確認
+**ステップ4: マイグレーション確認**
 
 ```bash
 # Prisma Studioでテーブルを確認
@@ -1001,7 +505,7 @@ psql "postgresql://dbadmin:<PASSWORD>@localhost:5432/bookmarkdb"
 \q
 ```
 
-#### ステップ5: ポートフォワーディングの終了
+**ステップ5: ポートフォワーディングの終了**
 
 マイグレーションが完了したら、ポートフォワーディングを終了します。
 
@@ -1009,9 +513,37 @@ psql "postgresql://dbadmin:<PASSWORD>@localhost:5432/bookmarkdb"
 # ポートフォワーディングを実行しているターミナルで Ctrl+C を押す
 ```
 
-### 5. コンテナイメージのビルド＆プッシュ
+### 6. 環境変数の設定
 
-プロジェクトルートに戻り、コンテナイメージをビルドしてECRにプッシュ
+コンテナイメージをビルドする前に、SSM Parameter Storeに必要な環境変数を設定します。
+
+**MongoDB接続文字列の設定**:
+
+```bash
+# MongoDB Atlas接続文字列を設定
+aws ssm put-parameter \
+  --name "/bookmark-manager/staging/MONGODB_URI" \
+  --value "mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority" \
+  --type "SecureString"
+```
+
+**注意**:
+- MongoDB Atlasのアカウント作成と接続文字列の取得が必要です（詳細は[MongoDB Atlas設定](#mongodb-atlas設定)を参照）
+- 接続文字列にはユーザー名、パスワード、クラスタ名、データベース名が含まれます
+
+**その他の環境変数（オプション）**:
+
+```bash
+# JWT_SECRET（認証機能実装時に設定）
+# aws ssm put-parameter \
+#   --name "/bookmark-manager/staging/JWT_SECRET" \
+#   --value "your-secret-key" \
+#   --type "SecureString"
+```
+
+### 7. コンテナイメージのビルド＆プッシュ
+
+プロジェクトルートに戻り、コンテナイメージをビルドしてECRにプッシュします。
 
 ```bash
 # プロジェクトルートに戻る
@@ -1025,7 +557,7 @@ aws ecr get-login-password --region $AWS_REGION | \
   docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
 # Webイメージのビルド＆プッシュ
-docker build --platform linux/amd64 --build-arg NEXT_PUBLIC_SENTRY_DSN="https://8145f9f0127b9487fc67e4940fa0e6b8@o4510377330999296.ingest.us.sentry.io/4510380263014400" -f src/apps/frontend/web/Dockerfile -t bookmark-manager-staging-web:latest .
+docker build --platform linux/amd64 -f src/apps/frontend/web/Dockerfile -t bookmark-manager-staging-web:latest .
 docker tag bookmark-manager-staging-web:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/bookmark-manager-staging-web:latest
 docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/bookmark-manager-staging-web:latest
 
@@ -1035,12 +567,30 @@ docker tag bookmark-manager-staging-api:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGI
 docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/bookmark-manager-staging-api:latest
 ```
 
-### 6. ECS再デプロイ
+### 8. ECS再デプロイ
 
 ```bash
 aws ecs update-service --cluster bookmark-manager-staging-cluster --service bookmark-manager-staging-web --force-new-deployment --query 'service.{ServiceName:serviceName,Status:status,DesiredCount:desiredCount}'
 aws ecs update-service --cluster bookmark-manager-staging-cluster --service bookmark-manager-staging-api --force-new-deployment --query 'service.{ServiceName:serviceName,Status:status,DesiredCount:desiredCount}'
 ```
+
+### 9. (オプション) Datadog + Sentry監視設定
+
+監視設定が必要な場合は、[Datadog + Sentry監視設定](#datadog--sentry監視設定)セクションを参照してください。
+
+**概要**:
+- **Sentry**: Next.jsのエラー監視（無料枠: 月間5,000イベント）
+- **Datadog**: ECS + RDS監視（Infrastructure Pro Plan、月額 $25.8）
+
+**主な手順**:
+1. Sentryアカウント作成とAuth Token取得
+2. Datadogアカウント作成とAPI/App Key取得
+3. AWS Secrets Managerにキーを保存
+4. `.tfvars.local`ファイル作成（Organization/Team設定）
+5. `monitoring`モジュールで監視リソース作成
+6. `compute`モジュールでDatadog AgentとSentry DSNを有効化
+
+詳細は[Datadog + Sentry監視設定](#datadog--sentry監視設定)を参照してください。
 
 ## 構築後の設定
 
@@ -1059,24 +609,6 @@ aws ssm get-parameter \
   --output text
 ```
 
-### 環境変数の設定
-
-SSM Parameter Storeに環境変数を設定：
-
-```bash
-# JWT_SECRET
-# aws ssm put-parameter \
-#   --name "/bookmark-manager/staging/JWT_SECRET" \
-#   --value "your-secret-key" \
-#   --type "SecureString"
-
-# MongoDB接続文字列（別途MongoDB Atlas設定が必要）
-aws ssm put-parameter \
-  --name "/bookmark-manager/staging/MONGODB_URI" \
-  --value "mongodb+srv://..." \
-  --type "SecureString"
-```
-
 ### ALBのDNS名を確認
 
 ```bash
@@ -1086,7 +618,13 @@ terragrunt run output alb_dns_name
 
 ブラウザでアクセスして動作確認してください。
 
-## デプロイ
+#### ALB DNSの固定値を更新
+
+「infra/dast/」で使用
+
+## デプロイ（更新時）
+
+既存のstaging環境を更新する際の手順です。初期構築については[初期構築手順](#初期構築手順)を参照してください。
 
 ### コンテナイメージの更新
 
@@ -1142,8 +680,164 @@ aws ecs update-service \
 # 例: web_image = "${dependency.ecr.outputs.web_repository_url}:v1.0.1"
 
 cd infra/terraform/envs/staging/compute
-terragrunt run apply
+terragrunt apply
 ```
+
+### インフラ変更の適用
+
+Terraform/Terragruntコードを変更した場合：
+
+```bash
+cd infra/terraform/envs/staging
+
+# 特定のモジュールのみ更新
+cd <module-name>  # network, security, compute, database, storage, monitoring
+terragrunt plan
+terragrunt apply
+
+# 全モジュールを一括更新
+cd infra/terraform/envs/staging
+terragrunt run --all plan
+terragrunt run --all apply
+```
+
+### ロールバック手順
+
+問題が発生した場合のロールバック：
+
+#### コンテナイメージのロールバック
+
+```bash
+# 以前のイメージタグを確認
+aws ecr describe-images \
+  --repository-name bookmark-manager-staging-web \
+  --query 'sort_by(imageDetails,&imagePushedAt)[-5:].[imageTags[0],imagePushedAt]' \
+  --output table
+
+# 特定のバージョンにロールバック
+cd infra/terraform/envs/staging/compute
+# terragrunt.hclのイメージタグを変更
+terragrunt apply
+
+# または、AWS CLIで直接ロールバック
+aws ecs update-service \
+  --cluster bookmark-manager-staging-cluster \
+  --service bookmark-manager-staging-web \
+  --task-definition bookmark-manager-staging-web:PREVIOUS_REVISION \
+  --force-new-deployment
+```
+
+#### インフラ変更のロールバック
+
+```bash
+# Gitで以前のコミットに戻す
+git log --oneline  # コミット履歴を確認
+git checkout <commit-hash> -- infra/terraform/
+
+# Terragruntで適用
+cd infra/terraform/envs/staging/<module-name>
+terragrunt apply
+```
+
+## Datadog + Sentry監視設定
+
+DatadogとSentryを組み合わせた効率的なモニタリング構成です。この設定はオプションですが、本番環境レベルの監視を実現できます。
+
+### 概要
+
+**月額コスト: $25.8**（Datadog のみ、Sentryは無料枠）
+
+- **Sentry**: Next.jsのエラー監視（無料枠: 月間5,000イベント）
+- **Datadog**: ECS + RDS監視（Infrastructure Pro Plan）
+
+**監視対象**:
+- Next.js: Sentry（エラー監視、セッションリプレイ）
+- ECS Fargate (Web + API): Datadog（APM、メトリクス、ログ）- 月〜金 9:00-22:00のみ
+- RDS PostgreSQL: Datadog（CloudWatch統合、CPU/接続数）- 24時間
+
+### セットアップ手順概要
+
+詳細な手順は元のREADMEのDatadog + Sentryセクション（L199-791）を参照してください。ここでは概要のみ記載します。
+
+**前提条件**:
+1. Sentryアカウント作成（無料）
+2. Datadogアカウント作成（14日間無料トライアル）
+
+**ステップ1: パッケージインストール**
+```bash
+pnpm install  # @sentry/nextjs, dd-trace
+```
+
+**ステップ2: ローカル設定ファイル作成**
+```bash
+cd infra/terraform/envs/staging
+cp .tfvars.local.example .tfvars.local
+# .tfvars.localを編集（sentry_organization, sentry_team, alert_email）
+```
+
+**ステップ3: Sentry Auth Token取得とSecrets Manager保存**
+```bash
+# Sentry Internal Integration作成（必須権限: Project:Admin, Team:Read, Organization:Read, Issue&Event:Write）
+aws secretsmanager create-secret \
+  --name "sentry/auth_token" \
+  --description "Sentry Auth Token for Terraform Provider" \
+  --secret-string "your-sentry-internal-integration-token" \
+  --region ap-northeast-1
+```
+
+**ステップ4: Datadog API/App Key取得とSecrets Manager保存**
+```bash
+# Datadog API Key作成（データ送信用）
+aws secretsmanager create-secret \
+  --name "datadog/api_key" \
+  --description "Datadog API Key for Datadog Agent" \
+  --secret-string "your-datadog-api-key-32-chars" \
+  --region ap-northeast-1
+
+# Datadog App Key作成（Terraform用、必須スコープ: dashboards_read/write, monitors_read/write）
+aws secretsmanager create-secret \
+  --name "datadog/app_key" \
+  --description "Datadog App Key for Terraform Provider" \
+  --secret-string "your-datadog-app-key-40-chars" \
+  --region ap-northeast-1
+```
+
+**ステップ5: monitoringモジュールで監視リソース作成**
+```bash
+cd infra/terraform/envs/staging/monitoring
+terragrunt apply
+# 作成されるリソース: Sentryプロジェクト、Sentry DSN（SSM）、Sentryアラート、Datadogモニター×3、Datadogダッシュボード
+```
+
+**ステップ6: computeモジュールでDatadog AgentとSentry DSNを有効化**
+```bash
+# compute/terragrunt.hclを編集
+# enable_datadog = true
+# web_environment に NEXT_PUBLIC_SENTRY_DSN を追加
+
+cd infra/terraform/envs/staging/compute
+terragrunt apply
+```
+
+### 動作確認
+
+- **Sentry**: https://sentry.io/ → Project: `bookmark-manager-web-staging`
+- **Datadog**: https://ap1.datadoghq.com/ → Dashboard: `Bookmark Manager - staging`
+
+### トラブルシューティング
+
+よくあるエラーと対処法:
+
+**`Error: 403 Forbidden` (Datadog)**
+- Application Keyのスコープ不足。必須スコープ（dashboards_read/write, monitors_read/write）を付与
+
+**`Error: failed to perform health check` (Sentry)**
+- Auth Tokenの権限不足。Internal Integrationで必須Permissionsを確認
+
+**`Error: Duplicate data configuration`**
+- キャッシュクリア: `rm -rf .terragrunt-cache && terragrunt init`
+
+詳細なトラブルシューティングは元のREADMEのDatadog + Sentryセクションを参照してください。
 
 ## メンテナンス
 
@@ -1176,14 +870,104 @@ find . -type d -name ".terragrunt-cache" -exec rm -rf {} +
 
 ## インフラ削除
 
-**注意**: データベースを含む全てのリソースが削除されます。
+**注意**: データベースを含む全てのリソースが削除されます。削除操作は不可逆です。
+
+### 重要な注意事項
+
+- **データベースのバックアップ**: 削除前に必要なデータのバックアップを取得してください
+- **本番環境では絶対に実行しない**: 本番環境のリソースを誤って削除しないよう注意してください
+- **依存関係の確認**: 各モジュールで依存関係の警告が表示された場合は `y` を入力して続行してください
+
+### 削除手順
+
+依存関係に従って、以下の順序でモジュールを削除する必要があります:
 
 ```bash
-cd infra/terraform/envs/staging
+cd /Users/kumao/SourceCode/01_develop/bookmark-manager-app/infra/terraform/envs/staging
 
-# 全モジュールを一括削除（依存関係の逆順に自動実行）
-terragrunt run --all destroy
+# 1. Monitoringモジュール削除
+cd monitoring
+terragrunt destroy -auto-approve
+
+# 2. Databaseモジュール削除
+cd ../database
+terragrunt destroy -auto-approve
+
+# 3. Storageモジュール削除
+cd ../storage
+terragrunt destroy -auto-approve
+
+# 4. Computeモジュール削除
+cd ../compute
+terragrunt destroy -auto-approve
+
+# 5. Securityモジュール削除（依存関係警告が表示されるため、yで続行）
+cd ../security
+echo "y" | terragrunt destroy -auto-approve
+
+# 6. Networkモジュール削除（依存関係警告が表示されるため、yで続行）
+cd ../network
+echo "y" | terragrunt destroy -auto-approve
+
+# 7. ECRモジュール削除（依存関係警告が表示されるため、yで続行）
+cd ../ecr
+echo "y" | terragrunt destroy -auto-approve
 ```
+
+### トラブルシューティング
+
+#### VPC Endpoint ENIが削除されない場合
+
+VPC Endpointを削除してもENI(Elastic Network Interface)がすぐにデタッチされない場合があります。
+
+**対処方法**:
+
+1. **AWS CLIで手動削除**:
+   ```bash
+   # VPC Endpoint IDを確認
+   aws ec2 describe-vpc-endpoints --filters "Name=vpc-id,Values=<VPC_ID>"
+
+   # VPC Endpointを削除
+   aws ec2 delete-vpc-endpoints --vpc-endpoint-ids <VPCE_ID1> <VPCE_ID2>
+   ```
+
+2. **Terraformステートから削除**:
+   ```bash
+   cd network
+   terragrunt state rm aws_vpc_endpoint.ecr_api aws_vpc_endpoint.ecr_dkr
+   ```
+
+3. **再度Networkモジュールをdestroy**:
+   ```bash
+   echo "y" | terragrunt destroy -auto-approve
+   ```
+
+#### AWS署名期限切れエラー
+
+長時間のオペレーション中に `SignatureDoesNotMatch: Signature expired` エラーが発生した場合:
+
+**対処方法**: destroyコマンドを再実行してください。Terraformは未削除のリソースのみを処理します。
+
+```bash
+echo "y" | terragrunt destroy -auto-approve
+```
+
+### 削除結果の確認
+
+全てのリソースが正常に削除されたことを確認します:
+
+```bash
+# 各モジュールでリソースが残っていないか確認
+cd monitoring && terragrunt show
+cd ../database && terragrunt show
+cd ../storage && terragrunt show
+cd ../compute && terragrunt show
+cd ../security && terragrunt show
+cd ../network && terragrunt show
+cd ../ecr && terragrunt show
+```
+
+全てのモジュールで「No resources」または「No state」と表示されれば、削除完了です。
 
 ## 想定月額コスト
 
@@ -1231,10 +1015,10 @@ terragrunt run --all destroy
 ```bash
 # 作業終了時
 cd infra/terraform/envs/staging
-terragrunt run-all destroy
+terragrunt run --all destroy
 
 # 必要な時だけ
-terragrunt run-all apply
+terragrunt run --all apply
 ```
 
 ## コスト監視

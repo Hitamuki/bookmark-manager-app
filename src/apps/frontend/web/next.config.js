@@ -6,6 +6,7 @@
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { composePlugins, withNx } = require('@nx/next');
+const { withSentryConfig } = require('@sentry/nextjs');
 
 /**
  * @type {import('@nx/next/plugins/with-nx').WithNxOptions}
@@ -44,4 +45,13 @@ const plugins = [
   withNx,
 ];
 
-module.exports = composePlugins(...plugins)(nextConfig);
+// Sentryの設定オプション
+const sentryWebpackPluginOptions = {
+  // Sentryへのソースマップアップロードを無効化（必要に応じて有効化）
+  silent: true,
+  hideSourceMaps: true,
+  widenClientFileUpload: true,
+};
+
+// NxとSentryを組み合わせる
+module.exports = withSentryConfig(composePlugins(...plugins)(nextConfig), sentryWebpackPluginOptions);

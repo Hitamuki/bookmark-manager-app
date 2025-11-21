@@ -21,7 +21,7 @@ set -e
 
 # デフォルト設定
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TARGET_URL="http://bookmark-manager-staging-alb-491287683.ap-northeast-1.elb.amazonaws.com/samples"
+TARGET_URL="http://bookmark-manager-staging-alb-2010620542.ap-northeast-1.elb.amazonaws.com/samples"
 SCAN_MODE="baseline"
 REPORT_DIR="${SCRIPT_DIR}/reports"
 DATE_STAMP=$(date +%Y%m%d-%H%M%S)

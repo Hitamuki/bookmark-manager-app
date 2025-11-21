@@ -42,3 +42,6 @@ Sentry.init({
     return event;
   },
 });
+
+// Next.js 15でナビゲーショントラッキングを有効化
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

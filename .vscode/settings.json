@@ -86,6 +86,11 @@
     "editor.defaultFormatter": "hashicorp.terraform",
     "editor.formatOnSave": true,
     "editor.formatOnSaveMode": "file"
-  }
+  },
+  "datadog.ust.environment.setup.focusedName": "staging",
+  "datadog.ust.service.setup.linkedNames": [
+    "bookmark-manager-api",
+    "bookmark-manager-api-prisma"
+  ]
   // ===== 未整理 =====
 }

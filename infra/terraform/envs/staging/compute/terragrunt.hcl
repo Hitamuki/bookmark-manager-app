@@ -49,6 +49,15 @@ dependency "ecr" {
   }
 }
 
+
+dependency "monitoring" {
+  config_path = "../monitoring"
+
+  mock_outputs = {
+    sentry_dsn = "https://mock@sentry.io/0"
+  }
+}
+
 # モジュール固有の変数
 inputs = {
   # ネットワーク設定（networkモジュールから取得）
@@ -71,6 +80,7 @@ inputs = {
   web_image  = "${dependency.ecr.outputs.web_repository_url}:latest"
 
   # 環境変数（必要に応じて追加）
+  # 注: API_URLは動的に設定されます（fargate_task.tfで自動追加）
   web_environment = [
     {
       name  = "NODE_ENV"
@@ -81,12 +91,8 @@ inputs = {
       value = "3000"
     },
     {
-      name  = "API_URL"
-      value = "http://bookmark-manager-staging-alb-491287683.ap-northeast-1.elb.amazonaws.com"
-    },
-    {
       name  = "NEXT_PUBLIC_SENTRY_DSN"
-      value = "https://8145f9f0127b9487fc67e4940fa0e6b8@o4510377330999296.ingest.us.sentry.io/4510380263014400"
+      value = dependency.monitoring.outputs.sentry_dsn
     }
   ]
 
@@ -99,6 +105,7 @@ inputs = {
   api_image  = "${dependency.ecr.outputs.api_repository_url}:latest"
 
   # 環境変数（必要に応じて追加）
+  # 注: ALLOWED_ORIGINSは動的に設定されます（fargate_task.tfで自動追加）
   api_environment = [
     {
       name  = "NODE_ENV"
@@ -107,10 +114,6 @@ inputs = {
     {
       name  = "PORT"
       value = "3001"
-    },
-    {
-      name  = "ALLOWED_ORIGINS"
-      value = "http://bookmark-manager-staging-alb-491287683.ap-northeast-1.elb.amazonaws.com"
     }
   ]
 

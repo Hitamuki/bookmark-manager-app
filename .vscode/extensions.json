@@ -77,6 +77,8 @@
     "wallabyjs.console-ninja",
     // "formulahendry.code-runner",
     // "wallabyjs.quokka-vscode",
+    // ◆ Operations
+    "datadog.datadog-vscode",
     // ◆ Tools
     // "vscodevim.vim",
     // "ms-ossdata.vscode-postgresql",

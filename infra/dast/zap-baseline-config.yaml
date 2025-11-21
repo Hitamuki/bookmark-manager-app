@@ -43,7 +43,7 @@ scanPolicy:
 # 認証設定（将来的に認証機能実装時に使用）
 # authentication:
 #   type: "form"
-#   loginUrl: "http://bookmark-manager-staging-alb-491287683.ap-northeast-1.elb.amazonaws.com/login"
+#   loginUrl: "http://bookmark-manager-staging-alb-2010620542.ap-northeast-1.elb.amazonaws.com/login"
 #   username: "${AUTH_USERNAME}"
 #   password: "${AUTH_PASSWORD}"
 #   usernameField: "email"
@@ -55,12 +55,12 @@ scanPolicy:
 contexts:
   - name: "Staging Environment"
     urls:
-      - "http://bookmark-manager-staging-alb-491287683.ap-northeast-1.elb.amazonaws.com.*"
+      - "http://bookmark-manager-staging-alb-2010620542.ap-northeast-1.elb.amazonaws.com.*"
     includePaths:
-      - "http://bookmark-manager-staging-alb-491287683.ap-northeast-1.elb.amazonaws.com/.*"
+      - "http://bookmark-manager-staging-alb-2010620542.ap-northeast-1.elb.amazonaws.com/.*"
     excludePaths:
-      - "http://bookmark-manager-staging-alb-491287683.ap-northeast-1.elb.amazonaws.com/api/health.*"
-      - "http://bookmark-manager-staging-alb-491287683.ap-northeast-1.elb.amazonaws.com/_next/static/.*"
+      - "http://bookmark-manager-staging-alb-2010620542.ap-northeast-1.elb.amazonaws.com/api/health.*"
+      - "http://bookmark-manager-staging-alb-2010620542.ap-northeast-1.elb.amazonaws.com/_next/static/.*"
 
 # スパイダー設定（クローリング設定）
 spider:

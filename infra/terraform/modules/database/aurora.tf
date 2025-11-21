@@ -19,8 +19,9 @@ resource "aws_db_subnet_group" "aurora" {
 resource "random_password" "aurora_password" {
   count = var.use_aurora ? 1 : 0
 
-  length  = 16
-  special = true
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
 # Aurora Cluster (PostgreSQL Serverless v2)

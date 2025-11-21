@@ -14,7 +14,7 @@ services:
       - dast-network
     command: >
       zap-baseline.py
-      -t ${TARGET_URL:-http://bookmark-manager-staging-alb-491287683.ap-northeast-1.elb.amazonaws.com/samples}
+      -t ${TARGET_URL:-http://bookmark-manager-staging-alb-2010620542.ap-northeast-1.elb.amazonaws.com/samples}
       -r /zap/reports/zap-report-$(date +%Y%m%d-%H%M%S).html
       -J /zap/reports/zap-report-$(date +%Y%m%d-%H%M%S).json
       -w /zap/reports/zap-report-$(date +%Y%m%d-%H%M%S).md
