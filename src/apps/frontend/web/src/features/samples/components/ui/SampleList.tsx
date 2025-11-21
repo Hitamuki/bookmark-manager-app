@@ -6,6 +6,7 @@
 
 import { Button, Pagination, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import { useQueryClient } from '@tanstack/react-query';
+import * as Sentry from '@sentry/nextjs';
 import { Edit, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -25,6 +26,9 @@ export const SampleList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const offset = (currentPage - 1) * PAGINATION.ITEMS_PER_PAGE;
 
+  // Sentryテストモード（trueにするとエラーをスローして削除を実行しない）
+  const [isSentryTestMode, setIsSentryTestMode] = useState(false);
+
   const { data, isLoading, isError, error } = useSampleControllerSearchSamples({
     limit: PAGINATION.ITEMS_PER_PAGE,
     offset,
@@ -35,6 +39,18 @@ export const SampleList = () => {
     mutation: {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['/api/samples'] });
+      },
+      onError: (error) => {
+        // Sentryにエラーを送信
+        Sentry.captureException(error, {
+          tags: {
+            feature: 'sample-delete',
+            component: 'SampleList',
+          },
+          extra: {
+            sampleId: error.config?.url,
+          },
+        });
       },
     },
   });
@@ -53,6 +69,16 @@ export const SampleList = () => {
 
   return (
     <div className="space-y-4">
+      <div className="flex justify-end">
+        <Button
+          size="sm"
+          color={isSentryTestMode ? 'warning' : 'default'}
+          variant="flat"
+          onPress={() => setIsSentryTestMode(!isSentryTestMode)}
+        >
+          {isSentryTestMode ? 'Sentryテストモード: ON' : 'Sentryテストモード: OFF'}
+        </Button>
+      </div>
       <Table aria-label="Sample list table">
         <TableHeader>
           <TableColumn>Title</TableColumn>
@@ -74,7 +100,28 @@ export const SampleList = () => {
                     color="danger"
                     size="sm"
                     variant="light"
-                    onPress={() => deleteMutation.mutateAsync({ id: sample.id })}
+                    onPress={async () => {
+                      if (isSentryTestMode) {
+                        // テストモード: 意図的にエラーを発生させて削除は実行しない
+                        const testError = new Error('[TEST] Sample delete error for Sentry testing');
+                        Sentry.captureException(testError, {
+                          tags: {
+                            feature: 'sample-delete',
+                            component: 'SampleList',
+                            test: 'true',
+                          },
+                          extra: {
+                            sampleId: sample.id,
+                            sampleTitle: sample.title,
+                          },
+                        });
+                        // エラーをスローしてUIにも表示
+                        throw testError;
+                      } else {
+                        // 通常モード: 実際の削除処理
+                        await deleteMutation.mutateAsync({ id: sample.id });
+                      }
+                    }}
                     aria-label="Delete sample"
                   >
                     <Trash2 className="h-4 w-4" />
