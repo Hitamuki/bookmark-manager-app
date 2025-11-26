@@ -1,0 +1,16 @@
+# ============================================================
+# ローカル開発用の設定ファイル（サンプル）- Production環境
+# ============================================================
+# このファイルは .gitignore に含まれます。
+# 使用方法:
+#   1. このファイルを .tfvars.local にコピー
+#   2. 実際の値を設定
+
+inputs = {
+  # Sentry設定（本番環境用）
+  sentry_organization = "your-organization-slug"
+  sentry_team         = "production-team"
+
+  # アラート設定（本番環境用）
+  alert_email = "production-alerts@example.com"
+}

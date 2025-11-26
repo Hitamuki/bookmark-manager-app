@@ -35,3 +35,15 @@ variable "bastion_security_group_id" {
   type        = string
   default     = null
 }
+
+variable "allow_all_ips" {
+  description = "Allow all IPs to access ALB (true for production public service)"
+  type        = bool
+  default     = false
+}
+
+variable "enable_waf" {
+  description = "Enable WAF for ALB (recommended for production)"
+  type        = bool
+  default     = false
+}

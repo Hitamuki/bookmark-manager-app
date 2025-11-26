@@ -154,3 +154,159 @@ variable "app_version" {
   type        = string
   default     = "1.0.0"
 }
+
+# ============================================================
+# オートスケーリング設定
+# ============================================================
+
+variable "enable_autoscaling" {
+  description = "Enable ECS auto scaling"
+  type        = bool
+  default     = false
+}
+
+# Web オートスケーリング
+variable "web_autoscaling_min_capacity" {
+  description = "Minimum number of web tasks for autoscaling"
+  type        = number
+  default     = 1
+}
+
+variable "web_autoscaling_max_capacity" {
+  description = "Maximum number of web tasks for autoscaling"
+  type        = number
+  default     = 4
+}
+
+variable "web_autoscaling_cpu_threshold" {
+  description = "CPU utilization threshold for web autoscaling"
+  type        = number
+  default     = 70
+}
+
+variable "web_autoscaling_memory_threshold" {
+  description = "Memory utilization threshold for web autoscaling"
+  type        = number
+  default     = 80
+}
+
+# API オートスケーリング
+variable "api_autoscaling_min_capacity" {
+  description = "Minimum number of API tasks for autoscaling"
+  type        = number
+  default     = 1
+}
+
+variable "api_autoscaling_max_capacity" {
+  description = "Maximum number of API tasks for autoscaling"
+  type        = number
+  default     = 4
+}
+
+variable "api_autoscaling_cpu_threshold" {
+  description = "CPU utilization threshold for API autoscaling"
+  type        = number
+  default     = 70
+}
+
+variable "api_autoscaling_memory_threshold" {
+  description = "Memory utilization threshold for API autoscaling"
+  type        = number
+  default     = 80
+}
+
+# ============================================================
+# CloudWatch Logs設定
+# ============================================================
+
+variable "cloudwatch_logs_retention_days" {
+  description = "CloudWatch Logs retention in days"
+  type        = number
+  default     = 7
+}
+
+# ============================================================
+# ALB設定
+# ============================================================
+
+variable "enable_alb_deletion_protection" {
+  description = "Enable ALB deletion protection"
+  type        = bool
+  default     = false
+}
+
+# ============================================================
+# Container Insights設定
+# ============================================================
+
+variable "enable_container_insights" {
+  description = "Enable ECS Container Insights"
+  type        = bool
+  default     = false
+}
+
+# ============================================================
+# ECS配置先設定
+# ============================================================
+
+variable "use_private_subnet" {
+  description = "Deploy ECS tasks in private subnet (true for production)"
+  type        = bool
+  default     = false # staging: false (public), production: true (private)
+}
+
+# ============================================================
+# WAF設定
+# ============================================================
+
+variable "waf_web_acl_arn" {
+  description = "WAF Web ACL ARN from security module (optional)"
+  type        = string
+  default     = null
+}
+
+# ============================================================
+# Route53 & ACM設定
+# ============================================================
+
+variable "enable_route53" {
+  description = "Enable Route53 for custom domain"
+  type        = bool
+  default     = false
+}
+
+variable "domain_name" {
+  description = "Custom domain name (e.g., tidilyspace.app)"
+  type        = string
+  default     = null
+}
+
+variable "create_route53_zone" {
+  description = "Create new Route53 hosted zone (false if using existing zone)"
+  type        = bool
+  default     = false
+}
+
+variable "route53_zone_id" {
+  description = "Existing Route53 hosted zone ID (required if create_route53_zone is false)"
+  type        = string
+  default     = null
+}
+
+variable "enable_acm" {
+  description = "Enable ACM certificate for HTTPS"
+  type        = bool
+  default     = false
+}
+
+variable "acm_certificate_arn" {
+  description = "Existing ACM certificate ARN (if not provided, will create new one)"
+  type        = string
+  default     = null
+}
+
+variable "acm_validation_method" {
+  description = "ACM certificate validation method (DNS or EMAIL)"
+  type        = string
+  default     = "DNS"
+}

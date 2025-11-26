@@ -3,12 +3,15 @@
 # ============================================================
 locals {
   # 動的IPと固定IPを結合
+  # - var.allow_all_ips が true の場合: 全IP許可（本番環境の一般公開サービス）
   # - var.enable_dynamic_ip が true の場合: 実行時のIPアドレス + 固定IP
   # - var.enable_dynamic_ip が false の場合: 固定IPのみ
-  all_allowed_cidrs = var.enable_dynamic_ip ? concat(
-    [local.my_ip_cidr],      # 動的に取得した現在のIP
-    var.allowed_cidr_blocks  # terraform.tfvarsで指定した固定IP
-  ) : var.allowed_cidr_blocks
+  all_allowed_cidrs = var.allow_all_ips ? ["0.0.0.0/0"] : (
+    var.enable_dynamic_ip ? concat(
+      [local.my_ip_cidr],      # 動的に取得した現在のIP
+      var.allowed_cidr_blocks  # terraform.tfvarsで指定した固定IP
+    ) : var.allowed_cidr_blocks
+  )
 }
 
 # ALB Security Group

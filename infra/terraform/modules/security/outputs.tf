@@ -22,3 +22,8 @@ output "db_security_group_id" {
   description = "Database Security Group ID"
   value       = aws_security_group.db.id
 }
+
+output "waf_web_acl_arn" {
+  description = "WAF Web ACL ARN"
+  value       = var.enable_waf ? aws_wafv2_web_acl.main[0].arn : null
+}

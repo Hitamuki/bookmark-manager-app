@@ -4,7 +4,7 @@ resource "aws_ecs_cluster" "main" {
 
   setting {
     name  = "containerInsights"
-    value = "disabled" # staging環境ではコスト削減のため無効化
+    value = var.enable_container_insights ? "enabled" : "disabled"
   }
 
   tags = {
@@ -15,7 +15,7 @@ resource "aws_ecs_cluster" "main" {
 # CloudWatch Log Group for Web
 resource "aws_cloudwatch_log_group" "web" {
   name              = "/ecs/${var.project_name}-${var.environment}-web"
-  retention_in_days = 7 # staging環境では短期保存
+  retention_in_days = var.cloudwatch_logs_retention_days
 
   tags = {
     Name = "${var.project_name}-${var.environment}-web-logs"
@@ -25,7 +25,7 @@ resource "aws_cloudwatch_log_group" "web" {
 # CloudWatch Log Group for API
 resource "aws_cloudwatch_log_group" "api" {
   name              = "/ecs/${var.project_name}-${var.environment}-api"
-  retention_in_days = 7 # staging環境では短期保存
+  retention_in_days = var.cloudwatch_logs_retention_days
 
   tags = {
     Name = "${var.project_name}-${var.environment}-api-logs"
@@ -60,10 +60,10 @@ resource "aws_ecs_service" "web" {
   }
 
   network_configuration {
-    # NAT Gateway削減のためパブリックサブネットに配置（Staging環境のみ）
-    subnets          = var.public_subnet_ids
+    # 本番環境: プライベートサブネット、staging: パブリックサブネット
+    subnets          = var.use_private_subnet ? var.private_subnet_ids : var.public_subnet_ids
     security_groups  = [var.ecs_security_group_id]
-    assign_public_ip = true
+    assign_public_ip = var.use_private_subnet ? false : true
   }
 
   load_balancer {
@@ -76,6 +76,12 @@ resource "aws_ecs_service" "web" {
 
   tags = {
     Name = "${var.project_name}-${var.environment}-web-service"
+  }
+
+  # オートスケーリング有効時はdesired_countを無視
+  # 注意: ignore_changesは静的リストのみサポートのため、オートスケーリングを使う環境では常に無視
+  lifecycle {
+    ignore_changes = [desired_count]
   }
 }
 
@@ -107,10 +113,10 @@ resource "aws_ecs_service" "api" {
   }
 
   network_configuration {
-    # NAT Gateway削減のためパブリックサブネットに配置（Staging環境のみ）
-    subnets          = var.public_subnet_ids
+    # 本番環境: プライベートサブネット、staging: パブリックサブネット
+    subnets          = var.use_private_subnet ? var.private_subnet_ids : var.public_subnet_ids
     security_groups  = [var.ecs_security_group_id]
-    assign_public_ip = true
+    assign_public_ip = var.use_private_subnet ? false : true
   }
 
   load_balancer {
@@ -123,5 +129,11 @@ resource "aws_ecs_service" "api" {
 
   tags = {
     Name = "${var.project_name}-${var.environment}-api-service"
+  }
+
+  # オートスケーリング有効時はdesired_countを無視
+  # 注意: ignore_changesは静的リストのみサポートのため、オートスケーリングを使う環境では常に無視
+  lifecycle {
+    ignore_changes = [desired_count]
   }
 }
