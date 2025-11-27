@@ -4,13 +4,13 @@
 
 Terragruntを使用した**超コスト最適化**されたstaging環境のインフラ構成です。
 
-**月額コスト: $83-94**（営業時間のみ稼働 + Datadog監視）、最大53%のコスト削減を実現しています。
+**月額コスト: $83-94**（営業時間のみ稼働 + Datadog監視）、最大53％のコスト削減を実現しています。
 
-**Datadog未使用の場合: $56-67**（最大70%削減）
+**Datadog未使用の場合: $56-67**（最大70％削減）
 
 **Secrets Manager追加コスト: +$1.20/月**（3つのシークレット × $0.40）
 
-**新機能**: Bastion EC2インスタンス（t3.nano）を追加し、SSM Session Manager経由でRDSに安全に接続できます。
+**新機能**: Bastion EC2インスタンス（t3.nano）を追加し、SSM セッション Manager経由でRDSに安全に接続できます。
 
 ## 使用AWSサービス一覧
 
@@ -130,7 +130,7 @@ graph TD
 
 ### ネットワーク構成
 
-```
+```txt
 Internet (固定IPのみ) / 開発者 (SSM Session Manager)
     ↓                          ↓
 ┌─────────────────────────────────────────────┐
@@ -159,7 +159,7 @@ Internet (固定IPのみ) / 開発者 (SSM Session Manager)
 
 #### 1. ECS自動停止/起動 ⭐ 重要
 
-- **削減効果**: ECS稼働時間 65%削減
+- **削減効果**: ECS稼働時間 65％削減
 - **実装**:
   - EventBridge + Lambda によるスケジューラー
   - 月〜金 9:00-22:00 JST のみ稼働
@@ -168,7 +168,7 @@ Internet (固定IPのみ) / 開発者 (SSM Session Manager)
 
 #### 2. RDS PostgreSQL採用 ⭐ 重要
 
-- **削減効果**: 月額 $28削減（65%削減）
+- **削減効果**: 月額 $28削減（65％削減）
 - **変更**: Aurora Serverless v2 → RDS PostgreSQL (db.t4g.micro)
 - **メリット**: Graviton2プロセッサでコスト最適化
 - **設定**: [database/rds.tf](../../modules/database/rds.tf)
@@ -211,7 +211,7 @@ Internet (固定IPのみ) / 開発者 (SSM Session Manager)
 
 ## Terragruntとは
 
-Terragruntは、Terraformのラッパーツールで、以下のメリットがあります：
+Terragruntは、Terraformのラッパーツールで、以下のメリットがあります。
 
 - **DRY（Don't Repeat Yourself）**: 共通設定を一元管理し、重複を削減
 - **依存関係管理**: モジュール間の依存関係を自動的に解決
@@ -319,9 +319,9 @@ infra/terraform/envs/staging/
 
 ### 構築フロー
 
-以下の順序でインフラを構築します：
+以下の順序でインフラを構築します。
 
-```
+```txt
 1. Terragruntインストール
    ↓
 2. 固定IP設定（terraform.tfvars作成）
@@ -374,9 +374,10 @@ curl -s https://checkip.amazonaws.com
 ```
 
 **注意**:
-- `terraform.tfvars`は`.gitignore`に含まれており、Gitにコミットされません
-- `/32`は単一IPアドレスを指定します
-- 複数のIPを許可する場合は、配列にIPを追加してください
+
+- `terraform.tfvars`は`.gitignore`に含まれており、Gitにコミットされない
+- `/32`は単一IPアドレスを指定する
+- 複数のIPを許可する場合は、配列にIPを追加する
 
 ### 3. Lambda関数のビルド（ECS自動停止/起動）
 
@@ -412,6 +413,7 @@ terragrunt run --all apply
 ```
 
 **構築されるリソース**:
+
 - ECRリポジトリ（Web + API）
 - VPC、サブネット、ルーティング
 - セキュリティグループ、IAMロール
@@ -450,7 +452,6 @@ DATABASE_URL="postgresql://dbadmin:YOUR_PASSWORD@localhost:5432/bookmarkdb"
 ```
 
 **ステップ2: SSMポートフォワーディングの開始**
-
 別ターミナルで、Bastion EC2経由でRDSへのポートフォワーディングを確立します。
 
 ```bash
@@ -466,11 +467,11 @@ DATABASE_URL="postgresql://dbadmin:YOUR_PASSWORD@localhost:5432/bookmarkdb"
 ```
 
 **トラブルシューティング**:
+
 - Bastionインスタンスが停止している場合、起動してください
-- SSM Session Manager Pluginがインストールされていることを確認してください
+- SSM セッション Manager Pluginがインストールされていることを確認してください
 
 **ステップ3: マイグレーションの実行**
-
 ポートフォワーディングが確立したら、元のターミナルでマイグレーションを実行します。
 
 ```bash
@@ -484,11 +485,12 @@ pnpm dotenv -e .env.staging -- prisma db seed \
 ```
 
 **注意**:
-- `migrate deploy`は本番環境用のマイグレーションコマンドで、プロンプトなしで実行されます
-- ローカル開発では`migrate dev`を使用しますが、staging/production環境では`migrate deploy`を使用します
-- ポートフォワーディングが確立している間のみマイグレーションが可能です
 
-**ステップ4: マイグレーション確認**
+- `migrate deploy`は本番環境用のマイグレーションコマンドで、プロンプトなしで実行される
+- ローカル開発では`migrate dev`を使用しますが、staging/production環境では`migrate deploy`を使用する
+- ポートフォワーディングが確立している間のみマイグレーションが可能
+
+- **ステップ4: マイグレーション確認**
 
 ```bash
 # Prisma Studioでテーブルを確認
@@ -506,7 +508,6 @@ psql "postgresql://dbadmin:<PASSWORD>@localhost:5432/bookmarkdb"
 ```
 
 **ステップ5: ポートフォワーディングの終了**
-
 マイグレーションが完了したら、ポートフォワーディングを終了します。
 
 ```bash
@@ -528,8 +529,9 @@ aws ssm put-parameter \
 ```
 
 **注意**:
+
 - MongoDB Atlasのアカウント作成と接続文字列の取得が必要です（詳細は[MongoDB Atlas設定](#mongodb-atlas設定)を参照）
-- 接続文字列にはユーザー名、パスワード、クラスタ名、データベース名が含まれます
+- 接続文字列にはユーザー名、パスワード、クラスタ名、データベース名が含まれる
 
 **その他の環境変数（オプション）**:
 
@@ -755,6 +757,63 @@ DatadogとSentryを組み合わせた効率的なモニタリング構成です�
 - ECS Fargate (Web + API): Datadog（APM、メトリクス、ログ）- 月〜金 9:00-22:00のみ
 - RDS PostgreSQL: Datadog（CloudWatch統合、CPU/接続数）- 24時間
 
+### Staging環境の設定値
+
+検証環境では無料枠内に収めるため、最小限の設定とします。
+
+#### Datadog設定
+
+- **サンプリング率**: 5%
+- **レート制限**: 10スパン/秒
+- **プロファイリング**: 無効
+- **ランタイムメトリクス**: 無効
+
+**環境変数:**
+
+```bash
+NODE_ENV=staging
+DD_ENV=staging
+DD_SERVICE=bookmark-api
+DD_VERSION=1.0.0
+```
+
+#### Sentry設定
+
+**バックエンド（NestJS）:**
+
+- 適用なし（Sentryはフロントエンドのみ使用）
+
+**フロントエンド（Next.js）:**
+
+- **エラー記録**: 100％（sampleRate: 1.0）
+- **トレースサンプリング**: 5%
+- **APIルート**: 20%
+- **ページビュー**: 5%
+- **セッションリプレイ**: 無効（通常時・エラー時ともに0％）
+
+**環境変数:**
+
+```bash
+NODE_ENV=staging
+NEXT_PUBLIC_SENTRY_DSN=https://xxxxx@xxxxx.ingest.sentry.io/xxxxx
+```
+
+#### 環境別設定の実装箇所
+
+**バックエンド（NestJS）:**
+
+- ファイル: `src/apps/web-api/core/src/main.ts`
+- Datadog設定は環境変数 `NODE_ENV` に基づいて動的に切り替わります
+
+**フロントエンド（Next.js）:**
+
+- `src/apps/frontend/web/instrumentation-client.ts`（クライアントサイド）
+- `src/apps/frontend/web/sentry.server.config.ts`（サーバーサイド）
+- `src/apps/frontend/web/sentry.edge.config.ts`（Edgeランタイム）
+- Sentry設定は環境変数 `NODE_ENV` に基づいて動的に切り替わります
+
+詳細は[モニタリング設計ドキュメント](../../../../docs/spec/docs/06-インフラ設計/07-monitoring.md)および[メインREADME](../../README.md#モニタリング設定環境別)を参照してください。
+
 ### セットアップ手順概要
 
 詳細な手順は元のREADMEのDatadog + Sentryセクション（L199-791）を参照してください。ここでは概要のみ記載します。
@@ -920,7 +979,7 @@ echo "y" | terragrunt destroy -auto-approve
 
 VPC Endpointを削除してもENI(Elastic Network Interface)がすぐにデタッチされない場合があります。
 
-**対処方法**:
+**対処法法**:
 
 1. **AWS CLIで手動削除**:
    ```bash
@@ -946,7 +1005,7 @@ VPC Endpointを削除してもENI(Elastic Network Interface)がすぐにデタ�
 
 長時間のオペレーション中に `SignatureDoesNotMatch: Signature expired` エラーが発生した場合:
 
-**対処方法**: destroyコマンドを再実行してください。Terraformは未削除のリソースのみを処理します。
+**対処法**: destroyコマンドを再実行してください。Terraformは未削除のリソースのみを処理します。
 
 ```bash
 echo "y" | terragrunt destroy -auto-approve
@@ -998,19 +1057,19 @@ cd ../ecr && terragrunt show
 
 ### コスト削減の内訳
 
-| 削減施策                 | 削減効果                      | 実装状況    |
-| ------------------------ | ----------------------------- | ----------- |
-| ECS自動停止/起動         | ECS稼働時間 65%削減           | ✅ 実装済み  |
-| Aurora → RDS             | 月額 $28削減（65%削減）       | ✅ 実装済み  |
-| NAT Gateway削除          | 月額 $32削減                  | ✅ 実装済み  |
-| VPC Endpoint使用         | データ転送料 月額$400-500削減 | ✅ 実装済み  |
-| Container Insights無効化 | 月額 $10削減                  | ✅ 実装済み  |
-| CloudWatch Logs 7日保存  | 月額 $5-10削減                | ✅ 実装済み  |
-| **合計削減効果**         | **月額 $75-145削減**          | **65%削減** |
+| 削減施策                 | 削減効果                      | 実装状況     |
+| ------------------------ | ----------------------------- | ------------ |
+| ECS自動停止/起動         | ECS稼働時間 65％削減          | ✅ 実装済み   |
+| Aurora → RDS             | 月額 $28削減（65％削減）      | ✅ 実装済み   |
+| NAT Gateway削除          | 月額 $32削減                  | ✅ 実装済み   |
+| VPC Endpoint使用         | データ転送料 月額$400-500削減 | ✅ 実装済み   |
+| Container Insights無効化 | 月額 $10削減                  | ✅ 実装済み   |
+| CloudWatch Logs 7日保存  | 月額 $5-10削減                | ✅ 実装済み   |
+| **合計削減効果**         | **月額 $75-145削減**          | **65％削減** |
 
 ### 使わない時はリソース削除
 
-**削減効果: 100%（$0/月）**
+**削減効果: 100％（$0/月）**
 
 ```bash
 # 作業終了時

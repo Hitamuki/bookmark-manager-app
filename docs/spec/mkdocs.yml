@@ -67,6 +67,14 @@ nav:
                       - 05-内部設計/API設計/APIメッセージ一覧.md
                       - API詳細:
                               - 05-内部設計/API設計/API詳細/01_仮API.md
+      - インフラ設計:
+              - 概要: 06-インフラ設計/01-overview.md
+              - 検証環境: 06-インフラ設計/02-staging.md
+              - 本番環境_商用利用前: 06-インフラ設計/03-production-pre-commercial.md
+              - 本番環境_商用利用後: 06-インフラ設計/04-production-commercial.md
+              - ネットワーク: 06-インフラ設計/05-network.md
+              - セキュリティ: 06-インフラ設計/06-security.md
+              - モニタリング: 06-インフラ設計/07-monitoring.md
       - その他:
               - バッチ:
                       - 10-その他/バッチ/バッチ一覧.md
@@ -157,3 +165,4 @@ plugins:
               enabled: true
       - search:
               lang: "ja"
+      - mermaid2

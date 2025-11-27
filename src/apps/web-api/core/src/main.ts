@@ -6,19 +6,31 @@
 // Datadogトレーサー初期化（他のインポートより前に記述）
 import tracer from 'dd-trace';
 
+// 環境を取得
+const environment = process.env.NODE_ENV || 'development';
+const isProduction = environment === 'production';
+const isStaging = environment === 'staging';
+
+// 環境別のDatadog設定
 tracer.init({
-  env: process.env.DD_ENV || 'development',
+  env: process.env.DD_ENV || environment,
   service: process.env.DD_SERVICE || 'bookmark-api',
   version: process.env.DD_VERSION || '1.0.0',
 
-  // サンプリング: 20%（コスト削減）
-  sampleRate: 0.2,
+  // サンプリング率: staging=5%, production=20%
+  sampleRate: isProduction ? 0.2 : isStaging ? 0.05 : 1.0,
 
-  // レート制限: 秒あたり最大50スパン
-  rateLimit: 50,
+  // レート制限: staging=10スパン/秒, production=50スパン/秒
+  rateLimit: isProduction ? 50 : isStaging ? 10 : 100,
 
   // ログ連携（ERROR以上のみ）
   logInjection: true,
+
+  // プロファイリング: stagingでは無効化（無料枠節約）
+  profiling: isProduction,
+
+  // ランタイムメトリクス: stagingでは無効化
+  runtimeMetrics: isProduction,
 });
 
 import * as fs from 'node:fs';

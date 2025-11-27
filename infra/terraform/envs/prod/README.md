@@ -125,29 +125,29 @@ graph TB
 
 ## AWSサービス一覧
 
-| カテゴリ               | サービス                      | 用途                                | スペック                                                   | 月額コスト概算 | 選定理由                                            |
-| ---------------------- | ----------------------------- | ----------------------------------- | ---------------------------------------------------------- | -------------- | --------------------------------------------------- |
+| カテゴリ               | サービス                      | 用途                                | スペック                                                  | 月額コスト概算 | 選定理由                                            |
+| ---------------------- | ----------------------------- | ----------------------------------- | --------------------------------------------------------- | -------------- | --------------------------------------------------- |
 | **コンピューティング** | ECS Fargate                   | コンテナ実行基盤                    | Web: 1-10タスク (1vCPU/2GB) / API: 1-10タスク (1vCPU/2GB) | $44-440        | サーバーレス、自動スケーリング対応、運用負荷低      |
-|                        | ECS Auto Scaling              | 自動スケーリング                    | CPU 70％/Memory 80％閾値                                   | 無料           | 負荷に応じた自動スケーリングでコスト最適化          |
-| **ネットワーク**       | VPC                           | 仮想ネットワーク                    | 10.1.0.0/16                                                | 無料           | ネットワーク分離、セキュリティ強化                  |
-|                        | Application Load Balancer     | L7ロードバランサー                  | HTTPS対応                                                  | $23            | パスベースルーティング、ヘルスチェック、SSL/TLS終端 |
-|                        | NAT Gateway                   | インターネット接続                  | Single-AZ                                                  | $32            | プライベートサブネットからの外部接続                |
-|                        | VPC Endpoint                  | AWSサービス接続                     | ECR/S3                                                     | $15            | データ転送料削減、セキュリティ強化                  |
-|                        | Route53                       | DNSサービス                         | ホストゾーン1個                                            | $0.50          | カスタムドメイン、ヘルスチェック、フェイルオーバー  |
-| **セキュリティ**       | WAF                           | Webアプリケーションファイアウォール | Core Rule Set, SQLi, XSS, Rate Limit                       | $10-50         | SQLインジェクション/XSS/DDoS対策                    |
-|                        | ACM                           | SSL/TLS証明書                       | ワイルドカード証明書                                       | 無料           | HTTPS通信の暗号化、ブラウザ信頼                     |
-|                        | Security Group                | ファイアウォール                    | ALB/ECS/Aurora用                                           | 無料           | きめ細かいアクセス制御                              |
-|                        | IAM Role                      | 権限管理                            | ECS Task Role, Execution Role                              | 無料           | 最小権限の原則に基づくアクセス制御                  |
-| **データベース**       | Aurora Serverless v2          | RDB                                 | PostgreSQL 17.6 / Multi-AZ (2インスタンス) / 0.5-2 ACU   | $88-176        | 自動スケーリング、高可用性、読み取り負荷分散        |
-|                        | RDS Automated Backups         | 自動バックアップ                    | 30日保持                                                   | $10            | ポイントインタイムリカバリ対応                      |
+|                        | ECS Auto Scaling              | 自動スケーリング                    | CPU 70％/Memory 80％閾値                                  | 無料           | 負荷に応じた自動スケーリングでコスト最適化          |
+| **ネットワーク**       | VPC                           | 仮想ネットワーク                    | 10.1.0.0/16                                               | 無料           | ネットワーク分離、セキュリティ強化                  |
+|                        | Application Load Balancer     | L7ロードバランサー                  | HTTPS対応                                                 | $23            | パスベースルーティング、ヘルスチェック、SSL/TLS終端 |
+|                        | NAT Gateway                   | インターネット接続                  | Single-AZ                                                 | $32            | プライベートサブネットからの外部接続                |
+|                        | VPC Endpoint                  | AWSサービス接続                     | ECR/S3                                                    | $15            | データ転送料削減、セキュリティ強化                  |
+|                        | Route53                       | DNSサービス                         | ホストゾーン1個                                           | $0.50          | カスタムドメイン、ヘルスチェック、フェイルオーバー  |
+| **セキュリティ**       | WAF                           | Webアプリケーションファイアウォール | Core Rule Set, SQLi, XSS, Rate Limit                      | $10-50         | SQLインジェクション/XSS/DDoS対策                    |
+|                        | ACM                           | SSL/TLS証明書                       | ワイルドカード証明書                                      | 無料           | HTTPS通信の暗号化、ブラウザ信頼                     |
+|                        | Security Group                | ファイアウォール                    | ALB/ECS/Aurora用                                          | 無料           | きめ細かいアクセス制御                              |
+|                        | IAM Role                      | 権限管理                            | ECS Task Role, Execution Role                             | 無料           | 最小権限の原則に基づくアクセス制御                  |
+| **データベース**       | Aurora Serverless v2          | RDB                                 | PostgreSQL 17.6 / Multi-AZ (2インスタンス) / 0.5-2 ACU    | $88-176        | 自動スケーリング、高可用性、読み取り負荷分散        |
+|                        | RDS Automated Backups         | 自動バックアップ                    | 30日保持                                                  | $10            | ポイントインタイムリカバリ対応                      |
 | **ストレージ**         | S3                            | オブジェクトストレージ              | Standard + IA / バージョニング有効                        | $5             | 静的アセット配信、低コスト                          |
-|                        | ECR                           | コンテナレジストリ                  | 30イメージ保持                                             | $5             | Dockerイメージ管理                                  |
+|                        | ECR                           | コンテナレジストリ                  | 30イメージ保持                                            | $5             | Dockerイメージ管理                                  |
 | **モニタリング**       | CloudWatch Logs               | ログ管理                            | 30日保持 / 約10GB/月想定                                  | $5             | アプリケーションログの集約                          |
-|                        | CloudWatch Container Insights | コンテナメトリクス                  | ECSクラスター監視                                          | $3             | ECSタスクの詳細メトリクス                           |
-|                        | Datadog                       | APM/インフラ監視                    | 4ホスト相当                                                | $62            | 統合監視、異常検知、アラート                        |
-|                        | Sentry                        | エラー監視                          | Free Plan (5,000 errors/月)                                | 無料           | Next.jsのエラー追跡、スタックトレース               |
-| **その他**             | Bastion Host (EC2)            | メンテナンス用                      | t3.nano                                                    | $3             | DB直接アクセス、トラブルシューティング              |
-|                        | SSM セッション Manager        | セキュアアクセス                    | -                                                          | 無料           | Bastionへの安全なアクセス                           |
+|                        | CloudWatch Container Insights | コンテナメトリクス                  | ECSクラスター監視                                         | $3             | ECSタスクの詳細メトリクス                           |
+|                        | Datadog                       | APM/インフラ監視                    | 4ホスト相当                                               | $62            | 統合監視、異常検知、アラート                        |
+|                        | Sentry                        | エラー監視                          | Free Plan (5,000 errors/月)                               | 無料           | Next.jsのエラー追跡、スタックトレース               |
+| **その他**             | Bastion Host (EC2)            | メンテナンス用                      | t3.nano                                                   | $3             | DB直接アクセス、トラブルシューティング              |
+|                        | SSM セッション Manager        | セキュアアクセス                    | -                                                         | 無料           | Bastionへの安全なアクセス                           |
 
 - **合計コスト概算**: $190.50-620.50/月
 
@@ -738,10 +738,72 @@ aws cloudwatch get-metric-statistics \
 
 ### モニタリング
 
+本番環境では実用的な監視設定を行い、適切なパフォーマンスとエラー追跡を実現します。
+
+#### 監視ツール
+
 - **Datadog**: ECS、Aurora、ALBのメトリクス監視
 - **Sentry**: Next.jsエラー監視
 - **CloudWatch Logs**: アプリケーションログ（30日保持）
 - **Container Insights**: ECSコンテナの詳細メトリクス
+
+#### Datadog設定（本番環境）
+
+- **サンプリング率**: 20%
+- **レート制限**: 50スパン/秒
+- **プロファイリング**: 有効
+- **ランタイムメトリクス**: 有効
+
+**環境変数:**
+
+```bash
+NODE_ENV=production
+DD_ENV=production
+DD_SERVICE=bookmark-api
+DD_VERSION=1.0.0
+DD_AGENT_HOST=localhost
+DD_TRACE_AGENT_PORT=8126
+```
+
+#### Sentry設定（本番環境）
+
+**バックエンド（NestJS）:**
+
+- 適用なし（Sentryはフロントエンドのみ使用）
+
+**フロントエンド（Next.js）:**
+
+- **エラー記録**: 100％（sampleRate: 1.0）
+- **トレースサンプリング**: 20%
+- **APIルート**: 100%
+- **ページビュー**: 20%
+- **セッションリプレイ**:
+  - 通常時: 無効（0％）
+  - エラー時: 10%
+
+**環境変数:**
+
+```bash
+NODE_ENV=production
+NEXT_PUBLIC_SENTRY_DSN=https://xxxxx@xxxxx.ingest.sentry.io/xxxxx
+SENTRY_DSN=https://xxxxx@xxxxx.ingest.sentry.io/xxxxx
+```
+
+#### 環境別設定の実装箇所
+
+**バックエンド（NestJS）:**
+
+- ファイル: `src/apps/web-api/core/src/main.ts`
+- Datadog設定は環境変数 `NODE_ENV` に基づいて動的に切り替わる
+
+**フロントエンド（Next.js）:**
+
+- `src/apps/frontend/web/instrumentation-client.ts`（クライアントサイド）
+- `src/apps/frontend/web/sentry.server.config.ts`（サーバーサイド）
+- `src/apps/frontend/web/sentry.edge.config.ts`（Edgeランタイム）
+- Sentry設定は環境変数 `NODE_ENV` に基づいて動的に切り替わる
+
+詳細は[モニタリング設計ドキュメント](../../../../docs/spec/docs/06-インフラ設計/07-monitoring.md)および[メインREADME](../../README.md#モニタリング設定環境別)を参照してください。
 
 ### バックアップ
 
