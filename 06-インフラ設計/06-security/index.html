@@ -1,0 +1,2328 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="ja">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="ブックマークアプリの設計書" name="description"/>
+<meta content="Hitamuki" name="author"/>
+<link href="../05-network/" rel="prev"/>
+<link href="../07-monitoring/" rel="next"/>
+<link href="../../assets/images/favicon.png" rel="icon"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.6.12" name="generator"/>
+<title>セキュリティ - ブックマークアプリ設計書</title>
+<link href="../../assets/stylesheets/main.2afb09e1.min.css" rel="stylesheet"/>
+<link href="../../assets/stylesheets/palette.06af60db.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP:300,300i,400,400i,700,700i%7CMonospace:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Noto Sans JP";--md-code-font:"Monospace"}</style>
+<link href="../../stylesheets/extra.css" rel="stylesheet"/>
+<script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+</head>
+<body data-md-color-accent="indigo" data-md-color-primary="blue-grey" data-md-color-scheme="default" dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#_1">
+          コンテンツにスキップ
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<header class="md-header" data-md-component="header">
+<nav aria-label="ヘッダー" class="md-header__inner md-grid">
+<a aria-label="ブックマークアプリ設計書" class="md-header__button md-logo" data-md-component="logo" href="../.." title="ブックマークアプリ設計書">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            ブックマークアプリ設計書
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              セキュリティ
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="" data-md-color-primary="blue-grey" data-md-color-scheme="default" id="__palette_0" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="" data-md-color-primary="blue-grey" data-md-color-scheme="slate" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_0" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+</form>
+<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+<div class="md-header__option">
+<div class="md-select">
+<button aria-label="言語切り替え" class="md-header__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"></path></svg>
+</button>
+<div class="md-select__inner">
+<ul class="md-select__list">
+<li class="md-select__item">
+<a class="md-select__link" href="/" hreflang="ja">
+              Japanese
+            </a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="検索" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="検索" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</label>
+<nav aria-label="検索" class="md-search__options">
+<button aria-label="クリア" class="md-search__icon md-icon" tabindex="-1" title="クリア" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+</button>
+</nav>
+<div class="md-search__suggest" data-md-component="search-suggest"></div>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="" tabindex="0">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            検索を初期化
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="md-header__source">
+<a class="md-source" data-md-component="source" href="https://github.com/Hitamuki/bookmark-manager-app" title="リポジトリへ">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 496 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"></path></svg>
+</div>
+<div class="md-source__repository">
+    bookmark-manager-app
+  </div>
+</a>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<nav aria-label="タブ" class="md-tabs" data-md-component="tabs">
+<div class="md-grid">
+<ul class="md-tabs__list">
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../..">
+          
+  
+  
+  HOME
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../03-%E8%A6%81%E4%BB%B6%E5%AE%9A%E7%BE%A9/v1.0/%E6%A6%82%E8%A6%81_%E8%A6%81%E4%BB%B6%E5%AE%9A%E7%BE%A9/">
+          
+  
+  
+  要件定義
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../04-%E5%A4%96%E9%83%A8%E8%A8%AD%E8%A8%88/%E6%A6%82%E8%A6%81_%E5%A4%96%E9%83%A8%E8%A8%AD%E8%A8%88/">
+          
+  
+  
+  外部設計
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../05-%E5%86%85%E9%83%A8%E8%A8%AD%E8%A8%88/%E6%A6%82%E8%A6%81_%E5%86%85%E9%83%A8%E8%A8%AD%E8%A8%88/">
+          
+  
+  
+  内部設計
+
+        </a>
+</li>
+<li class="md-tabs__item md-tabs__item--active">
+<a class="md-tabs__link" href="../01-overview/">
+          
+  
+  
+  インフラ設計
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../10-%E3%81%9D%E3%81%AE%E4%BB%96/%E3%83%90%E3%83%83%E3%83%81/%E3%83%90%E3%83%83%E3%83%81%E4%B8%80%E8%A6%A7/">
+          
+  
+  
+  その他
+
+        </a>
+</li>
+</ul>
+</div>
+</nav>
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="ナビゲーション" class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="ブックマークアプリ設計書" class="md-nav__button md-logo" data-md-component="logo" href="../.." title="ブックマークアプリ設計書">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+    ブックマークアプリ設計書
+  </label>
+<div class="md-nav__source">
+<a class="md-source" data-md-component="source" href="https://github.com/Hitamuki/bookmark-manager-app" title="リポジトリへ">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 496 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"></path></svg>
+</div>
+<div class="md-source__repository">
+    bookmark-manager-app
+  </div>
+</a>
+</div>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_1" type="checkbox"/>
+<label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+<span class="md-ellipsis">
+    HOME
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_1_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_1">
+<span class="md-nav__icon md-icon"></span>
+            HOME
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_1_1" type="checkbox"/>
+<label class="md-nav__link" for="__nav_1_1" id="__nav_1_1_label" tabindex="0">
+<span class="md-ellipsis">
+    はじめに
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_1_1_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_1_1">
+<span class="md-nav__icon md-icon"></span>
+            はじめに
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../..">
+<span class="md-ellipsis">
+    Welcome to MkDocs
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../01-Home/%E6%A6%82%E8%A6%81_%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88/">
+<span class="md-ellipsis">
+    概要
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../01-Home/%E5%A4%89%E6%9B%B4%E5%B1%A5%E6%AD%B4/CHANGELOG/">
+<span class="md-ellipsis">
+    変更履歴
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_1_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_1_3" id="__nav_1_3_label" tabindex="0">
+<span class="md-ellipsis">
+    バージョン履歴
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_1_3_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_1_3">
+<span class="md-nav__icon md-icon"></span>
+            バージョン履歴
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../01-Home/%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E5%B1%A5%E6%AD%B4/VersionHistory/">
+<span class="md-ellipsis">
+    バージョン履歴
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_1_3_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_1_3_2" id="__nav_1_3_2_label" tabindex="0">
+<span class="md-ellipsis">
+    v1.0
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_1_3_2_label" class="md-nav" data-md-level="3">
+<label class="md-nav__title" for="__nav_1_3_2">
+<span class="md-nav__icon md-icon"></span>
+            v1.0
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../01-Home/%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E5%B1%A5%E6%AD%B4/v1.0/%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E5%B1%A5%E6%AD%B4_v1.0/">
+<span class="md-ellipsis">
+    バージョン履歴 v1.0
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../01-Home/%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E5%B1%A5%E6%AD%B4/v1.0/%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E3%83%8E%E3%83%BC%E3%83%88_v1.0/">
+<span class="md-ellipsis">
+    リリースノート v1.0
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../01-Home/%E7%94%A8%E8%AA%9E%E9%9B%86/%E7%94%A8%E8%AA%9E%E9%9B%86/">
+<span class="md-ellipsis">
+    用語集
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_1_5" type="checkbox"/>
+<label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+<span class="md-ellipsis">
+    開発者ガイド
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_1_5_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_1_5">
+<span class="md-nav__icon md-icon"></span>
+            開発者ガイド
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../01-Home/%E9%96%8B%E7%99%BA%E8%80%85%E3%82%AC%E3%82%A4%E3%83%89/%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83/">
+<span class="md-ellipsis">
+    開発環境
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../01-Home/%E9%96%8B%E7%99%BA%E8%80%85%E3%82%AC%E3%82%A4%E3%83%89/%E8%A8%AD%E8%A8%88%E3%83%AB%E3%83%BC%E3%83%AB/%E8%A8%AD%E8%A8%88%E3%83%AB%E3%83%BC%E3%83%AB/">
+<span class="md-ellipsis">
+    設計ルール
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_1_5_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_1_5_3" id="__nav_1_5_3_label" tabindex="0">
+<span class="md-ellipsis">
+    開発ルール
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_1_5_3_label" class="md-nav" data-md-level="3">
+<label class="md-nav__title" for="__nav_1_5_3">
+<span class="md-nav__icon md-icon"></span>
+            開発ルール
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../01-Home/%E9%96%8B%E7%99%BA%E8%80%85%E3%82%AC%E3%82%A4%E3%83%89/%E9%96%8B%E7%99%BA%E3%83%AB%E3%83%BC%E3%83%AB/%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E8%A6%8F%E7%B4%84/">
+<span class="md-ellipsis">
+    コーディング規約
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../01-Home/%E9%96%8B%E7%99%BA%E8%80%85%E3%82%AC%E3%82%A4%E3%83%89/%E9%96%8B%E7%99%BA%E3%83%AB%E3%83%BC%E3%83%AB/%E9%96%8B%E7%99%BA%E6%A8%99%E6%BA%96/">
+<span class="md-ellipsis">
+    開発標準
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+<span class="md-ellipsis">
+    要件定義
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            要件定義
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2_1" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+<span class="md-ellipsis">
+    v1.0
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_1_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_2_1">
+<span class="md-nav__icon md-icon"></span>
+            v1.0
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../03-%E8%A6%81%E4%BB%B6%E5%AE%9A%E7%BE%A9/v1.0/%E6%A6%82%E8%A6%81_%E8%A6%81%E4%BB%B6%E5%AE%9A%E7%BE%A9/">
+<span class="md-ellipsis">
+    概要
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../03-%E8%A6%81%E4%BB%B6%E5%AE%9A%E7%BE%A9/v1.0/%E6%A9%9F%E8%83%BD%E8%A6%81%E4%BB%B6/">
+<span class="md-ellipsis">
+    機能要件
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../03-%E8%A6%81%E4%BB%B6%E5%AE%9A%E7%BE%A9/v1.0/%E9%9D%9E%E6%A9%9F%E8%83%BD%E8%A6%81%E4%BB%B6/">
+<span class="md-ellipsis">
+    非機能要件
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+<span class="md-ellipsis">
+    外部設計
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+            外部設計
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../04-%E5%A4%96%E9%83%A8%E8%A8%AD%E8%A8%88/%E6%A6%82%E8%A6%81_%E5%A4%96%E9%83%A8%E8%A8%AD%E8%A8%88/">
+<span class="md-ellipsis">
+    概要
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+<span class="md-ellipsis">
+    共通仕様
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_2_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_2">
+<span class="md-nav__icon md-icon"></span>
+            共通仕様
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../04-%E5%A4%96%E9%83%A8%E8%A8%AD%E8%A8%88/%E5%85%B1%E9%80%9A%E4%BB%95%E6%A7%98/%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E6%A7%8B%E6%88%90/">
+<span class="md-ellipsis">
+    システム構成
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../04-%E5%A4%96%E9%83%A8%E8%A8%AD%E8%A8%88/%E5%85%B1%E9%80%9A%E4%BB%95%E6%A7%98/%E6%A8%A9%E9%99%90/">
+<span class="md-ellipsis">
+    権限
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3_2_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_2_3" id="__nav_3_2_3_label" tabindex="0">
+<span class="md-ellipsis">
+    DB設計
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_2_3_label" class="md-nav" data-md-level="3">
+<label class="md-nav__title" for="__nav_3_2_3">
+<span class="md-nav__icon md-icon"></span>
+            DB設計
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../04-%E5%A4%96%E9%83%A8%E8%A8%AD%E8%A8%88/%E5%85%B1%E9%80%9A%E4%BB%95%E6%A7%98/DB%E8%A8%AD%E8%A8%88/ER%E5%9B%B3/">
+<span class="md-ellipsis">
+    ER図
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../04-%E5%A4%96%E9%83%A8%E8%A8%AD%E8%A8%88/%E5%85%B1%E9%80%9A%E4%BB%95%E6%A7%98/DB%E8%A8%AD%E8%A8%88/%E3%83%86%E3%83%BC%E3%83%96%E3%83%AB%E5%AE%9A%E7%BE%A9%E6%9B%B8/">
+<span class="md-ellipsis">
+    テーブル定義書
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+<span class="md-ellipsis">
+    画面設計
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_3_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_3">
+<span class="md-nav__icon md-icon"></span>
+            画面設計
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../04-%E5%A4%96%E9%83%A8%E8%A8%AD%E8%A8%88/%E7%94%BB%E9%9D%A2%E8%A8%AD%E8%A8%88/%E7%94%BB%E9%9D%A2%E4%B8%80%E8%A6%A7/">
+<span class="md-ellipsis">
+    画面一覧
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../04-%E5%A4%96%E9%83%A8%E8%A8%AD%E8%A8%88/%E7%94%BB%E9%9D%A2%E8%A8%AD%E8%A8%88/%E7%94%BB%E9%9D%A2%E9%81%B7%E7%A7%BB%E5%9B%B3/">
+<span class="md-ellipsis">
+    画面遷移図
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3_3_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_3_3" id="__nav_3_3_3_label" tabindex="0">
+<span class="md-ellipsis">
+    画面レイアウト
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_3_3_label" class="md-nav" data-md-level="3">
+<label class="md-nav__title" for="__nav_3_3_3">
+<span class="md-nav__icon md-icon"></span>
+            画面レイアウト
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../04-%E5%A4%96%E9%83%A8%E8%A8%AD%E8%A8%88/%E7%94%BB%E9%9D%A2%E8%A8%AD%E8%A8%88/%E7%94%BB%E9%9D%A2%E3%83%AC%E3%82%A4%E3%82%A2%E3%82%A6%E3%83%88/01_%E4%BB%AE%E7%94%BB%E9%9D%A2/">
+<span class="md-ellipsis">
+    01 仮画面
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+<span class="md-ellipsis">
+    機能設計
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_4_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_4">
+<span class="md-nav__icon md-icon"></span>
+            機能設計
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../04-%E5%A4%96%E9%83%A8%E8%A8%AD%E8%A8%88/%E6%A9%9F%E8%83%BD%E8%A8%AD%E8%A8%88/%E6%A9%9F%E8%83%BD%E4%B8%80%E8%A6%A7/">
+<span class="md-ellipsis">
+    機能一覧
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3_4_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_4_2" id="__nav_3_4_2_label" tabindex="0">
+<span class="md-ellipsis">
+    機能詳細
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_4_2_label" class="md-nav" data-md-level="3">
+<label class="md-nav__title" for="__nav_3_4_2">
+<span class="md-nav__icon md-icon"></span>
+            機能詳細
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../04-%E5%A4%96%E9%83%A8%E8%A8%AD%E8%A8%88/%E6%A9%9F%E8%83%BD%E8%A8%AD%E8%A8%88/%E6%A9%9F%E8%83%BD%E8%A9%B3%E7%B4%B0/01_%E4%BB%AE%E6%A9%9F%E8%83%BD/">
+<span class="md-ellipsis">
+    01 仮機能
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3_5" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+<span class="md-ellipsis">
+    API設計
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_5_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_5">
+<span class="md-nav__icon md-icon"></span>
+            API設計
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../04-%E5%A4%96%E9%83%A8%E8%A8%AD%E8%A8%88/API%E8%A8%AD%E8%A8%88/API%E4%B8%80%E8%A6%A7/">
+<span class="md-ellipsis">
+    API一覧
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../04-%E5%A4%96%E9%83%A8%E8%A8%AD%E8%A8%88/%E3%83%86%E3%82%B9%E3%83%88%E8%A8%AD%E8%A8%88/%E3%83%86%E3%82%B9%E3%83%88%E8%A8%AD%E8%A8%88/">
+<span class="md-ellipsis">
+    テスト設計
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+<span class="md-ellipsis">
+    内部設計
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+            内部設計
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../05-%E5%86%85%E9%83%A8%E8%A8%AD%E8%A8%88/%E6%A6%82%E8%A6%81_%E5%86%85%E9%83%A8%E8%A8%AD%E8%A8%88/">
+<span class="md-ellipsis">
+    概要
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_4_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
+<span class="md-ellipsis">
+    共通仕様
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_2_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_4_2">
+<span class="md-nav__icon md-icon"></span>
+            共通仕様
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../05-%E5%86%85%E9%83%A8%E8%A8%AD%E8%A8%88/%E5%85%B1%E9%80%9A%E4%BB%95%E6%A7%98/%E5%85%B1%E9%80%9A%E4%BB%95%E6%A7%98/">
+<span class="md-ellipsis">
+    共通仕様
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../05-%E5%86%85%E9%83%A8%E8%A8%AD%E8%A8%88/%E5%85%B1%E9%80%9A%E4%BB%95%E6%A7%98/%E3%82%A2%E3%83%BC%E3%82%AD%E3%83%86%E3%82%AF%E3%83%81%E3%83%A3%E8%A8%AD%E8%A8%88/">
+<span class="md-ellipsis">
+    アーキテクチャ設計
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../05-%E5%86%85%E9%83%A8%E8%A8%AD%E8%A8%88/%E5%85%B1%E9%80%9A%E4%BB%95%E6%A7%98/%E3%82%A8%E3%83%A9%E3%83%BC%E8%A8%AD%E8%A8%88/">
+<span class="md-ellipsis">
+    エラー設計
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../05-%E5%86%85%E9%83%A8%E8%A8%AD%E8%A8%88/%E5%85%B1%E9%80%9A%E4%BB%95%E6%A7%98/%E3%83%AD%E3%82%B0%E8%A8%AD%E8%A8%88/">
+<span class="md-ellipsis">
+    ログ設計
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../05-%E5%86%85%E9%83%A8%E8%A8%AD%E8%A8%88/%E5%85%B1%E9%80%9A%E4%BB%95%E6%A7%98/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3%E8%A8%AD%E8%A8%88/">
+<span class="md-ellipsis">
+    セキュリティ設計
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../05-%E5%86%85%E9%83%A8%E8%A8%AD%E8%A8%88/%E5%85%B1%E9%80%9A%E4%BB%95%E6%A7%98/%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E8%A8%AD%E8%A8%88/">
+<span class="md-ellipsis">
+    パフォーマンス設計
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../05-%E5%86%85%E9%83%A8%E8%A8%AD%E8%A8%88/DB%E8%A8%AD%E8%A8%88/%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9%E8%A8%AD%E8%A8%88/">
+<span class="md-ellipsis">
+    DB設計
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_4_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="0">
+<span class="md-ellipsis">
+    画面設計
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_4_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_4_4">
+<span class="md-nav__icon md-icon"></span>
+            画面設計
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../05-%E5%86%85%E9%83%A8%E8%A8%AD%E8%A8%88/%E7%94%BB%E9%9D%A2%E8%A8%AD%E8%A8%88/%E7%94%BB%E9%9D%A2%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8%E4%B8%80%E8%A6%A7/">
+<span class="md-ellipsis">
+    画面メッセージ一覧
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_4_4_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4_4_2" id="__nav_4_4_2_label" tabindex="0">
+<span class="md-ellipsis">
+    画面詳細
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_4_2_label" class="md-nav" data-md-level="3">
+<label class="md-nav__title" for="__nav_4_4_2">
+<span class="md-nav__icon md-icon"></span>
+            画面詳細
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../05-%E5%86%85%E9%83%A8%E8%A8%AD%E8%A8%88/%E7%94%BB%E9%9D%A2%E8%A8%AD%E8%A8%88/%E7%94%BB%E9%9D%A2%E8%A9%B3%E7%B4%B0/01_%E4%BB%AE%E7%94%BB%E9%9D%A2/">
+<span class="md-ellipsis">
+    01 仮画面
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_4_5" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4_5" id="__nav_4_5_label" tabindex="0">
+<span class="md-ellipsis">
+    API設計
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_5_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_4_5">
+<span class="md-nav__icon md-icon"></span>
+            API設計
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../05-%E5%86%85%E9%83%A8%E8%A8%AD%E8%A8%88/API%E8%A8%AD%E8%A8%88/API%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8%E4%B8%80%E8%A6%A7/">
+<span class="md-ellipsis">
+    APIメッセージ一覧
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_4_5_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4_5_2" id="__nav_4_5_2_label" tabindex="0">
+<span class="md-ellipsis">
+    API詳細
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_5_2_label" class="md-nav" data-md-level="3">
+<label class="md-nav__title" for="__nav_4_5_2">
+<span class="md-nav__icon md-icon"></span>
+            API詳細
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../05-%E5%86%85%E9%83%A8%E8%A8%AD%E8%A8%88/API%E8%A8%AD%E8%A8%88/API%E8%A9%B3%E7%B4%B0/01_%E4%BB%AEAPI/">
+<span class="md-ellipsis">
+    01 仮API
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_5" type="checkbox"/>
+<label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+<span class="md-ellipsis">
+    インフラ設計
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="true" aria-labelledby="__nav_5_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_5">
+<span class="md-nav__icon md-icon"></span>
+            インフラ設計
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../01-overview/">
+<span class="md-ellipsis">
+    概要
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../02-staging/">
+<span class="md-ellipsis">
+    検証環境
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../03-production-pre-commercial/">
+<span class="md-ellipsis">
+    本番環境_商用利用前
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../04-production-commercial/">
+<span class="md-ellipsis">
+    本番環境_商用利用後
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../05-network/">
+<span class="md-ellipsis">
+    ネットワーク
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+<span class="md-ellipsis">
+    セキュリティ
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="./">
+<span class="md-ellipsis">
+    セキュリティ
+    
+  </span>
+</a>
+<nav aria-label="目次" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      目次
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_2">
+<span class="md-ellipsis">
+      概要
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_3">
+<span class="md-ellipsis">
+      セキュリティレイヤー構成
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#wafweb-application-firewall">
+<span class="md-ellipsis">
+      WAF（Web Application Firewall）
+    </span>
+</a>
+<nav aria-label="WAF（Web Application Firewall）" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_4">
+<span class="md-ellipsis">
+      目的
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#aws-managed-rules">
+<span class="md-ellipsis">
+      AWS Managed Rules
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_5">
+<span class="md-ellipsis">
+      カスタムルール
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#terraform">
+<span class="md-ellipsis">
+      Terraform設定
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#security-group">
+<span class="md-ellipsis">
+      Security Group
+    </span>
+</a>
+<nav aria-label="Security Group" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_6">
+<span class="md-ellipsis">
+      設計原則
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#alb-security-group">
+<span class="md-ellipsis">
+      ALB Security Group
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ecs-security-group">
+<span class="md-ellipsis">
+      ECS Security Group
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#aurora-security-group">
+<span class="md-ellipsis">
+      Aurora Security Group
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#vpc-endpoint-security-group">
+<span class="md-ellipsis">
+      VPC Endpoint Security Group
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#iam">
+<span class="md-ellipsis">
+      IAM（アイデンティティ・アクセス管理）
+    </span>
+</a>
+<nav aria-label="IAM（アイデンティティ・アクセス管理）" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_7">
+<span class="md-ellipsis">
+      設計原則
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ecs-task-execution-role">
+<span class="md-ellipsis">
+      ECS Task Execution Role
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ecs-task-role">
+<span class="md-ellipsis">
+      ECS Task Role
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_8">
+<span class="md-ellipsis">
+      シークレット管理
+    </span>
+</a>
+<nav aria-label="シークレット管理" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ssm-parameter-store">
+<span class="md-ellipsis">
+      SSM Parameter Store
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_9">
+<span class="md-ellipsis">
+      データ暗号化
+    </span>
+</a>
+<nav aria-label="データ暗号化" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_10">
+<span class="md-ellipsis">
+      保管時の暗号化
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_11">
+<span class="md-ellipsis">
+      転送時の暗号化
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#owasp-top-10">
+<span class="md-ellipsis">
+      OWASP Top 10対策
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_12">
+<span class="md-ellipsis">
+      セキュリティ監視
+    </span>
+</a>
+<nav aria-label="セキュリティ監視" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#cloudwatch-alarms">
+<span class="md-ellipsis">
+      CloudWatch Alarms
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#datadog">
+<span class="md-ellipsis">
+      Datadog
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#sentry">
+<span class="md-ellipsis">
+      Sentry
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_13">
+<span class="md-ellipsis">
+      インシデント対応
+    </span>
+</a>
+<nav aria-label="インシデント対応" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_14">
+<span class="md-ellipsis">
+      手順
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_15">
+<span class="md-ellipsis">
+      エスカレーション
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_16">
+<span class="md-ellipsis">
+      コンプライアンス
+    </span>
+</a>
+<nav aria-label="コンプライアンス" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_17">
+<span class="md-ellipsis">
+      データ保護
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_18">
+<span class="md-ellipsis">
+      監査ログ
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_19">
+<span class="md-ellipsis">
+      定期的なセキュリティレビュー
+    </span>
+</a>
+<nav aria-label="定期的なセキュリティレビュー" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_20">
+<span class="md-ellipsis">
+      月次
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_21">
+<span class="md-ellipsis">
+      四半期
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_22">
+<span class="md-ellipsis">
+      年次
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_23">
+<span class="md-ellipsis">
+      参考リンク
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../07-monitoring/">
+<span class="md-ellipsis">
+    モニタリング
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_6" type="checkbox"/>
+<label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+<span class="md-ellipsis">
+    その他
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_6_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_6">
+<span class="md-nav__icon md-icon"></span>
+            その他
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_6_1" type="checkbox"/>
+<label class="md-nav__link" for="__nav_6_1" id="__nav_6_1_label" tabindex="0">
+<span class="md-ellipsis">
+    バッチ
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_6_1_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_6_1">
+<span class="md-nav__icon md-icon"></span>
+            バッチ
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../10-%E3%81%9D%E3%81%AE%E4%BB%96/%E3%83%90%E3%83%83%E3%83%81/%E3%83%90%E3%83%83%E3%83%81%E4%B8%80%E8%A6%A7/">
+<span class="md-ellipsis">
+    バッチ一覧
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_6_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_6_2" id="__nav_6_2_label" tabindex="0">
+<span class="md-ellipsis">
+    ツール
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_6_2_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_6_2">
+<span class="md-nav__icon md-icon"></span>
+            ツール
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../10-%E3%81%9D%E3%81%AE%E4%BB%96/%E3%83%84%E3%83%BC%E3%83%AB/%E3%83%84%E3%83%BC%E3%83%AB%E4%B8%80%E8%A6%A7/">
+<span class="md-ellipsis">
+    ツール一覧
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_6_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_6_3" id="__nav_6_3_label" tabindex="0">
+<span class="md-ellipsis">
+    運用管理
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_6_3_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_6_3">
+<span class="md-nav__icon md-icon"></span>
+            運用管理
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../10-%E3%81%9D%E3%81%AE%E4%BB%96/%E9%81%8B%E7%94%A8%E7%AE%A1%E7%90%86/%E9%9A%9C%E5%AE%B3%E5%AF%BE%E5%BF%9C/">
+<span class="md-ellipsis">
+    障害対応
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../10-%E3%81%9D%E3%81%AE%E4%BB%96/%E9%81%8B%E7%94%A8%E7%AE%A1%E7%90%86/%E7%9B%A3%E8%A6%96/">
+<span class="md-ellipsis">
+    監視
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+<h1 id="_1">セキュリティ設計<a class="headerlink" href="#_1" title="Permanent link">#</a></h1>
+<h2 id="_2">概要<a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<p>本番環境のセキュリティ設計について記載します。OWASP Top 10対策、AWSベストプラクティス、最小権限の原則に基づいて設計します。</p>
+<h2 id="_3">セキュリティレイヤー構成<a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
+<div class="mermaid">graph TD
+    Internet[インターネット]
+
+    subgraph "外部防御層"
+        WAF[WAF&lt;br&gt;Web Application Firewall]
+        CF[CloudFront&lt;br&gt;DDoS Protection]
+    end
+
+    subgraph "ネットワーク層"
+        ALB[ALB&lt;br&gt;HTTPS/TLS終端]
+        SG_ALB[Security Group&lt;br&gt;ALB]
+    end
+
+    subgraph "アプリケーション層"
+        SG_ECS[Security Group&lt;br&gt;ECS]
+        ECS[ECS Fargate&lt;br&gt;コンテナ分離]
+    end
+
+    subgraph "データ層"
+        SG_DB[Security Group&lt;br&gt;Aurora]
+        Aurora[Aurora PostgreSQL&lt;br&gt;暗号化]
+        SSM[SSM Parameter Store&lt;br&gt;シークレット管理]
+    end
+
+    subgraph "アクセス制御層"
+        IAM[IAM&lt;br&gt;ロール・ポリシー]
+    end
+
+    Internet --&gt; WAF
+    WAF --&gt; CF
+    CF --&gt; ALB
+    ALB --&gt; SG_ALB
+    SG_ALB --&gt; SG_ECS
+    SG_ECS --&gt; ECS
+    ECS --&gt; SG_DB
+    SG_DB --&gt; Aurora
+    ECS --&gt; SSM
+    ECS --&gt; IAM
+</div>
+<h2 id="wafweb-application-firewall">WAF（Web Application Firewall）<a class="headerlink" href="#wafweb-application-firewall" title="Permanent link">#</a></h2>
+<h3 id="_4">目的<a class="headerlink" href="#_4" title="Permanent link">#</a></h3>
+<ul>
+<li>SQLインジェクション防止</li>
+<li>XSS（Cross-Site Scripting）防止</li>
+<li>不正なリクエストのブロック</li>
+<li>レートリミット</li>
+<li>地域ブロック</li>
+</ul>
+<h3 id="aws-managed-rules">AWS Managed Rules<a class="headerlink" href="#aws-managed-rules" title="Permanent link">#</a></h3>
+<p><strong>Core Rule Set（CRS）:</strong></p>
+<ul>
+<li>SQLインジェクション</li>
+<li>XSS</li>
+<li>Local File Inclusion（LFI）</li>
+<li>Remote File Inclusion（RFI）</li>
+<li>コマンドインジェクション</li>
+</ul>
+<p><strong>Known Bad Inputs:</strong></p>
+<ul>
+<li>既知の脆弱性パターン</li>
+<li>悪意のあるボットシグネチャ</li>
+</ul>
+<p><strong>IP Reputation List:</strong></p>
+<ul>
+<li>既知の悪意のあるIPアドレス</li>
+</ul>
+<h3 id="_5">カスタムルール<a class="headerlink" href="#_5" title="Permanent link">#</a></h3>
+<p><strong>レートリミット:</strong></p>
+<ul>
+<li>同一IPからのリクエスト: 1000リクエスト/5分</li>
+<li>管理画面ログイン試行: 10回/5分</li>
+</ul>
+<p><strong>地域ブロック:</strong></p>
+<ul>
+<li>日本以外からのアクセス制限（オプション）</li>
+</ul>
+<h3 id="terraform">Terraform設定<a class="headerlink" href="#terraform" title="Permanent link">#</a></h3>
+<pre><code class="language-hcl"># WAF Web ACL
+resource "aws_wafv2_web_acl" "main" {
+  name  = "${var.project_name}-${var.environment}-waf"
+  scope = "CLOUDFRONT"
+
+  default_action {
+    allow {}
+  }
+
+  # AWS Managed Rules - Core Rule Set
+  rule {
+    name     = "AWSManagedRulesCommonRuleSet"
+    priority = 1
+
+    override_action {
+      none {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        vendor_name = "AWS"
+        name        = "AWSManagedRulesCommonRuleSet"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AWSManagedRulesCommonRuleSetMetric"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  # AWS Managed Rules - Known Bad Inputs
+  rule {
+    name     = "AWSManagedRulesKnownBadInputsRuleSet"
+    priority = 2
+
+    override_action {
+      none {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        vendor_name = "AWS"
+        name        = "AWSManagedRulesKnownBadInputsRuleSet"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AWSManagedRulesKnownBadInputsRuleSetMetric"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  # Rate Limiting
+  rule {
+    name     = "RateLimitRule"
+    priority = 3
+
+    action {
+      block {}
+    }
+
+    statement {
+      rate_based_statement {
+        limit              = 1000
+        aggregate_key_type = "IP"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "RateLimitRuleMetric"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "${var.project_name}-${var.environment}-waf"
+    sampled_requests_enabled   = true
+  }
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-waf"
+  }
+}
+
+# WAF Association with CloudFront
+resource "aws_wafv2_web_acl_association" "cloudfront" {
+  resource_arn = aws_cloudfront_distribution.main.arn
+  web_acl_arn  = aws_wafv2_web_acl.main.arn
+}
+</code></pre>
+<h2 id="security-group">Security Group<a class="headerlink" href="#security-group" title="Permanent link">#</a></h2>
+<h3 id="_6">設計原則<a class="headerlink" href="#_6" title="Permanent link">#</a></h3>
+<ol>
+<li><strong>最小権限の原則</strong>: 必要最小限のポートのみ開放</li>
+<li><strong>階層的制御</strong>: 各レイヤーごとに独立したSecurity Group</li>
+<li><strong>送信元制限</strong>: IPアドレスではなくSecurity Group IDで制御</li>
+</ol>
+<h3 id="alb-security-group">ALB Security Group<a class="headerlink" href="#alb-security-group" title="Permanent link">#</a></h3>
+<p><strong>インバウンド:</strong></p>
+<table>
+<thead>
+<tr>
+<th>プロトコル</th>
+<th>ポート</th>
+<th>送信元</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TCP</td>
+<td>80</td>
+<td>0.0.0.0/0</td>
+<td>HTTP（HTTPS リダイレクト）</td>
+</tr>
+<tr>
+<td>TCP</td>
+<td>443</td>
+<td>0.0.0.0/0</td>
+<td>HTTPS</td>
+</tr>
+</tbody>
+</table>
+<p><strong>アウトバウンド:</strong></p>
+<table>
+<thead>
+<tr>
+<th>プロトコル</th>
+<th>ポート</th>
+<th>送信先</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TCP</td>
+<td>3000-3001</td>
+<td>ECS Security Group</td>
+<td>ECSタスクへの転送</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Terraform設定:</strong></p>
+<pre><code class="language-hcl"># ALB Security Group
+resource "aws_security_group" "alb" {
+  name        = "${var.project_name}-${var.environment}-alb-sg"
+  description = "Security group for ALB"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    description = "HTTP from Internet"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "HTTPS from Internet"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description     = "To ECS tasks"
+    from_port       = 3000
+    to_port         = 3001
+    protocol        = "tcp"
+    security_groups = [aws_security_group.ecs.id]
+  }
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-alb-sg"
+  }
+}
+</code></pre>
+<h3 id="ecs-security-group">ECS Security Group<a class="headerlink" href="#ecs-security-group" title="Permanent link">#</a></h3>
+<p><strong>インバウンド:</strong></p>
+<table>
+<thead>
+<tr>
+<th>プロトコル</th>
+<th>ポート</th>
+<th>送信元</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TCP</td>
+<td>3000</td>
+<td>ALB Security Group</td>
+<td>Webコンテナ</td>
+</tr>
+<tr>
+<td>TCP</td>
+<td>3001</td>
+<td>ALB Security Group</td>
+<td>APIコンテナ</td>
+</tr>
+</tbody>
+</table>
+<p><strong>アウトバウンド:</strong></p>
+<table>
+<thead>
+<tr>
+<th>プロトコル</th>
+<th>ポート</th>
+<th>送信先</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TCP</td>
+<td>5432</td>
+<td>Aurora Security Group</td>
+<td>PostgreSQL</td>
+</tr>
+<tr>
+<td>TCP</td>
+<td>27017</td>
+<td>0.0.0.0/0</td>
+<td>MongoDB Atlas（外部）</td>
+</tr>
+<tr>
+<td>TCP</td>
+<td>443</td>
+<td>0.0.0.0/0</td>
+<td>HTTPS（外部API、VPC Endpoint）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Terraform設定:</strong></p>
+<pre><code class="language-hcl"># ECS Security Group
+resource "aws_security_group" "ecs" {
+  name        = "${var.project_name}-${var.environment}-ecs-sg"
+  description = "Security group for ECS tasks"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    description     = "Web container port from ALB"
+    from_port       = 3000
+    to_port         = 3000
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb.id]
+  }
+
+  ingress {
+    description     = "API container port from ALB"
+    from_port       = 3001
+    to_port         = 3001
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb.id]
+  }
+
+  egress {
+    description     = "To Aurora PostgreSQL"
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [aws_security_group.aurora.id]
+  }
+
+  egress {
+    description = "To MongoDB Atlas"
+    from_port   = 27017
+    to_port     = 27017
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "HTTPS to Internet and VPC Endpoints"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-ecs-sg"
+  }
+}
+</code></pre>
+<h3 id="aurora-security-group">Aurora Security Group<a class="headerlink" href="#aurora-security-group" title="Permanent link">#</a></h3>
+<p><strong>インバウンド:</strong></p>
+<table>
+<thead>
+<tr>
+<th>プロトコル</th>
+<th>ポート</th>
+<th>送信元</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TCP</td>
+<td>5432</td>
+<td>ECS Security Group</td>
+<td>ECSタスクからのアクセス</td>
+</tr>
+</tbody>
+</table>
+<p><strong>アウトバウンド:</strong></p>
+<table>
+<thead>
+<tr>
+<th>プロトコル</th>
+<th>ポート</th>
+<th>送信先</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>なし</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Terraform設定:</strong></p>
+<pre><code class="language-hcl"># Aurora Security Group
+resource "aws_security_group" "aurora" {
+  name        = "${var.project_name}-${var.environment}-aurora-sg"
+  description = "Security group for Aurora PostgreSQL"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    description     = "PostgreSQL from ECS tasks"
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [aws_security_group.ecs.id]
+  }
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-aurora-sg"
+  }
+}
+</code></pre>
+<h3 id="vpc-endpoint-security-group">VPC Endpoint Security Group<a class="headerlink" href="#vpc-endpoint-security-group" title="Permanent link">#</a></h3>
+<p><strong>インバウンド:</strong></p>
+<table>
+<thead>
+<tr>
+<th>プロトコル</th>
+<th>ポート</th>
+<th>送信元</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TCP</td>
+<td>443</td>
+<td>ECS Security Group</td>
+<td>VPC Endpointへのアクセス</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Terraform設定:</strong></p>
+<pre><code class="language-hcl"># VPC Endpoint Security Group
+resource "aws_security_group" "vpc_endpoint" {
+  name        = "${var.project_name}-${var.environment}-vpc-endpoint-sg"
+  description = "Security group for VPC Endpoints"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    description     = "HTTPS from ECS tasks"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = [aws_security_group.ecs.id]
+  }
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-vpc-endpoint-sg"
+  }
+}
+</code></pre>
+<h2 id="iam">IAM（アイデンティティ・アクセス管理）<a class="headerlink" href="#iam" title="Permanent link">#</a></h2>
+<h3 id="_7">設計原則<a class="headerlink" href="#_7" title="Permanent link">#</a></h3>
+<ol>
+<li><strong>最小権限の原則</strong>: 必要最小限の権限のみ付与</li>
+<li><strong>ロールベースアクセス制御</strong>: IAMユーザーではなくIAMロールを使用</li>
+<li><strong>明示的な拒否</strong>: 必要に応じてDenyポリシーを使用</li>
+</ol>
+<h3 id="ecs-task-execution-role">ECS Task Execution Role<a class="headerlink" href="#ecs-task-execution-role" title="Permanent link">#</a></h3>
+<p><strong>用途:</strong></p>
+<ul>
+<li>ECRからのイメージプル</li>
+<li>CloudWatch Logsへのログ書き込み</li>
+<li>SSM Parameter Storeからのシークレット取得</li>
+</ul>
+<p><strong>Terraform設定:</strong></p>
+<pre><code class="language-hcl"># ECS Task Execution Role
+resource "aws_iam_role" "ecs_execution_role" {
+  name = "${var.project_name}-${var.environment}-ecs-execution-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ecs-tasks.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-ecs-execution-role"
+  }
+}
+
+# AWS Managed Policy
+resource "aws_iam_role_policy_attachment" "ecs_execution_role_policy" {
+  role       = aws_iam_role.ecs_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+# SSM Parameter Store Access
+resource "aws_iam_role_policy" "ecs_ssm_policy" {
+  name = "${var.project_name}-${var.environment}-ecs-ssm-policy"
+  role = aws_iam_role.ecs_execution_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "ssm:GetParameters",
+          "ssm:GetParameter"
+        ]
+        Effect = "Allow"
+        Resource = [
+          "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/${var.project_name}/${var.environment}/*"
+        ]
+      },
+      {
+        Action = [
+          "kms:Decrypt"
+        ]
+        Effect = "Allow"
+        Resource = [
+          "arn:aws:kms:${var.aws_region}:${data.aws_caller_identity.current.account_id}:key/*"
+        ]
+      }
+    ]
+  })
+}
+</code></pre>
+<h3 id="ecs-task-role">ECS Task Role<a class="headerlink" href="#ecs-task-role" title="Permanent link">#</a></h3>
+<p><strong>用途:</strong></p>
+<ul>
+<li>S3バケットへのアクセス</li>
+<li>SSMセッションマネージャー接続</li>
+<li>その他のAWSサービスへのアクセス</li>
+</ul>
+<p><strong>Terraform設定:</strong></p>
+<pre><code class="language-hcl"># ECS Task Role
+resource "aws_iam_role" "ecs_task_role" {
+  name = "${var.project_name}-${var.environment}-ecs-task-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ecs-tasks.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-ecs-task-role"
+  }
+}
+
+# S3 Access Policy
+resource "aws_iam_role_policy" "ecs_s3_policy" {
+  name = "${var.project_name}-${var.environment}-ecs-s3-policy"
+  role = aws_iam_role.ecs_task_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Effect = "Allow"
+        Resource = [
+          "${aws_s3_bucket.assets.arn}/*"
+        ]
+      },
+      {
+        Action = [
+          "s3:ListBucket"
+        ]
+        Effect = "Allow"
+        Resource = [
+          aws_s3_bucket.assets.arn
+        ]
+      }
+    ]
+  })
+}
+
+# SSM Session Manager Policy
+resource "aws_iam_role_policy" "ecs_ssm_session_policy" {
+  name = "${var.project_name}-${var.environment}-ecs-ssm-session-policy"
+  role = aws_iam_role.ecs_task_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",
+          "ssmmessages:OpenControlChannel",
+          "ssmmessages:OpenDataChannel"
+        ]
+        Effect = "Allow"
+        Resource = "*"
+      }
+    ]
+  })
+}
+</code></pre>
+<h2 id="_8">シークレット管理<a class="headerlink" href="#_8" title="Permanent link">#</a></h2>
+<h3 id="ssm-parameter-store">SSM Parameter Store<a class="headerlink" href="#ssm-parameter-store" title="Permanent link">#</a></h3>
+<p><strong>管理対象:</strong></p>
+<ul>
+<li>DATABASE_URL（Aurora接続文字列）</li>
+<li>MONGODB_URI（MongoDB接続文字列）</li>
+<li>JWT_SECRET（JWT署名鍵）</li>
+<li>DATADOG_API_KEY</li>
+<li>SENTRY_DSN</li>
+<li>その他のAPIキー</li>
+</ul>
+<p><strong>暗号化:</strong></p>
+<ul>
+<li>AWS KMS（Key Management Service）による暗号化</li>
+<li>SecureStringタイプを使用</li>
+</ul>
+<p><strong>アクセス制御:</strong></p>
+<ul>
+<li>IAMロールによる厳格な権限管理</li>
+<li>パラメータパスによるアクセス制御</li>
+</ul>
+<p><strong>Terraform設定:</strong></p>
+<pre><code class="language-hcl"># DATABASE_URL
+resource "aws_ssm_parameter" "database_url" {
+  name        = "/${var.project_name}/${var.environment}/DATABASE_URL"
+  description = "Database connection URL for Prisma"
+  type        = "SecureString"
+  value       = "postgresql://${var.db_username}:${random_password.aurora_password.result}@${aws_rds_cluster.main.endpoint}:5432/${var.db_name}?schema=public"
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-database-url"
+  }
+}
+
+# MONGODB_URI
+resource "aws_ssm_parameter" "mongodb_uri" {
+  name        = "/${var.project_name}/${var.environment}/MONGODB_URI"
+  description = "MongoDB connection string"
+  type        = "SecureString"
+  value       = var.mongodb_uri
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-mongodb-uri"
+  }
+}
+
+# JWT_SECRET
+resource "aws_ssm_parameter" "jwt_secret" {
+  name        = "/${var.project_name}/${var.environment}/JWT_SECRET"
+  description = "JWT signing secret"
+  type        = "SecureString"
+  value       = random_password.jwt_secret.result
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-jwt-secret"
+  }
+}
+</code></pre>
+<h2 id="_9">データ暗号化<a class="headerlink" href="#_9" title="Permanent link">#</a></h2>
+<h3 id="_10">保管時の暗号化<a class="headerlink" href="#_10" title="Permanent link">#</a></h3>
+<p><strong>Aurora PostgreSQL:</strong></p>
+<ul>
+<li>AWS KMSによる暗号化</li>
+<li>デフォルトで有効化</li>
+</ul>
+<p><strong>S3:</strong></p>
+<ul>
+<li>AES-256暗号化</li>
+<li>サーバー側暗号化（SSE-S3）</li>
+</ul>
+<p><strong>CloudWatch Logs:</strong></p>
+<ul>
+<li>KMS暗号化オプション</li>
+</ul>
+<p><strong>Terraform設定:</strong></p>
+<pre><code class="language-hcl"># Aurora暗号化
+resource "aws_rds_cluster" "main" {
+  # ... 他の設定 ...
+
+  storage_encrypted = true
+  kms_key_id        = aws_kms_key.rds.arn
+}
+
+# S3暗号化
+resource "aws_s3_bucket_server_side_encryption_configuration" "assets" {
+  bucket = aws_s3_bucket.assets.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+</code></pre>
+<h3 id="_11">転送時の暗号化<a class="headerlink" href="#_11" title="Permanent link">#</a></h3>
+<p><strong>HTTPS/TLS:</strong></p>
+<ul>
+<li>CloudFront: TLS 1.2以上</li>
+<li>ALB: TLS 1.2以上</li>
+<li>Aurora: TLS 1.2以上</li>
+<li>MongoDB Atlas: TLS 1.2以上</li>
+</ul>
+<p><strong>Terraform設定:</strong></p>
+<pre><code class="language-hcl"># ALB HTTPS Listener
+resource "aws_lb_listener" "https" {
+  load_balancer_arn = aws_lb.main.arn
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn   = aws_acm_certificate.main.arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.web.arn
+  }
+}
+</code></pre>
+<h2 id="owasp-top-10">OWASP Top 10対策<a class="headerlink" href="#owasp-top-10" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>脅威</th>
+<th>対策</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A01: Broken Access Control</td>
+<td>IAMロール、Security Group、WAF</td>
+</tr>
+<tr>
+<td>A02: Cryptographic Failures</td>
+<td>KMS暗号化、TLS 1.2以上</td>
+</tr>
+<tr>
+<td>A03: Injection</td>
+<td>WAF（SQLインジェクション対策）、Prisma（パラメータ化クエリ）</td>
+</tr>
+<tr>
+<td>A04: Insecure Design</td>
+<td>セキュアアーキテクチャ設計</td>
+</tr>
+<tr>
+<td>A05: Security Misconfiguration</td>
+<td>Terraformによる一貫性のある設定管理</td>
+</tr>
+<tr>
+<td>A06: Vulnerable Components</td>
+<td>定期的な依存パッケージ更新、Dependabot</td>
+</tr>
+<tr>
+<td>A07: Authentication Failures</td>
+<td>JWT、セッション管理、レートリミット</td>
+</tr>
+<tr>
+<td>A08: Software and Data Integrity Failures</td>
+<td>コンテナイメージ署名、GitHub Actions検証</td>
+</tr>
+<tr>
+<td>A09: Security Logging and Monitoring</td>
+<td>CloudWatch、Datadog、Sentry</td>
+</tr>
+<tr>
+<td>A10: Server-Side Request Forgery (SSRF)</td>
+<td>VPC分離、アウトバウンド制限</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_12">セキュリティ監視<a class="headerlink" href="#_12" title="Permanent link">#</a></h2>
+<h3 id="cloudwatch-alarms">CloudWatch Alarms<a class="headerlink" href="#cloudwatch-alarms" title="Permanent link">#</a></h3>
+<p><strong>監視項目:</strong></p>
+<ul>
+<li>異常なトラフィック増加</li>
+<li>5xxエラー率上昇</li>
+<li>不正なログインパターン</li>
+<li>WAFブロック数増加</li>
+</ul>
+<h3 id="datadog">Datadog<a class="headerlink" href="#datadog" title="Permanent link">#</a></h3>
+<p><strong>監視項目:</strong></p>
+<ul>
+<li>APM（トレース）</li>
+<li>セキュリティイベント</li>
+<li>異常検知</li>
+</ul>
+<h3 id="sentry">Sentry<a class="headerlink" href="#sentry" title="Permanent link">#</a></h3>
+<p><strong>監視項目:</strong></p>
+<ul>
+<li>アプリケーションエラー</li>
+<li>パフォーマンス低下</li>
+<li>セキュリティ関連の例外</li>
+</ul>
+<h2 id="_13">インシデント対応<a class="headerlink" href="#_13" title="Permanent link">#</a></h2>
+<h3 id="_14">手順<a class="headerlink" href="#_14" title="Permanent link">#</a></h3>
+<ol>
+<li><strong>検知</strong>: CloudWatch / Datadog / Sentryによる自動アラート</li>
+<li><strong>初動対応</strong>: 影響範囲の特定、一時的な緩和策</li>
+<li><strong>調査</strong>: ログ分析、トラフィック分析</li>
+<li><strong>恒久対策</strong>: 脆弱性修正、セキュリティ強化</li>
+<li><strong>事後分析</strong>: インシデントレポート作成、再発防止策</li>
+</ol>
+<h3 id="_15">エスカレーション<a class="headerlink" href="#_15" title="Permanent link">#</a></h3>
+<ol>
+<li>開発チーム → チームリーダー</li>
+<li>チームリーダー → セキュリティ責任者</li>
+<li>セキュリティ責任者 → 経営層</li>
+</ol>
+<h2 id="_16">コンプライアンス<a class="headerlink" href="#_16" title="Permanent link">#</a></h2>
+<h3 id="_17">データ保護<a class="headerlink" href="#_17" title="Permanent link">#</a></h3>
+<ul>
+<li><strong>個人情報</strong>: 暗号化、アクセス制御</li>
+<li><strong>ログ保持期間</strong>: 法令準拠（最低1年）</li>
+<li><strong>バックアップ</strong>: 7日間保持</li>
+</ul>
+<h3 id="_18">監査ログ<a class="headerlink" href="#_18" title="Permanent link">#</a></h3>
+<ul>
+<li>CloudTrail: AWSリソース操作ログ</li>
+<li>VPCフローログ: ネットワークトラフィック</li>
+<li>CloudWatch Logs: アプリケーションログ</li>
+</ul>
+<h2 id="_19">定期的なセキュリティレビュー<a class="headerlink" href="#_19" title="Permanent link">#</a></h2>
+<h3 id="_20">月次<a class="headerlink" href="#_20" title="Permanent link">#</a></h3>
+<ul>
+<li>WAFログレビュー</li>
+<li>Security Groupルールレビュー</li>
+<li>IAMポリシーレビュー</li>
+</ul>
+<h3 id="_21">四半期<a class="headerlink" href="#_21" title="Permanent link">#</a></h3>
+<ul>
+<li>脆弱性スキャン</li>
+<li>ペネトレーションテスト（外部委託）</li>
+<li>セキュリティパッチ適用</li>
+</ul>
+<h3 id="_22">年次<a class="headerlink" href="#_22" title="Permanent link">#</a></h3>
+<ul>
+<li>セキュリティ監査（外部委託）</li>
+<li>ディザスタリカバリ訓練</li>
+</ul>
+<h2 id="_23">参考リンク<a class="headerlink" href="#_23" title="Permanent link">#</a></h2>
+<ul>
+<li><a href="https://aws.amazon.com/security/best-practices/">AWS Security Best Practices</a></li>
+<li><a href="https://owasp.org/www-project-top-ten/">OWASP Top 10</a></li>
+<li><a href="https://docs.aws.amazon.com/waf/">AWS WAF Documentation</a></li>
+<li><a href="https://docs.aws.amazon.com/iam/">AWS IAM Documentation</a></li>
+</ul>
+<aside class="md-source-file">
+<span class="md-source-file__fact">
+<span class="md-icon" title="最終更新日">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"></path></svg>
+</span>
+    2025-11-27
+  </span>
+</aside>
+</article>
+</div>
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+</div>
+<button class="md-top md-icon" data-md-component="top" hidden="" type="button">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"></path></svg>
+  ページトップへ戻る
+</button>
+</main>
+<footer class="md-footer">
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+</div>
+<div class="md-social">
+<a class="md-social__link" href="https://github.com/Hitamuki/bookmark-manager-app" rel="noopener" target="_blank" title="bookmark-manager-app">
+<svg viewbox="0 0 496 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"></path></svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tabs", "navigation.expand", "navigation.top", "toc.integrate", "header.autohide", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "\u30b3\u30d4\u30fc\u3057\u307e\u3057\u305f", "clipboard.copy": "\u30af\u30ea\u30c3\u30d7\u30dc\u30fc\u30c9\u3078\u30b3\u30d4\u30fc", "search.result.more.one": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3082\u30461\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.more.other": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3042\u3068#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.none": "\u4f55\u3082\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3067\u3057\u305f", "search.result.one": "1\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.other": "#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.placeholder": "\u691c\u7d22\u30ad\u30fc\u30ef\u30fc\u30c9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044", "search.result.term.missing": "\u691c\u7d22\u306b\u542b\u307e\u308c\u306a\u3044", "select.version": "\u30d0\u30fc\u30b8\u30e7\u30f3\u5207\u308a\u66ff\u3048"}, "version": null}</script>
+<script src="../../assets/javascripts/bundle.c8b220af.min.js"></script>
+<script src="../../javascripts/extra.js"></script>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@10.4.0/dist/mermaid.esm.min.mjs";
+mermaid.initialize({});</script></body>
+</html>
