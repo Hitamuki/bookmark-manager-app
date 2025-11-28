@@ -223,6 +223,41 @@ src/
 - `pnpm generate:api-client`で実行
 - 生成先: `src/libs/api-client/`
 
+### コーディング規約
+
+**ファイル規則**:
+- 拡張子: `.ts` (通常) / `.tsx` (Reactコンポーネント)
+
+**命名規則**:
+- 変数・関数: キャメルケース、意味のある名前（略語回避）
+- 定数: 大文字スネークケース（例: `MAX_RETRY_COUNT`）
+- Private変数・メソッド: プレフィックス `_` を使用
+
+**スタイル**:
+- インデント: スペース2個
+- セミコロン: 必須
+- クォート: シングルクォート（JSXではダブルクォート）
+- インポート順序: Biomeに従う
+
+**型定義**:
+- 暗黙的な`any`型を避ける
+- 関数の戻り値の型は必ず明示
+- ジェネリクスは意味のある名前を使用（単一文字を避ける）
+
+**コメント**:
+- 公開API/クラス/インターフェースにはJSDocコメント必須
+- インラインコメントは複雑なロジックの説明のみ
+
+**エラー処理**:
+- カスタム例外クラスを使用
+- try-catchブロックは適切な範囲で使用
+
+### テスト規約
+
+- テストファイル: `.test.ts` または `.spec.ts`
+- テスト名: 機能を明確に説明
+- AAA（Arrange-Act-Assert）パターンに従う
+
 ## トラブルシューティング
 
 ### ビルドが不正確な場合
@@ -256,19 +291,123 @@ pnpm install
 - **API仕様管理**: Apidog（仕様書生成・モック・テスト）
 - **バージョン管理**: mise（Node.js等のバージョン管理）
 
-## インフラ（AWS + Terraform）
+## インフラ（AWS + Terragrunt）
 
-- **IaC**: Terraform
+### 技術スタック
+
+- **IaC**: Terraform + Terragrunt（モジュール管理）
 - **コンピューティング**: ECS on Fargate
 - **ロードバランサー**: ALB
 - **CDN**: CloudFront + WAF
 - **DNS**: Route53
 - **ストレージ**: S3（静的アセット）
+- **コンテナレジストリ**: ECR
 - **DB**: Aurora PostgreSQL + MongoDB Atlas
 - **モニタリング**: Datadog + Sentry
 - **シークレット管理**: SSM Parameter Store
 
-Terraformディレクトリ: `infra/`（modules: network, security, compute, database, storage, monitoring）
+### ディレクトリ構成
+
+```
+infra/terraform/
+├── envs/                       # Terragrunt環境別設定
+│   ├── root.hcl                # ルート設定
+│   └── staging/
+│       ├── terragrunt.hcl      # 環境共通設定
+│       ├── ecr/                # コンテナレジストリ
+│       ├── network/            # VPC・サブネット
+│       ├── security/           # IAM・WAF・セキュリティグループ
+│       ├── compute/            # ECS・ALB・Fargate
+│       ├── database/           # Aurora・MongoDB・SSM
+│       └── storage/            # S3
+└── modules/                    # 再利用可能なTerraformモジュール
+```
+
+### インフラ構築手順
+
+**前提条件**:
+- AWS CLI、Terraform、Terragrunt、TFLintがインストール済み（`mise install`で一括インストール可能）
+- AWSアカウントとIAMユーザー（AdministratorAccess権限）作成済み
+- AWS CLIの認証設定完了（`aws configure`）
+
+**基本ワークフロー**:
+
+```bash
+# 1. ECRリポジトリ作成（最初に必要）
+cd infra/terraform/envs/staging/ecr
+terragrunt run init
+terragrunt run apply
+
+# 2. コンテナイメージをビルド＆プッシュ
+# プロジェクトルートで実行（詳細はinfra/README.md参照）
+# ECRログイン → docker build → docker tag → docker push
+
+# 3. 全インフラ構築（依存関係順に自動実行）
+cd infra/terraform/envs/staging
+tflint --init  # 初回のみ
+terragrunt run --all init
+terragrunt run --all plan   # 実行計画確認
+terragrunt run --all apply  # インフラ構築
+
+# 4. リソース確認・削除
+terragrunt run --all state list  # 作成済みリソース一覧
+terragrunt run --all destroy     # インフラ削除
+```
+
+**個別モジュール操作**:
+
+```bash
+cd infra/terraform/envs/staging/network
+terragrunt run init
+terragrunt run plan
+terragrunt run apply
+terragrunt run destroy
+```
+
+**便利コマンド**:
+
+```bash
+# リント・検証
+tflint --recursive
+terragrunt run validate
+
+# フォーマット
+terragrunt hcl fmt
+terraform fmt
+
+# 出力値確認
+terragrunt run output
+
+# 現在の状態確認
+terragrunt run show
+terragrunt run state list
+
+# Terragruntキャッシュクリア
+find . -type d -name ".terragrunt-cache" -exec rm -rf {} +
+```
+
+### Aurora PostgreSQLへのローカル接続
+
+**前提条件**:
+- AWS Session Manager Pluginインストール済み
+- ECSタスクが実行中
+
+**接続方法**:
+
+```bash
+# staging環境に接続
+./scripts/connect_to_awsdb.sh staging 5432
+
+# 別ターミナルでpsql接続
+psql postgresql://dbadmin:<PASSWORD>@localhost:5432/bookmarkdb
+```
+
+**DBクライアント（DBeaver等）での接続**:
+- Host: `localhost`
+- Port: `5432`
+- Database: `bookmarkdb`
+- Username: `dbadmin`
+- Password: スクリプト実行時に表示
 
 ## 開発方針
 
