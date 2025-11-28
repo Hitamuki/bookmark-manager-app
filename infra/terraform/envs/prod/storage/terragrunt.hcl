@@ -27,7 +27,7 @@ inputs = {
   # CORS設定（本番環境では具体的なドメイン指定）
   # TODO: ドメイン名は将来的に tidilyhub.app に変更する可能性あり
   cors_allowed_origins = [
-    "https://tidilyspace.app",
-    "https://www.tidilyspace.app"
+    "https://tidilyspace.com",
+    "https://www.tidilyspace.com"
   ]
 }

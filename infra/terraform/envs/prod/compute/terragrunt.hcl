@@ -149,7 +149,7 @@ inputs = {
 
   # ドメイン名
   # TODO: 将来的に tidilyhub.app に変更する可能性あり
-  domain_name = "tidilyspace.app"
+  domain_name = "tidilyspace.com"
 
   # Route53ホストゾーン作成（新規の場合はtrue、既存の場合はfalse）
   # 初回デプロイ時: true（新規作成）

@@ -24,12 +24,12 @@ graph TB
     end
 
     subgraph "DNS"
-        Route53[Route53<br>tidilyspace.app]
+        Route53[Route53<br>tidilyspace.com]
     end
 
     subgraph "AWS Cloud - Region: ap-northeast-1"
         subgraph "Certificate"
-            ACM[ACM証明書<br>*.tidilyspace.app<br>TLS 1.3]
+            ACM[ACM証明書<br>*.tidilyspace.com<br>TLS 1.3]
         end
 
         subgraph "VPC: 10.1.0.0/16"
@@ -232,17 +232,25 @@ graph TB
 
 ### 依存関係の説明
 
-1. **Phase 1: 基礎インフラ** (並列実行可能)
-   - ECR: コンテナイメージリポジトリ
+1. **Phase 1: ECRリポジトリ**
+   - ECR: コンテナイメージリポジトリ（最初に作成が必要）
+
+2. **Phase 2: Dockerイメージ**
+   - コンテナイメージのビルド＆プッシュ（Compute層で使用）
+
+3. **Phase 3: ネットワークとセキュリティ** (Phase 2完了後、並列実行可能)
    - Network: VPC、サブネット、NAT Gateway
    - Security: セキュリティグループ、IAMロール、WAF
 
-2. **Phase 2: データ層** (Phase 1完了後)
+4. **Phase 4: データ層** (Phase 3完了後)
    - Storage: S3バケット (Network依存)
    - Monitoring: Datadog/Sentry設定 (独立)
    - Database: Aurora (Network, Security依存)
 
-3. **Phase 3: アプリケーション層** (Phase 2完了後)
+5. **Phase 5: Prismaマイグレーション** (Phase 4完了後)
+   - データベーススキーマとテーブルの作成
+
+6. **Phase 6: アプリケーション層** (Phase 5完了後)
    - Compute: ECS、ALB、Auto Scaling (全依存)
 
 ## ディレクトリ構成
@@ -299,6 +307,8 @@ modules/                        # 再利用可能なTerraformモジュール
 
 ### 1. 前提条件の確認
 
+**Bash:**
+
 ```bash
 # AWS CLI認証情報確認
 aws sts get-caller-identity
@@ -312,6 +322,23 @@ export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output tex
 
 # Sentry認証トークン設定
 export SENTRY_AUTH_TOKEN=your-sentry-token
+```
+
+**Fish:**
+
+```fish
+# AWS CLI認証情報確認
+aws sts get-caller-identity
+
+# Terragrunt インストール確認
+terragrunt --version  # 0.93.0以上
+
+# 環境変数設定
+set -x AWS_REGION ap-northeast-1
+set -x AWS_ACCOUNT_ID (aws sts get-caller-identity --query Account --output text)
+
+# Sentry認証トークン設定
+set -x SENTRY_AUTH_TOKEN your-sentry-token
 ```
 
 ### 2. ローカル設定ファイルの作成
@@ -329,58 +356,307 @@ cp .tfvars.local.example .tfvars.local
 vim .tfvars.local
 ```
 
-### 3. ECRリポジトリ作成とイメージプッシュ
+### 3. ドメイン購入（Route53）
+
+⚠️ **重要**: インフラストラクチャをデプロイする前に、Route53でドメインを購入してください。これにより、Compute層デプロイ時に自動的にHTTPS化が完了します。
+
+#### ステップ1: AWS Consoleでドメイン購入
+
+1. **AWS Console** → **Route53** → **Registered domains** → **Register domain**
+2. `tidilyspace.com` を検索
+3. カートに追加して購入手続き
+   - **価格**: 約$13/年（.comドメイン）
+   - **自動更新**: 有効推奨
+   - **プライバシー保護**: 有効推奨
+4. 連絡先情報を入力
+5. 購入完了（**通常10-30分で登録完了**）
+
+#### ステップ2: ドメイン登録の確認
+
+⚠️ **Region指定について**: Route53 Domains APIは`us-east-1`リージョンでのみ利用可能です。インフラストラクチャ自体は`ap-northeast-1`にデプロイされますが、ドメイン関連の操作のみ`--region us-east-1`を指定してください。
 
 ```bash
-# ECRリポジトリ作成
-cd ecr
-terragrunt apply
+# ドメインが登録されたか確認
+aws route53domains get-domain-detail --domain-name tidilyspace.com --region us-east-1 --query 'DomainName' --output text
+# 出力例: tidilyspace.com
 
-# ECRログイン
-aws ecr get-login-password --region ap-northeast-1 | \
-  docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com
-
-# Dockerイメージビルド & プッシュ (プロジェクトルートから実行)
-cd ../../../../  # プロジェクトルートへ移動
-
-# Webイメージ
-docker build -t bookmark-manager-prod-web -f apps/frontend/web/Dockerfile .
-docker tag bookmark-manager-prod-web:latest \
-  ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/bookmark-manager-prod-web:latest
-docker push ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/bookmark-manager-prod-web:latest
-
-# APIイメージ
-docker build -t bookmark-manager-prod-api -f apps/web-api/core/Dockerfile .
-docker tag bookmark-manager-prod-api:latest \
-  ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/bookmark-manager-prod-api:latest
-docker push ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/bookmark-manager-prod-api:latest
+# ドメインのステータス確認
+aws route53domains get-domain-detail --domain-name tidilyspace.com --region us-east-1 --query 'StatusList' --output json
+# 出力例: ["clientTransferProhibited"]
 ```
 
-### 4. インフラストラクチャのデプロイ
+#### ステップ3: ネームサーバーの確認と調整
+
+Route53でドメインを購入すると、自動的に新しいホストゾーンが作成されます。しかし、Terraformで既にホストゾーンを作成済みなので、既存のホストゾーンを使用するように調整します。
+
+```bash
+# Route53購入時に自動作成されたホストゾーンのネームサーバーを確認
+aws route53domains get-domain-detail --domain-name tidilyspace.com --region us-east-1 --query 'Nameservers[*].Name' --output json
+
+# Terraformで作成済みの既存ホストゾーンのネームサーバーを確認
+aws route53 list-hosted-zones --query "HostedZones[?Name=='tidilyspace.com.'].Id" --output text
+# 出力例: /hostedzone/Z02049501824CSY6XOD0V
+
+aws route53 get-hosted-zone --id Z02049501824CSY6XOD0V --query 'DelegationSet.NameServers' --output json
+# 出力例:
+# [
+#   "ns-1641.awsdns-13.co.uk",
+#   "ns-897.awsdns-48.net",
+#   "ns-1059.awsdns-04.org",
+#   "ns-240.awsdns-30.com"
+# ]
+```
+
+**ネームサーバーの統一**:
+
+もし異なるネームサーバーが設定されている場合、以下の手順で既存のホストゾーンに統一してください。
+
+1. **AWS Console** → **Route53** → **Registered domains** → **tidilyspace.com**
+2. 右上の「**Add or edit name servers**」をクリック
+3. 既存のホストゾーンのネームサーバー（4つ）を入力
+4. 保存
+
+または、AWS CLIで変更。
+
+```bash
+# ネームサーバーを既存のホストゾーンに変更
+aws route53domains update-domain-nameservers \
+  --region us-east-1 \
+  --domain-name tidilyspace.com \
+  --nameservers \
+    Name=ns-1641.awsdns-13.co.uk \
+    Name=ns-897.awsdns-48.net \
+    Name=ns-1059.awsdns-04.org \
+    Name=ns-240.awsdns-30.com
+```
+
+#### ステップ4: 不要なホストゾーンの削除（オプション）
+
+Route53購入時に自動作成されたホストゾーンは不要なので削除できます（月額$0.50の節約）。
+
+```bash
+# 自動作成されたホストゾーンを特定
+aws route53 list-hosted-zones --query "HostedZones[?Name=='tidilyspace.com.']" --output json
+
+# Terraformで作成したホストゾーンIDと比較して、異なる方を削除
+# 削除前にレコードを確認
+aws route53 list-resource-record-sets --hosted-zone-id <自動作成されたホストゾーンID> --output json
+
+# NS/SOAレコードのみの場合は安全に削除可能
+aws route53 delete-hosted-zone --id <自動作成されたホストゾーンID>
+```
+
+#### ステップ5: compute/terragrunt.hcl の設定確認
+
+Compute層をHTTPS対応でデプロイするため、`enable_acm = true` に設定されていることを確認してください。
+
+```bash
+cd infra/terraform/envs/prod/compute
+grep "enable_acm" terragrunt.hcl
+# 出力: enable_acm = true
+```
+
+もし `false` になっている場合は、`true` に変更してください。
+
+### 4. 環境変数とシークレットの設定
+
+インフラストラクチャをデプロイする前に、SSM Parameter StoreとAWS Secrets Managerに必要な環境変数とシークレットを設定します。
+
+#### SSM Parameter Storeへの環境変数設定
+
+**MongoDB接続文字列の設定**:
+
+```bash
+# MongoDB Atlas接続文字列を設定
+aws ssm put-parameter \
+  --name "/bookmark-manager/prod/MONGODB_URI" \
+  --value "mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority" \
+  --type "SecureString" \
+  --region ap-northeast-1
+```
+
+**注意**:
+
+- MongoDB Atlasのアカウント作成と接続文字列の取得が必要
+- 接続文字列にはユーザー名、パスワード、クラスタ名、データベース名が含まれる
+- 本番環境では専用のMongoDBクラスターを使用することを推奨
+
+**その他の環境変数（必要に応じて）**:
+
+```bash
+# JWT_SECRET（認証機能実装時に設定）
+# aws ssm put-parameter \
+#   --name "/bookmark-manager/prod/JWT_SECRET" \
+#   --value "your-secret-key" \
+#   --type "SecureString" \
+#   --region ap-northeast-1
+```
+
+#### AWS Secrets Managerへのシークレット設定
+
+⚠️ **重要**: 以下のシークレットはstaging環境作成時に既に作成済みの場合、本番環境でも共有されます。初回のみ作成が必要です。
+
+**Sentry Auth Token（Terraform Provider用）**:
+
+```bash
+# Sentry Internal Integration作成（必須権限: Project:Admin, Team:Read, Organization:Read, Issue&Event:Write）
+aws secretsmanager create-secret \
+  --name "sentry/auth_token" \
+  --description "Sentry Auth Token for Terraform Provider" \
+  --secret-string "your-sentry-internal-integration-token" \
+  --region ap-northeast-1
+```
+
+**Datadog API Key（データ送信用）**:
+
+```bash
+# Datadog API Key作成
+aws secretsmanager create-secret \
+  --name "datadog/api_key" \
+  --description "Datadog API Key for Datadog Agent" \
+  --secret-string "your-datadog-api-key-32-chars" \
+  --region ap-northeast-1
+```
+
+**Datadog App Key（Terraform Provider用）**:
+
+```bash
+# Datadog App Key作成（必須スコープ: dashboards_read/write, monitors_read/write）
+aws secretsmanager create-secret \
+  --name "datadog/app_key" \
+  --description "Datadog App Key for Terraform Provider" \
+  --secret-string "your-datadog-app-key-40-chars" \
+  --region ap-northeast-1
+```
+
+**シークレット設定の確認**:
+
+```bash
+# SSM Parameter Storeの確認
+aws ssm get-parameter \
+  --name "/bookmark-manager/prod/MONGODB_URI" \
+  --with-decryption \
+  --region ap-northeast-1
+
+# Secrets Managerの確認
+aws secretsmanager list-secrets \
+  --region ap-northeast-1 \
+  --query 'SecretList[?Name==`sentry/auth_token` || Name==`datadog/api_key` || Name==`datadog/app_key`].[Name,Description]' \
+  --output table
+```
+
+### 5. インフラストラクチャのデプロイ
+
+#### Phase 1: 基礎インフラ
 
 ```bash
 cd infra/terraform/envs/prod
 
-# Phase 1: 基礎インフラ (並列実行可能)
-cd network && terragrunt apply -auto-approve
-cd ../security && terragrunt apply -auto-approve
-
-# Phase 2: データ層
-cd ../storage && terragrunt apply -auto-approve
-cd ../monitoring && terragrunt apply -auto-approve
-cd ../database && terragrunt apply -auto-approve  # ⚠️ 約10-15分かかります
-
-# Phase 3: アプリケーション層
-cd ../compute && terragrunt apply -auto-approve
+# ECRリポジトリ作成
+cd ecr && terragrunt apply -auto-approve
 ```
 
-### 5. Prismaマイグレーションの実行
+#### Phase 2: Dockerイメージのビルド＆プッシュ
+
+⚠️ **重要**: Compute層(ECS)をデプロイする前に、ECRにコンテナイメージをプッシュしておく必要があります。
+
+**Bash:**
+
+```bash
+# ECRログイン
+aws ecr get-login-password --region ap-northeast-1 | \
+  docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com
+
+# プロジェクトルートへ移動
+cd ../../../../
+
+# Webイメージのビルド＆プッシュ
+docker build --platform linux/amd64 -t bookmark-manager-prod-web -f src/apps/frontend/web/Dockerfile .
+docker tag bookmark-manager-prod-web:latest \
+  ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/bookmark-manager-prod-web:latest
+docker push ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/bookmark-manager-prod-web:latest
+
+# APIイメージのビルド＆プッシュ
+docker build --platform linux/amd64 -t bookmark-manager-prod-api -f src/apps/web-api/core/Dockerfile .
+docker tag bookmark-manager-prod-api:latest \
+  ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/bookmark-manager-prod-api:latest
+docker push ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/bookmark-manager-prod-api:latest
+
+# インフラディレクトリに戻る
+cd infra/terraform/envs/prod
+```
+
+**Fish:**
+
+```bash
+# ECRログイン
+aws ecr get-login-password --region ap-northeast-1 | \
+  docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com
+
+# プロジェクトルートへ移動
+cd ../../../../
+
+# Webイメージのビルド＆プッシュ
+docker build --platform linux/amd64 -t bookmark-manager-prod-web -f src/apps/frontend/web/Dockerfile .
+docker tag bookmark-manager-prod-web:latest \
+  $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/bookmark-manager-prod-web:latest
+docker push $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/bookmark-manager-prod-web:latest
+
+# APIイメージのビルド＆プッシュ
+docker build --platform linux/amd64 -t bookmark-manager-prod-api -f src/apps/web-api/core/Dockerfile .
+docker tag bookmark-manager-prod-api:latest \
+  $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/bookmark-manager-prod-api:latest
+docker push $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/bookmark-manager-prod-api:latest
+
+# インフラディレクトリに戻る
+cd infra/terraform/envs/prod
+```
+
+#### Phase 3: ネットワークとセキュリティ（並列実行可能）
+
+```bash
+# ネットワークとセキュリティの構築
+cd network && terragrunt apply -auto-approve
+cd ../security && terragrunt apply -auto-approve
+```
+
+#### Phase 4: データ層
+
+```bash
+# ストレージとモニタリングの構築
+cd storage && terragrunt apply -auto-approve
+cd ../monitoring && terragrunt apply -auto-approve
+
+# データベースの構築（⚠️ 約10-15分かかります）
+cd ../database && terragrunt apply -auto-approve
+```
+
+#### Phase 5: Prismaマイグレーションの実行
 
 データベースが構築されたら、Prismaマイグレーションを実行してテーブルを作成します。
 
-**重要**: Auroraはプライベートサブネットにあるため、ローカルから直接アクセスできません。SSMポートフォワーディング経由で接続する必要があります。
+⚠️ **重要**: Auroraはプライベートサブネットにあるため、ローカルから直接アクセスできません。SSMポートフォワーディング経由で接続する必要があります。
 
-#### ステップ1: 環境変数ファイルの準備
+##### ステップ1: 環境変数ファイルの準備
+
+**Bash:**
+
+```bash
+# プロジェクトルートで実行
+
+# SSM Parameter StoreからDATABASE_URLを取得して設定
+# localhost経由でアクセスするため、エンドポイントをlocalhostに変更
+aws ssm get-parameter \
+  --name "/bookmark-manager/prod/DATABASE_URL" \
+  --with-decryption \
+  --query "Parameter.Value" \
+  --output text
+
+# 取得したURLのホスト部分をlocalhostに置き換えて.env.prodに設定
+# 例: postgresql://dbadmin:PASSWORD@localhost:5432/bookmarkdb
+```
+
+**Fish:**
 
 ```bash
 # プロジェクトルートで実行
@@ -400,10 +676,11 @@ aws ssm get-parameter \
 `.env.prod`の例。
 
 ``` txt
+<!-- DATABASE_URLのパスワードに含まれる特殊文字はURLエンコードする -->
 DATABASE_URL="postgresql://dbadmin:YOUR_PASSWORD@localhost:5432/bookmarkdb"
 ```
 
-#### ステップ2: SSMポートフォワーディングの開始
+##### ステップ2: SSMポートフォワーディングの開始
 
 別ターミナルで、Bastion EC2経由でAuroraへのポートフォワーディングを確立します。
 
@@ -424,7 +701,7 @@ DATABASE_URL="postgresql://dbadmin:YOUR_PASSWORD@localhost:5432/bookmarkdb"
 - Bastionインスタンスが停止している場合、起動してください
 - SSM セッション Manager Pluginがインストールされていることを確認してください
 
-#### ステップ3: マイグレーションの実行
+##### ステップ3: マイグレーションの実行
 
 ポートフォワーディングが確立したら、元のターミナルでマイグレーションを実行します。
 
@@ -444,7 +721,7 @@ pnpm dotenv -e .env.prod -- prisma db seed \
 - ローカル開発では`migrate dev`を使用しますが、本番環境では`migrate deploy`を使用する
 - ポートフォワーディングが確立している間のみマイグレーションが可能
 
-#### ステップ4: マイグレーション確認
+##### ステップ4: マイグレーション確認
 
 ```bash
 # Prisma Studioでテーブルを確認
@@ -461,7 +738,7 @@ psql "postgresql://dbadmin:<PASSWORD>@localhost:5432/bookmarkdb"
 \q
 ```
 
-#### ステップ5: ポートフォワーディングの終了
+##### ステップ5: ポートフォワーディングの終了
 
 マイグレーションが完了したら、ポートフォワーディングを終了します。
 
@@ -469,51 +746,29 @@ psql "postgresql://dbadmin:<PASSWORD>@localhost:5432/bookmarkdb"
 # ポートフォワーディングを実行しているターミナルで Ctrl+C を押す
 ```
 
-### 6. Route53ネームサーバー設定
+#### Phase 6: アプリケーション層（HTTPS対応）
+
+ドメイン購入が完了したら（セクション3参照）、HTTPS対応でCompute層をデプロイします。
 
 ```bash
-cd compute
+# ECS、ALB、Auto Scalingの構築
+cd ../compute && terragrunt apply -auto-approve
 
-# Route53ホストゾーンのネームサーバーを確認
-terragrunt output route53_zone_name_servers
-
-# 出力例:
-# [
-#   "ns-1234.awsdns-12.org",
-#   "ns-5678.awsdns-34.com",
-#   "ns-9012.awsdns-56.net",
-#   "ns-3456.awsdns-78.co.uk"
-# ]
-
-# ⚠️ 重要: ドメインレジストラでネームサーバーを上記の値に設定
-# - お名前.com、ムームードメインなどの管理画面にアクセス
-# - tidilyspace.app のネームサーバー設定を変更
-# - 上記4つのネームサーバーを登録
-# - DNS伝播には最大48時間かかる場合があります（通常は1-2時間）
+# ACM証明書のステータス確認（5-10分で検証完了）
+aws acm describe-certificate --certificate-arn $(terragrunt output -raw acm_certificate_arn) --region ap-northeast-1 --query 'Certificate.Status' --output text
+# 出力: ISSUED （検証完了）
 ```
 
-### 7. ACM証明書の検証待機
+### 6. デプロイ確認
 
-```bash
-# ACM証明書のステータス確認
-cd compute
-terragrunt output acm_certificate_status
-
-# "ISSUED"になるまで待機（通常5-10分、Route53のDNS検証レコードが自動作成される）
-# DNS伝播が完了していれば自動的に検証される
-
-# 証明書ARNを確認
-terragrunt output acm_certificate_arn
-```
-
-### 8. デプロイ確認
+**Bash:**
 
 ```bash
 # Webサイト URL を取得（HTTPSで自動リダイレクト）
 cd compute
 terragrunt output website_url
 
-# 出力例: https://tidilyspace.app
+# 出力例: https://tidilyspace.com
 
 # ヘルスチェック（HTTPS）
 DOMAIN=$(terragrunt output -raw domain_name)
@@ -538,7 +793,41 @@ cd ../database
 terragrunt output db_endpoint
 ```
 
-### 9. WAF動作確認
+**Fish:**
+
+```bash
+# Webサイト URL を取得（HTTPSで自動リダイレクト）
+cd compute
+terragrunt output website_url
+
+# 出力例: https://tidilyspace.com
+
+# ヘルスチェック（HTTPS）
+set DOMAIN (terragrunt output -raw domain_name)
+curl -I https://$DOMAIN/health          # Next.jsヘルスチェック（HTTPS）
+curl -I https://$DOMAIN/api/health      # NestJSヘルスチェック（HTTPS）
+
+# HTTPからHTTPSへのリダイレクト確認
+curl -I http://$DOMAIN/health           # 301リダイレクト -> HTTPS
+
+# wwwサブドメインも動作確認
+curl -I https://www.$DOMAIN/health
+
+# ECSタスク状態確認
+aws ecs describe-services \
+  --cluster bookmark-manager-prod-cluster \
+  --services bookmark-manager-prod-web bookmark-manager-prod-api \
+  --query 'services[*].{Name:serviceName,Running:runningCount,Desired:desiredCount,Status:status}' \
+  --output table
+
+# Auroraエンドポイント確認
+cd ../database
+terragrunt output db_endpoint
+```
+
+### 7. WAF動作確認
+
+**Bash:**
 
 ```bash
 DOMAIN=$(terragrunt output -raw domain_name)
@@ -563,7 +852,34 @@ aws cloudwatch get-metric-statistics \
   --statistics Sum
 ```
 
-### 10. SSL/TLS証明書確認
+**Fish:**
+
+```bash
+set DOMAIN (terragrunt output -raw domain_name)
+
+# 正常なリクエスト (200 OK)
+curl -I https://$DOMAIN/health
+
+# SQLインジェクション試行 (403 Forbidden - WAFでブロック)
+curl -I "https://$DOMAIN/?id=1' OR '1'='1"
+
+# XSS試行 (403 Forbidden - WAFでブロック)
+curl -I "https://$DOMAIN/?q=<script>alert('XSS')</script>"
+
+# WAFメトリクス確認
+aws cloudwatch get-metric-statistics \
+  --namespace AWS/WAFV2 \
+  --metric-name BlockedRequests \
+  --dimensions Name=WebACL,Value=bookmark-manager-prod-waf Name=Region,Value=ap-northeast-1 \
+  --start-time (date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%S) \
+  --end-time (date -u +%Y-%m-%dT%H:%M:%S) \
+  --period 300 \
+  --statistics Sum
+```
+
+### 8. SSL/TLS証明書確認
+
+**Bash:**
 
 ```bash
 DOMAIN=$(terragrunt output -raw domain_name)
@@ -578,13 +894,46 @@ echo "https://www.ssllabs.com/ssltest/analyze.html?d=${DOMAIN}"
 echo "https://${DOMAIN}"
 ```
 
-### 11. Auto Scaling動作確認
+**Fish:**
+
+```bash
+set DOMAIN (terragrunt output -raw domain_name)
+
+# SSL証明書情報確認
+openssl s_client -connect $DOMAIN:443 -servername $DOMAIN </dev/null 2>/dev/null | openssl x509 -noout -text
+
+# SSL Labs でセキュリティ評価（ブラウザで確認）
+echo "https://www.ssllabs.com/ssltest/analyze.html?d=$DOMAIN"
+
+# ブラウザでHTTPS接続確認
+echo "https://$DOMAIN"
+```
+
+### 9. Auto Scaling動作確認
+
+**Bash:**
 
 ```bash
 DOMAIN=$(terragrunt output -raw domain_name)
 
 # 負荷テスト (Apache Bench使用)
 ab -n 10000 -c 100 https://${DOMAIN}/
+
+# スケーリング状態監視 (別ターミナルで実行)
+watch -n 10 'aws ecs describe-services \
+  --cluster bookmark-manager-prod-cluster \
+  --services bookmark-manager-prod-web \
+  --query "services[0].{Desired:desiredCount,Running:runningCount,Pending:pendingCount}" \
+  --output table'
+```
+
+**Fish:**
+
+```bash
+set DOMAIN (terragrunt output -raw domain_name)
+
+# 負荷テスト (Apache Bench使用)
+ab -n 10000 -c 100 https://$DOMAIN/
 
 # スケーリング状態監視 (別ターミナルで実行)
 watch -n 10 'aws ecs describe-services \
@@ -646,7 +995,7 @@ watch -n 10 'aws ecs describe-services \
 
 - **S3バージョニング**: 有効
 - **ライフサイクル**: IA移行180日、削除730日
-- **CORS**: tidilyspace.app（将来的に tidilyhub.app に変更の可能性あり）
+- **CORS**: tidilyspace.com
 
 ### ECR
 
@@ -657,30 +1006,38 @@ watch -n 10 'aws ecs describe-services \
 
 ### 前提条件
 
-1. ECRにコンテナイメージがプッシュされていること
-2. AWS CLIが設定されていること
-3. `.tfvars.local` ファイルが作成されていること（Sentry/Datadog設定）
+1. AWS CLIが設定されていること
+2. `.tfvars.local` ファイルが作成されていること（Sentry/Datadog設定）
+3. Dockerがインストールされていること
 
-### 段階的デプロイ
+### 段階的デプロイ（推奨）
 
 ```bash
 cd infra/terraform/envs/prod
 
 # Phase 1: 基礎インフラ
-cd ecr && terragrunt apply
-cd ../network && terragrunt apply
-cd ../security && terragrunt apply
+cd ecr && terragrunt apply              # ECRリポジトリ作成
 
-# Phase 2: データ層
-cd ../storage && terragrunt apply
-cd ../monitoring && terragrunt apply
-cd ../database && terragrunt apply  # 約10-15分かかります
+# ⚠️ Phase 2: Dockerイメージをビルド&プッシュ（手順は「環境構築手順 > Phase 2」参照）
 
-# Phase 3: アプリケーション層
-cd ../compute && terragrunt apply
+# Phase 3: ネットワークとセキュリティ
+cd network && terragrunt apply          # VPC/サブネット/NAT
+cd ../security && terragrunt apply       # SG/IAM/WAF
+
+# Phase 4: データ層
+cd ../storage && terragrunt apply        # S3バケット
+cd ../monitoring && terragrunt apply     # Datadog/Sentry
+cd ../database && terragrunt apply       # Aurora（約10-15分）
+
+# ⚠️ Phase 5: Prismaマイグレーション実行（手順は「環境構築手順 > Phase 5」参照）
+
+# Phase 6: アプリケーション層（HTTPS対応）
+cd ../compute && terragrunt apply        # ECS/ALB/Auto Scaling
 ```
 
 ### 一括デプロイ（推奨しない）
+
+⚠️ **注意**: 依存関係が複雑なため、段階的デプロイを推奨します。特にECRイメージのプッシュは手動で行う必要があります。
 
 ```bash
 cd infra/terraform/envs/prod
@@ -715,6 +1072,8 @@ curl http://<ALB_DNS_NAME>/health
 
 ### オートスケーリング動作確認
 
+**Bash:**
+
 ```bash
 # ECSタスク数を監視
 aws ecs describe-services \
@@ -730,6 +1089,27 @@ aws cloudwatch get-metric-statistics \
   --dimensions Name=ServiceName,Value=bookmark-manager-prod-web \
   --start-time $(date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%S) \
   --end-time $(date -u +%Y-%m-%dT%H:%M:%S) \
+  --period 300 \
+  --statistics Average
+```
+
+**Fish:**
+
+```bash
+# ECSタスク数を監視
+aws ecs describe-services \
+  --cluster bookmark-manager-prod-cluster \
+  --services bookmark-manager-prod-web bookmark-manager-prod-api \
+  --query 'services[*].{Name:serviceName,Running:runningCount,Desired:desiredCount}' \
+  --output table
+
+# CloudWatch Metricsで詳細確認
+aws cloudwatch get-metric-statistics \
+  --namespace AWS/ECS \
+  --metric-name DesiredTaskCount \
+  --dimensions Name=ServiceName,Value=bookmark-manager-prod-web \
+  --start-time (date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%S) \
+  --end-time (date -u +%Y-%m-%dT%H:%M:%S) \
   --period 300 \
   --statistics Average
 ```
@@ -893,15 +1273,7 @@ aws application-autoscaling describe-scaling-policies \
 
 ### 現在のドメイン
 
-- `tidilyspace.app`
-
-### TODO
-
-- 将来的に `tidilyhub.app` に変更する可能性あり
-- 変更時は以下のファイルを更新してください:
-  - `storage/terragrunt.hcl` の `cors_allowed_origins`
-  - Route53レコード（実装時）
-  - ACM証明書（実装時）
+- `tidilyspace.com`
 
 ## 削除
 
@@ -914,6 +1286,8 @@ aws application-autoscaling describe-scaling-policies \
 - 関係者への通知
 
 ### 削除手順
+
+#### ステップ1: インフラストラクチャの削除
 
 ```bash
 cd infra/terraform/envs/prod
@@ -930,6 +1304,66 @@ cd ../security && terragrunt destroy
 cd ../network && terragrunt destroy
 cd ../ecr && terragrunt destroy
 ```
+
+#### ステップ2: Route53ホストゾーンの削除
+
+Terraformで作成したホストゾーンを削除します。
+
+```bash
+# ホストゾーンIDを確認
+aws route53 list-hosted-zones --query "HostedZones[?Name=='tidilyspace.com.'].Id" --output text
+# 出力例: /hostedzone/Z02049501824CSY6XOD0V
+
+# レコードを確認（NS/SOAのみであることを確認）
+aws route53 list-resource-record-sets --hosted-zone-id Z02049501824CSY6XOD0V --output json
+
+# ホストゾーンを削除（NS/SOAレコード以外のレコードがある場合は先に削除が必要）
+aws route53 delete-hosted-zone --id Z02049501824CSY6XOD0V
+```
+
+#### ステップ3: ドメインの削除（オプション）
+
+⚠️ **警告**: ドメインを削除すると、再取得が困難になる場合があります。慎重に検討してください。
+
+**Route53でのドメイン削除**:
+
+Route53で購入したドメインは、AWS Consoleから削除できます。
+
+1. **AWS Console** → **Route53** → **Registered domains**
+2. `tidilyspace.com` を選択
+3. 右上の「**Delete domain**」をクリック
+4. 確認メッセージに従って削除
+
+または、AWS CLIで削除。
+
+```bash
+# ドメインの削除（自動更新を無効化して有効期限まで待つ）
+aws route53domains update-domain-nameservers \
+  --region us-east-1 \
+  --domain-name tidilyspace.com \
+  --nameservers Name=ns-000.awsdns-00.com
+
+# 自動更新を無効化
+aws route53domains disable-domain-auto-renew \
+  --region us-east-1 \
+  --domain-name tidilyspace.com
+```
+
+⚠️ **注意**:
+
+- Route53でのドメイン削除は即座には実行されません
+- 登録期間が終了するまで課金される
+- ドメインを完全に削除するには、有効期限まで待つか、AWS Supportに連絡してください
+
+### ドメインの再作成
+
+削除したドメインを再度購入する場合は、「**3. ドメイン購入（Route53）**」セクションの手順に従ってください。
+
+⚠️ **重要**:
+
+- `.com`ドメインは人気が高いため、削除後すぐに第三者に取得される可能性がある
+- 同じドメインの再取得を保証できません
+- 継続して使用する予定がある場合は、削除せずに保持することを強く推奨
 
 ## 参考リンク
 

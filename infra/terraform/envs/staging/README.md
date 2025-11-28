@@ -447,7 +447,8 @@ aws ssm get-parameter \
 ```
 
 `.env.staging`の例：
-```
+``` bash
+# DATABASE_URLのパスワードに含まれる特殊文字はURLエンコードする
 DATABASE_URL="postgresql://dbadmin:YOUR_PASSWORD@localhost:5432/bookmarkdb"
 ```
 
