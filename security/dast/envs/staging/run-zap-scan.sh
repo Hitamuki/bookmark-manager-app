@@ -113,7 +113,7 @@ echo ""
 
 # 対象URLの疎通確認
 echo -e "${YELLOW}[1/4] 対象URLの疎通確認中...${NC}"
-if curl -s -o /dev/null -w "%{http_code}" "${TARGET_URL}" | grep -q "200\|301\|302"; then
+if curl -s -o /dev/null -w "%{http_code}" "${TARGET_URL}" | grep -q "200\|301\|302\|307"; then
     echo -e "${GREEN}✓ 疎通確認成功${NC}"
 else
     echo -e "${RED}✗ 対象URLに接続できません: ${TARGET_URL}${NC}"

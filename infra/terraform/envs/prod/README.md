@@ -558,20 +558,34 @@ cd ecr && terragrunt apply -auto-approve
 
 #### Phase 2: Dockerイメージのビルド＆プッシュ
 
-⚠️ **重要**: Compute層(ECS)をデプロイする前に、ECRにコンテナイメージをプッシュしておく必要があります。
+- ⚠️ **重要**: Compute層(ECS)をデプロイする前に、ECRにコンテナイメージをプッシュしておく必要がある
+- ⚠️ **Next.js環境変数の注意点**: `NEXT_PUBLIC_*` プレフィックスの環境変数はビルド時にクライアント側のコードにバンドルされるため、`--build-arg`でビルド時に渡す必要がある
 
 **Bash:**
 
 ```bash
+# AWS情報取得
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+AWS_REGION=$(aws configure get region)
+
 # ECRログイン
 aws ecr get-login-password --region ap-northeast-1 | \
   docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com
 
-# プロジェクトルートへ移動
-cd ../../../../
+# Sentry DSNを取得（monitoringモジュールから）
+cd monitoring
+SENTRY_DSN=$(terragrunt output -raw sentry_dsn)
+echo "Sentry DSN: ${SENTRY_DSN}"
 
-# Webイメージのビルド＆プッシュ
-docker build --platform linux/amd64 -t bookmark-manager-prod-web -f src/apps/frontend/web/Dockerfile .
+# プロジェクトルートへ移動
+cd ../../../../../
+
+# Webイメージのビルド＆プッシュ（Sentry DSNをビルド引数として渡す）
+docker build \
+  --platform linux/amd64 \
+  --build-arg NEXT_PUBLIC_SENTRY_DSN="${SENTRY_DSN}" \
+  -t bookmark-manager-prod-web \
+  -f src/apps/frontend/web/Dockerfile .
 docker tag bookmark-manager-prod-web:latest \
   ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/bookmark-manager-prod-web:latest
 docker push ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/bookmark-manager-prod-web:latest
@@ -589,15 +603,28 @@ cd infra/terraform/envs/prod
 **Fish:**
 
 ```bash
+# AWS情報取得
+set AWS_ACCOUNT_ID (aws sts get-caller-identity --query Account --output text)
+set AWS_REGION (aws configure get region)
+
 # ECRログイン
 aws ecr get-login-password --region ap-northeast-1 | \
   docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com
 
-# プロジェクトルートへ移動
-cd ../../../../
+# Sentry DSNを取得（monitoringモジュールから）
+cd monitoring
+set SENTRY_DSN (terragrunt output -raw sentry_dsn)
+echo "Sentry DSN: $SENTRY_DSN"
 
-# Webイメージのビルド＆プッシュ
-docker build --platform linux/amd64 -t bookmark-manager-prod-web -f src/apps/frontend/web/Dockerfile .
+# プロジェクトルートへ移動
+cd ../../../../../
+
+# Webイメージのビルド＆プッシュ（Sentry DSNをビルド引数として渡す）
+docker build \
+  --platform linux/amd64 \
+  --build-arg NEXT_PUBLIC_SENTRY_DSN="$SENTRY_DSN" \
+  -t bookmark-manager-prod-web \
+  -f src/apps/frontend/web/Dockerfile .
 docker tag bookmark-manager-prod-web:latest \
   $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/bookmark-manager-prod-web:latest
 docker push $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/bookmark-manager-prod-web:latest

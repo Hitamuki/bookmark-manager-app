@@ -636,7 +636,7 @@ site*/
 storybook-static
 
 # OWASP ZAP
-infra/dast/reports
+security/dast/**/reports
 
 # MCP Server
 .mcp.json

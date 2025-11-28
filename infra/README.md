@@ -438,12 +438,11 @@ enable_execute_command = true
 
 ## TBD
 
-- DatadogやSentryをTerraform管理
+- staging → dev、prodの時間制限をstaging
 - コスパ重視のホスティングサービスと切り分け
   - Web：Vercel
   - API：Render
   - DB（PostgreSQL）：Supabase
   - DB（MongoDB）：MongoDB Atlas
 - tfstateファイルをS3バックエンドへの移行（チーム開発時）
-- prod環境のTerragrunt設定作成（商用利用時）
 - Kubernetes、EKS移行（マイクロサービス化）

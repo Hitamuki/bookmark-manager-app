@@ -1,0 +1,31 @@
+services:
+  zap:
+    image: ghcr.io/zaproxy/zaproxy:stable
+    container_name: owasp-zap-prod
+    user: zap
+    volumes:
+      # レポート出力先
+      - ./reports:/zap/reports:rw
+      # ZAP設定ファイル
+      - ./zap-baseline-config.yaml:/zap/config.yaml:ro
+    networks:
+      - dast-network
+    command: >
+      zap-baseline.py
+      -t ${TARGET_URL:-https://tidilyspace.com}
+      -r /zap/reports/zap-report-$(date +%Y%m%d-%H%M%S).html
+      -J /zap/reports/zap-report-$(date +%Y%m%d-%H%M%S).json
+      -w /zap/reports/zap-report-$(date +%Y%m%d-%H%M%S).md
+      -x /zap/reports/zap-report-$(date +%Y%m%d-%H%M%S).xml
+      -l INFO
+      -c /zap/config.yaml
+      -a
+    environment:
+      # タイムゾーン設定
+      - TZ=Asia/Tokyo
+      # ZAPのメモリ設定（本番環境は控えめに）
+      - ZAPROXY_JAVA_OPTS=-Xmx1g
+
+networks:
+  dast-network:
+    driver: bridge

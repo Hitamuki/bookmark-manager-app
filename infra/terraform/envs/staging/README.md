@@ -943,7 +943,7 @@ find . -type d -name ".terragrunt-cache" -exec rm -rf {} +
 依存関係に従って、以下の順序でモジュールを削除する必要があります:
 
 ```bash
-cd /Users/kumao/SourceCode/01_develop/bookmark-manager-app/infra/terraform/envs/staging
+cd infra/terraform/envs/staging
 
 # 1. Monitoringモジュール削除
 cd monitoring
