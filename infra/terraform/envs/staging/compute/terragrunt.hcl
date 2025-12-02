@@ -125,4 +125,14 @@ inputs = {
   # Datadog監視設定
   enable_datadog = true
   app_version    = "1.0.0"
+
+  # ============================================================
+  # Route53 & ACM設定（staging環境では無効）
+  # ============================================================
+
+  # Route53無効（ALBのDNS名を直接使用）
+  enable_route53 = false
+
+  # ACM無効（HTTPのみ）
+  enable_acm = false
 }

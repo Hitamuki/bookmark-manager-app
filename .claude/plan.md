@@ -518,7 +518,7 @@ const nextConfig = {
   output: process.env.VERCEL ? undefined : 'standalone',
 
   async rewrites() {
-    const apiUrl = process.env.API_URL || 'http://localhost:4000';
+    const apiUrl = process.env.API_URL || 'http://localhost:3001';
     return [
       {
         source: '/api/:path*',
@@ -575,7 +575,7 @@ tracer.init({
 async function bootstrap() {
   // ... 既存コード ...
 
-  const port = process.env.PORT || 4000;
+  const port = process.env.PORT || 3001;
   // Fly.ioでは0.0.0.0でリッスン
   await app.listen(port, '0.0.0.0');
   logger.log(`🚀 Application is running on: http://localhost:${port}/${globalPrefix}`);

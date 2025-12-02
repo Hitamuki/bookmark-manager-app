@@ -1,5 +1,5 @@
 ### Fix
-@baseUrl = http://localhost:4000/api
+@baseUrl = http://localhost:3001/api
 @contentType = application/json
 
 ### Variables

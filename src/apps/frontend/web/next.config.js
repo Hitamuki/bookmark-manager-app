@@ -28,8 +28,8 @@ const nextConfig = {
   },
   output: 'standalone',
   async rewrites() {
-    // ECS環境ではALB経由、ローカルではlocalhost:4000
-    const apiUrl = process.env.API_URL || 'http://localhost:4000';
+    // ECS環境ではALB経由、ローカルではlocalhost:3001
+    const apiUrl = process.env.API_URL || 'http://localhost:3001';
     return [
       {
         // 全ての /api/* をバックエンドAPIへプロキシ（/healthはApp Routerで処理）

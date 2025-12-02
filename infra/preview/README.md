@@ -116,6 +116,9 @@ Settings → Environment Variables で設定。
 # API接続
 API_URL=https://bookmark-api-preview.fly.dev
 
+# アプリケーションURL（ログ出力用）
+NEXT_PUBLIC_APP_URL=https://bookmark-manager-preview.vercel.app
+
 # 機能フラグ
 NEXT_PUBLIC_API_MOCKING=disabled
 
@@ -141,6 +144,9 @@ MONGODB_URI="mongodb+srv://bookmark_preview:[PASSWORD]@bookmark-manager-preview.
 
 # Security
 ALLOWED_ORIGINS="https://bookmark-manager-preview.vercel.app,http://localhost:3000"
+
+# Application URL（ログ出力用）
+PUBLIC_URL="https://bookmark-api-preview.fly.dev/api"
 
 # Monitoring
 DD_ENV=preview

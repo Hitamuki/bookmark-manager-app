@@ -82,9 +82,14 @@ async function bootstrap() {
   // biome-ignore lint/correctness/useHookAtTopLevel: NestJSのコードなのでReact Hooksのルールは適用しない
   app.useGlobalFilters(new AllExceptionsFilter(logger));
 
-  const port = process.env.PORT || 4000;
+  const port = process.env.PORT || 3001;
   await app.listen(port);
-  logger.log(`🚀 Application is running on: http://localhost:${port}/${globalPrefix}`);
+
+  // 環境に応じた適切なURLを表示
+  const publicUrl = process.env.PUBLIC_URL;
+  const baseUrl = publicUrl ? `${publicUrl}/${globalPrefix}` : `http://localhost:${port}/${globalPrefix}`;
+
+  logger.log(`🚀 Application is running on: ${baseUrl}`);
 }
 
 bootstrap();

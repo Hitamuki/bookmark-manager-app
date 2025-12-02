@@ -32,7 +32,11 @@ resource "aws_ecs_task_definition" "web" {
         [
           {
             name  = "API_URL"
-            value = "http://${aws_lb.main.dns_name}"
+            value = var.enable_route53 ? (var.enable_acm ? "https://${var.domain_name}" : "http://${var.domain_name}") : "http://${aws_lb.main.dns_name}"
+          },
+          {
+            name  = "NEXT_PUBLIC_APP_URL"
+            value = var.enable_route53 ? (var.enable_acm ? "https://${var.domain_name}" : "http://${var.domain_name}") : "http://${aws_lb.main.dns_name}"
           }
         ],
         var.enable_datadog ? [
@@ -173,7 +177,11 @@ resource "aws_ecs_task_definition" "api" {
         [
           {
             name  = "ALLOWED_ORIGINS"
-            value = "http://${aws_lb.main.dns_name}"
+            value = var.enable_route53 ? (var.enable_acm ? "https://${var.domain_name},https://www.${var.domain_name}" : "http://${var.domain_name}") : "http://${aws_lb.main.dns_name}"
+          },
+          {
+            name  = "PUBLIC_URL"
+            value = var.enable_route53 ? (var.enable_acm ? "https://${var.domain_name}/api" : "http://${var.domain_name}/api") : "http://${aws_lb.main.dns_name}/api"
           }
         ],
         var.enable_datadog ? [

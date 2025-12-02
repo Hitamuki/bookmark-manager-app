@@ -12,7 +12,7 @@ test('should display samples from API', async ({ page }) => {
   // If there's a specific route for samples, use await page.goto('/samples');
 
   // Make an API call to the backend to get samples
-  const response = await page.request.get('http://localhost:4000/api/samples');
+  const response = await page.request.get('http://localhost:3001/api/samples');
   expect(response.ok()).toBeTruthy();
 
   const samples = await response.json();
