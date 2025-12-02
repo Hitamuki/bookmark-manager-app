@@ -36,7 +36,7 @@
 **主要サービス:**
 
 - **Web**: Vercel（Next.js最適化、CDN、自動デプロイ）
-- **API**: Render（NestJS、自動スケーリング）
+- **API**: Fly.io（NestJS、Dockerコンテナ、常時稼働）
 - **PostgreSQL**: Supabase（無料枠、バックアップ自動化）
 - **MongoDB**: MongoDB Atlas（無料枠、クラスター管理）
 
@@ -123,7 +123,7 @@
 
 検証が完了したら、まずはコスパ重視のマネージドサービスでサービスを開始します。
 
-1. **本番環境構築**: Vercel、Render、Supabase、MongoDB Atlasの設定
+1. **本番環境構築**: Vercel、Fly.io、Supabase、MongoDB Atlasの設定
 2. **デプロイ**: Git連携による自動デプロイ
 3. **初期ユーザー獲得**: 実際のユーザーへのサービス提供開始
 4. **フィードバック収集**: ユーザーからのフィードバックを基に改善
@@ -144,7 +144,7 @@
 
 | 項目 | 検証環境 | 本番_商用利用前 | 本番_商用利用後 |
 |------|---------|----------------|----------------|
-| **ホスティング** | AWS ECS | Vercel/Render | AWS ECS |
+| **ホスティング** | AWS ECS | Vercel/Fly.io | AWS ECS |
 | **DB（PostgreSQL）** | RDS PostgreSQL | Supabase | Aurora Serverless v2 |
 | **DB（MongoDB）** | MongoDB Atlas (M0/M10) | MongoDB Atlas (M0) | MongoDB Atlas (M10〜) |
 | **CDN** | - | Vercel Edge | CloudFront |

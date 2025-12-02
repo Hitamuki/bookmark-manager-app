@@ -441,7 +441,7 @@ enable_execute_command = true
 - staging → dev、prodの時間制限をstaging
 - コスパ重視のホスティングサービスと切り分け
   - Web：Vercel
-  - API：Render
+  - API：Fly.io
   - DB（PostgreSQL）：Supabase
   - DB（MongoDB）：MongoDB Atlas
 - tfstateファイルをS3バックエンドへの移行（チーム開発時）

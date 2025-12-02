@@ -14,8 +14,8 @@ graph TD
         VWeb[Next.js Web<br>SSR + SPA]
     end
 
-    subgraph "Render"
-        RAPI[NestJS API<br>Web Service]
+    subgraph "Fly.io"
+        FAPI[NestJS API<br>Web Service]
     end
 
     subgraph "Supabase"
@@ -32,14 +32,14 @@ graph TD
     end
 
     U --> VWeb
-    VWeb --> RAPI
-    RAPI --> SPG
-    RAPI --> MA
+    VWeb --> FAPI
+    FAPI --> SPG
+    FAPI --> MA
 
     VWeb --> DD
-    RAPI --> DD
+    FAPI --> DD
     VWeb --> SN
-    RAPI --> SN
+    FAPI --> SN
 ```
 
 ## サービス構成
@@ -69,33 +69,33 @@ graph TD
   - Serverless Function実行時間: 100時間/月
 - **Pro プラン**: $20/月（商用可）
 
-### API - Render
+### API - Fly.io
 
 **選定理由:**
 
-- NestJS等のNode.jsアプリ対応
-- 自動スケーリング
-- Git連携による自動デプロイ
-- 無料枠あり
+- Node.js/Dockerコンテナ完全対応
+- 無料枠で常時稼働可能（スリープなし）
+- グローバルエッジネットワーク
+- 低レイテンシー（Tokyo リージョン）
 
 **主要機能:**
 
 - Dockerコンテナデプロイ
-- 自動スリープ（無料プラン）
+- 自動スケーリング
 - カスタムドメイン対応
-- 環境変数管理
+- 環境変数管理（Secrets）
 - ヘルスチェック
 - 自動HTTPS
+- リージョン選択（Tokyo）
 
 **料金:**
 
 - **Free プラン**: $0/月
-  - 750時間/月
-  - 15分無通信でスリープ
-  - 512MB RAM
-- **Starter プラン**: $7/月
-  - スリープなし
-  - 512MB RAM
+  - $5/月 無料クレジット付与
+  - 最大3台の共有CPU-1x、256MBマシン
+  - スリープなし（常時稼働）
+  - 100GB帯域幅/月
+  - IPv6無料（IPv4は$2/月）
 
 ### PostgreSQL - Supabase
 
@@ -197,19 +197,20 @@ graph LR
 2. main ブランチへマージ → 自動本番デプロイ
 3. 環境変数は Vercel ダッシュボードで管理
 
-### API（Render）
+### API（Fly.io）
 
 ```mermaid
 graph LR
-    A[Gitプッシュ] --> B[Render自動ビルド]
+    A[Gitプッシュ] --> B[GitHub Actions]
     B --> C[Dockerイメージビルド]
-    C --> D[デプロイ]
+    C --> D[Fly.ioデプロイ]
     D --> E[ヘルスチェック]
 ```
 
-1. main ブランチへプッシュ → 自動デプロイ
-2. render.yaml でビルド設定管理
-3. 環境変数は Render ダッシュボードで管理
+1. main ブランチへプッシュ → GitHub Actions トリガー
+2. fly.toml でデプロイ設定管理
+3. 環境変数は `flyctl secrets` で管理
+4. 自動デプロイまたは手動デプロイ選択可能
 
 ## 環境変数管理
 
@@ -225,28 +226,31 @@ SENTRY_DSN=https://...
 DATADOG_API_KEY=...
 ```
 
-### Render
+### Fly.io
 
 ```bash
-# render.yaml
-env:
-  - key: DATABASE_URL
-    sync: false  # ダッシュボードで設定
-  - key: MONGODB_URI
-    sync: false
-  - key: NODE_ENV
-    value: production
+# Fly.io Secrets（暗号化環境変数）
+flyctl secrets set DATABASE_URL="postgresql://..."
+flyctl secrets set MONGODB_URI="mongodb+srv://..."
+flyctl secrets set DD_API_KEY="..."
+flyctl secrets set SENTRY_DSN="..."
+
+# fly.toml（非機密情報）
+[env]
+  NODE_ENV = "production"
+  ENVIRONMENT = "preview"
+  PORT = "8080"
 ```
 
 ### Supabase
 
 - Connection String: Supabaseダッシュボードから取得
-- 環境変数としてRenderへ設定
+- 環境変数としてFly.ioへ設定
 
 ### MongoDB Atlas
 
 - Connection String: Atlasダッシュボードから取得
-- 環境変数としてRenderへ設定
+- 環境変数としてFly.ioへ設定
 
 ## セキュリティ
 
@@ -258,7 +262,7 @@ env:
 ### HTTPS/TLS
 
 - Vercel: 自動HTTPS
-- Render: 自動HTTPS
+- Fly.io: 自動HTTPS
 - Supabase: 強制HTTPS
 - MongoDB Atlas: TLS 1.2以上
 
@@ -292,11 +296,11 @@ env:
 - 自動スケーリング
 - Edge Network による分散配信
 
-### Render
+### Fly.io
 
-- Free プラン: スケーリングなし
-- Starter プラン以上: 垂直スケーリング（手動）
-- Standard プラン以上: 水平スケーリング対応
+- Free プラン: 垂直スケーリング（手動）
+- 水平スケーリング: 複数リージョンへのデプロイ可能
+- 自動スケーリング: マシン数の動的調整
 
 ### データベース
 
@@ -310,7 +314,7 @@ env:
 | サービス      | プラン    | 月額   |
 | ------------- | --------- | ------ |
 | Vercel        | Hobby     | $0     |
-| Render        | Free      | $0     |
+| Fly.io        | Free      | $0     |
 | Supabase      | Free      | $0     |
 | MongoDB Atlas | M0        | $0     |
 | Datadog       | Free      | $0     |
@@ -322,12 +326,12 @@ env:
 | サービス      | プラン         | 月額    |
 | ------------- | -------------- | ------- |
 | Vercel        | Pro            | $20     |
-| Render        | Starter        | $7      |
+| Fly.io        | Free（十分）   | $0      |
 | Supabase      | Free           | $0      |
 | MongoDB Atlas | M0             | $0      |
 | Datadog       | Pro（1ホスト） | $15     |
 | Sentry        | Team           | $26     |
-| **合計**      |                | **$68** |
+| **合計**      |                | **$61** |
 
 ## 制限事項
 
@@ -337,11 +341,12 @@ env:
 - チーム機能なし
 - カスタム認証制限
 
-### Render Free プラン
+### Fly.io Free プラン
 
-- 15分無通信でスリープ
-- 起動に数秒〜数十秒かかる
-- メモリ512MB制限
+- スリープなし（常時稼働）
+- メモリ256MB（共有CPU-1x）
+- $5/月の無料クレジット内で運用
+- 無料クレジット超過時は従量課金
 
 ### Supabase Free プラン
 
@@ -376,11 +381,11 @@ env:
 | サービス      | プラン    | 月額    |
 | ------------- | --------- | ------- |
 | Vercel        | Pro       | $20     |
-| Render        | Starter   | $7      |
+| Fly.io        | Free      | $0      |
 | Supabase      | Free      | $0      |
 | MongoDB Atlas | M0        | $0      |
 | Sentry        | Developer | $0      |
-| **合計**      |           | **$27** |
+| **合計**      |           | **$20** |
 
 ## AWS環境への移行
 
@@ -411,6 +416,6 @@ env:
 ## 参考リンク
 
 - [Vercel Documentation](https://vercel.com/docs)
-- [Render Documentation](https://render.com/docs)
+- [Fly.io Documentation](https://fly.io/docs/)
 - [Supabase Documentation](https://supabase.com/docs)
 - [MongoDB Atlas Documentation](https://www.mongodb.com/docs/atlas/)
