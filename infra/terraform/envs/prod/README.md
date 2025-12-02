@@ -1319,8 +1319,11 @@ aws application-autoscaling describe-scaling-policies \
 ```bash
 cd infra/terraform/envs/prod
 
-# 削除保護を無効化（database/terragrunt.hcl, compute/terragrunt.hcl を編集）
+# 削除保護を無効化（database/terragrunt.hcl, compute/terragrunt.hcl, ecr/terragrunt.hcl を編集）
 # deletion_protection = false に変更
+# skip_final_snapshot = true に変更
+# force_delete = true に変更
+# 変更後terragrunt applyで更新
 
 # 逆順で削除
 cd compute && terragrunt destroy

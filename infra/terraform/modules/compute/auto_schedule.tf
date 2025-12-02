@@ -5,7 +5,7 @@
 # Lambda関数のアーカイブ作成
 # 注意: Lambda関数はTypeScriptで記述されていますが、デプロイ前に
 # JavaScriptにトランスパイルする必要があります。
-# 手順: cd infra/terraform/modules/compute/lambda && npx esbuild ecs_scheduler.ts --bundle --platform=node --target=node20 --outfile=ecs_scheduler.js
+# 手順: cd infra/terraform/modules/compute/lambda && npx esbuild ecs_scheduler.ts --bundle --platform=node --target=node22 --outfile=ecs_scheduler.js
 data "archive_file" "ecs_scheduler" {
   count       = var.enable_auto_schedule ? 1 : 0
   type        = "zip"
@@ -80,7 +80,7 @@ resource "aws_lambda_function" "ecs_scheduler" {
   role             = aws_iam_role.ecs_scheduler_lambda[0].arn
   handler          = "ecs_scheduler.handler"
   source_code_hash = data.archive_file.ecs_scheduler[0].output_base64sha256
-  runtime          = "nodejs20.x"
+  runtime          = "nodejs22.x"
   timeout          = 60
   memory_size      = 128
 
