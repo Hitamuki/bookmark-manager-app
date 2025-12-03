@@ -25,7 +25,7 @@
 | [Session Manager Plugin](https://docs.aws.amazon.com/systems-manager/latest/userguide/what-is-systems-manager.html) | AWS Systems Manager（SSM） の機能の一部として動作するツールで、ローカル端末から AWS 上の EC2 インスタンスやその他のリソースに安全に接続するためのクライアント側コンポーネント |                                                                            |                                       |
 | [Terraform](https://developer.hashicorp.com/terraform/docs)                                                         | IaC（Infrastructure as Code）ツール。AWSリソースの構築・変更・削除をコードで管理                                                                                              |                                                                            |                                       |
 | [Terragrunt](https://terragrunt.gruntwork.io/docs/)                                                                 | Terraformのラッパーツール。肥大化しがちなtfファイルをモジュール単位で小さく管理可能                                                                                           |                                                                            |                                       |
-| [terraform-docs](https://terraform-docs.io/)                                                                        | Terraformコードから自動的にドキュメントを生成するためのツール                                                                                                                 |                                                                            |                                       |
+| [Terraform Docs](https://terraform-docs.io/)                                                                        | Terraformコードから自動的にドキュメントを生成するためのツール                                                                                                                 |                                                                            |                                       |
 | [TFLint](https://github.com/terraform-linters/tflint)                                                               | Terraformコードの品質を向上させるための静的解析ツール                                                                                                                         |                                                                            |                                       |
 | [Datadog](https://docs.datadoghq.com/ja/)                                                                           | モニタリング                                                                                                                                                                  |                                                                            |                                       |
 | [Sentry](https://docs.sentry.io/)                                                                                   | エラートラッキング / パフォーマンス監視                                                                                                                                       |                                                                            |                                       |
@@ -426,11 +426,177 @@ ECSサービスで`enableExecuteCommand`を有効にする必要があります�
 enable_execute_command = true
 ```
 
+## 使用方法
+
+### Terraform
+
+基本的なTerraformコマンド（個別モジュールで実行）
+
+```bash
+# 作業ディレクトリの初期化
+terraform init
+# 実行計画の確認
+terraform plan
+# 実行計画をファイルに保存
+terraform plan -out=tfplan
+# インフラの構築/変更
+terraform apply
+# 保存した実行計画を適用
+terraform apply tfplan
+# 構文検証
+terraform validate
+# フォーマット（現在のディレクトリ）
+terraform fmt
+# フォーマット（再帰的）
+terraform fmt -recursive
+# 出力値の確認
+terraform output
+# JSON形式で出力値を確認
+terraform output -json
+# 現在の状態を確認
+terraform show
+# 状態ファイル内のリソース一覧
+terraform state list
+# 特定のリソースの状態を確認
+terraform state show <リソース名>
+# インフラの削除
+terraform destroy
+```
+
+### Terragrunt
+
+Terragruntコマンド（Terraformのラッパー）
+
+```bash
+# 個別モジュールの操作
+cd infra/terraform/envs/staging/<module-name>
+# 初期化
+terragrunt run init
+# 実行計画の確認
+terragrunt run plan
+# 構築/変更
+terragrunt run apply
+# 削除
+terragrunt run destroy
+# 出力値の確認
+terragrunt run output
+# 状態確認
+terragrunt run show
+terragrunt run state list
+# 構文検証
+terragrunt run validate
+
+# 全モジュールの一括操作
+cd infra/terraform/envs/staging
+# 全モジュール初期化
+terragrunt run --all init
+# 全モジュールの実行計画確認
+terragrunt run --all plan
+# 全モジュールを構築（依存関係順に自動実行）
+terragrunt run --all apply
+# 全モジュールの状態確認
+terragrunt run --all state list
+# 全モジュールを削除
+terragrunt run --all destroy
+# Terragruntの設定ファイルフォーマット
+terragrunt hcl fmt
+# Terragruntキャッシュクリア
+find . -type d -name ".terragrunt-cache" -exec rm -rf {} +
+```
+
+**Terragruntの便利なオプション**:
+
+```bash
+# 依存関係を無視して実行（注意して使用）
+terragrunt run --all apply --terragrunt-ignore-dependency-errors
+# 特定のモジュールを除外
+terragrunt run --all apply --terragrunt-exclude-dir network
+# 特定のモジュールのみ実行
+terragrunt run --all apply --terragrunt-include-dir compute
+# 並列実行数を指定（デフォルト: 自動）
+terragrunt run --all apply --terragrunt-parallelism 2
+```
+
+### TFLint
+
+Terraformコードの静的解析ツール。
+
+```bash
+# 初回のみ: プラグインのインストール
+cd infra/terraform
+tflint --init
+# 現在のディレクトリをリント
+tflint
+# 再帰的にリント（全モジュール）
+tflint --recursive
+# 設定ファイルを明示的に指定
+tflint --recursive --config "$(pwd)/.tflint.hcl"
+# フォーマット指定
+tflint --format compact   # コンパクト形式
+tflint --format json      # JSON形式
+tflint --format checkstyle # Checkstyle形式
+# 特定のルールを有効化/無効化
+tflint --enable-rule <rule-name>
+tflint --disable-rule <rule-name>
+# 修正可能な問題を自動修正
+tflint --fix
+```
+
+**TFLintの設定ファイル**: [.tflint.hcl](terraform/.tflint.hcl)
+
+### terraform-docs
+
+Terraformモジュールのドキュメント自動生成ツール。
+
+#### コマンド
+
+```bash
+# terraform/ ルートで実行
+cd infra/terraform
+terraform-docs markdown table . --config .terraform-docs.yml --recursive > README.md
+```
+
+#### 備考
+
+- README.mdにマジックコメントを追加し、terraform-docsを実行すると、`<!-- BEGIN_TF_DOCS -->`と`<!-- END_TF_DOCS -->`の間だけが更新される
+
+    ```markdown
+    # Storage Module
+
+    このモジュールはS3バケットを管理する
+
+    <!-- BEGIN_TF_DOCS -->
+    <!-- END_TF_DOCS -->
+
+    ## 使用例
+
+    ...
+    ```
+
+**terraform-docsの設定ファイル**: [.terraform-docs.yml](terraform/.terraform-docs.yml)
+
+### 組み合わせワークフロー
+
+実際の開発フローでの使用例。
+
+```bash
+# 1. コードを編集後、フォーマット
+terraform fmt -recursive
+# 2. リントで問題がないか確認
+tflint --recursive
+# 3. 構文検証
+terragrunt run validate
+# 4. ドキュメント生成
+terraform-docs markdown table . --config .terraform-docs.yml --recursive > README.md
+# 5. 実行計画の確認
+terragrunt run plan
+# 6. 問題なければ適用
+terragrunt run apply
+```
+
 ### TODO
 
 - マイグレーション自動実行
-- Terraformでインフラ構築
-  - terraform-docs導入
 - CI/CD構築
   - GitHub ActionsでTerragruntを使用したAWSデプロイ
   - ECRへのコンテナイメージプッシュ自動化
