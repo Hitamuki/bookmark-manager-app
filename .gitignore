@@ -640,3 +640,6 @@ security/dast/**/reports
 
 # MCP Server
 .mcp.json
+
+# Terraform docsの再起実行によるルートディレクトリに生成されるファイルを無視
+infra/terraform/README.md
