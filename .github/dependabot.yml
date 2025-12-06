@@ -1,0 +1,17 @@
+version: 2
+updates:
+  # Nx
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    # PoCやSandboxを監視しない
+    exclude-paths:
+      - "poc/**"
+      - "sandbox/**"
+      - "docs/**"
+
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
