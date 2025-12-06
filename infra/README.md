@@ -594,6 +594,12 @@ terragrunt run plan
 terragrunt run apply
 ```
 
+## 注意事項
+
+- AWSで手動作成したリソースは手動で削除する
+  - Secrets Manager
+  - Systems Manager > パラメータストア
+
 ### TODO
 
 - マイグレーション自動実行
