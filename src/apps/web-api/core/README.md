@@ -79,6 +79,10 @@ pnpm generate:api-client
 pnpm exec nx run api-core:test
 ```
 
+## 注意事項
+
+- ローカルDBサーバー起動は「infra/docker」から
+
 ## ToDo
 
 - ビルド前に「pnpm nx reset」を実行しないと挙動が不正確になる

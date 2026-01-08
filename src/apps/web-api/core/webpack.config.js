@@ -2,8 +2,10 @@ const { NxAppWebpackPlugin } = require('@nx/webpack/app-plugin');
 const { join } = require('node:path');
 
 module.exports = {
+  devtool: 'source-map',
   output: {
     path: join(__dirname, '../../../../dist/src/apps/web-api/core'),
+    devtoolModuleFilenameTemplate: '[absolute-resource-path]',
   },
   plugins: [
     new NxAppWebpackPlugin({
